@@ -31,8 +31,8 @@
     "react-hook-form": "^7.50.0",
     "tailwind-merge": "^2.2.1",
     "tailwindcss-animate": "^1.0.7",
-    "viem": "^2.7.1",
-    "wagmi": "^2.5.5"
+    "viem": "^1.21.4",
+    "wagmi": "^1.4.13"
   },
   "devDependencies": {
     "@types/node": "^20",
