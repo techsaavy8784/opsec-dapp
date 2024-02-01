@@ -1,17 +1,17 @@
-"use client";
+"use client"
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react"
 import {
   RainbowKitProvider,
   getDefaultWallets,
   connectorsForWallets,
-} from "@rainbow-me/rainbowkit";
+} from "@rainbow-me/rainbowkit"
 import {
   argentWallet,
   trustWallet,
   ledgerWallet,
-} from "@rainbow-me/rainbowkit/wallets";
-import { configureChains, createConfig, WagmiConfig } from "wagmi";
+} from "@rainbow-me/rainbowkit/wallets"
+import { configureChains, createConfig, WagmiConfig } from "wagmi"
 import {
   mainnet,
   polygon,
@@ -20,8 +20,8 @@ import {
   base,
   zora,
   goerli,
-} from "wagmi/chains";
-import { publicProvider } from "wagmi/providers/public";
+} from "wagmi/chains"
+import { publicProvider } from "wagmi/providers/public"
 
 const { chains, publicClient, webSocketPublicClient } = configureChains(
   [
@@ -34,19 +34,19 @@ const { chains, publicClient, webSocketPublicClient } = configureChains(
     ...(process.env.NEXT_PUBLIC_ENABLE_TESTNETS === "true" ? [goerli] : []),
   ],
   [publicProvider()],
-);
+)
 
-const projectId = process.env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID ?? "";
+const projectId = process.env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID ?? ""
 
 const { wallets } = getDefaultWallets({
   appName: "RainbowKit demo",
   projectId,
   chains,
-});
+})
 
 const demoAppInfo = {
   appName: "Rainbowkit Demo",
-};
+}
 
 const connectors = connectorsForWallets([
   ...wallets,
@@ -58,19 +58,19 @@ const connectors = connectorsForWallets([
       ledgerWallet({ projectId, chains }),
     ],
   },
-]);
+])
 
 const wagmiConfig = createConfig({
   autoConnect: true,
   connectors,
   publicClient,
   webSocketPublicClient,
-});
+})
 
 export function Providers({ children }: { children: React.ReactNode }) {
-  const [mounted, setMounted] = useState(false);
+  const [mounted, setMounted] = useState(false)
 
-  useEffect(() => setMounted(true), []);
+  useEffect(() => setMounted(true), [])
 
   return (
     <WagmiConfig config={wagmiConfig}>
@@ -78,5 +78,5 @@ export function Providers({ children }: { children: React.ReactNode }) {
         {mounted && children}
       </RainbowKitProvider>
     </WagmiConfig>
-  );
+  )
 }
