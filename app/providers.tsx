@@ -6,7 +6,6 @@ import {
   getDefaultWallets,
   connectorsForWallets,
 } from "@rainbow-me/rainbowkit";
-import { ChakraProvider } from "@chakra-ui/react";
 import {
   argentWallet,
   trustWallet,
@@ -74,12 +73,10 @@ export function Providers({ children }: { children: React.ReactNode }) {
   useEffect(() => setMounted(true), []);
 
   return (
-    <ChakraProvider>
-      <WagmiConfig config={wagmiConfig}>
-        <RainbowKitProvider chains={chains} appInfo={demoAppInfo}>
-          {mounted && children}
-        </RainbowKitProvider>
-      </WagmiConfig>
-    </ChakraProvider>
+    <WagmiConfig config={wagmiConfig}>
+      <RainbowKitProvider chains={chains} appInfo={demoAppInfo}>
+        {mounted && children}
+      </RainbowKitProvider>
+    </WagmiConfig>
   );
 }
