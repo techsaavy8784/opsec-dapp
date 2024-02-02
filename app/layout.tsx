@@ -3,6 +3,7 @@ import { Inter } from "next/font/google"
 import { Providers } from "./providers"
 import "@rainbow-me/rainbowkit/styles.css"
 import "./globals.css"
+import { Sidebar } from "@/components/sidebar"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -18,9 +19,12 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
-      <body className={inter.className}>
+      <body
+        className={`${inter.className} bg-[url(/backgrounds/dashboard.png)] min-h-screen`}
+      >
         <Providers>
-          <main className="dark flex min-h-screen flex-col items-center justify-between p-24">
+          <main className="dark flex">
+            <Sidebar />
             {children}
           </main>
         </Providers>
