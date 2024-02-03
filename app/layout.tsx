@@ -4,6 +4,8 @@ import { Providers } from "./providers"
 import "@rainbow-me/rainbowkit/styles.css"
 import "./globals.css"
 import { Sidebar } from "@/components/sidebar"
+import { Footer } from "@/components/footer"
+import { Navbar } from "@/components/navbar"
 
 const inter = Inter({ subsets: ["latin"] })
 
@@ -20,12 +22,16 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${inter.className} bg-[url(/backgrounds/dashboard.png)] min-h-screen`}
+        className={`${inter.className} bg-[url(/backgrounds/dashboard.png)] bg-cover min-h-screen`}
       >
         <Providers>
           <main className="dark flex">
             <Sidebar />
-            {children}
+            <div className="relative w-full">
+              <Navbar />
+              {children}
+            </div>
+            <Footer />
           </main>
         </Providers>
       </body>
