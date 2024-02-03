@@ -1,6 +1,7 @@
 import Image from "next/image"
 import React from "react"
 import { Button } from "@/components/ui/button"
+import { PaymentModal } from "../payment-modal"
 import { FaArrowRightLong } from "react-icons/fa6"
 
 type Props = {
@@ -34,13 +35,14 @@ export const NodeCard = ({ shop }: Props) => {
           contributions.
         </p>
       </div>
-      <Button
-        type="button"
-        className="text-white font-[600] text-[16px] bg-[#F44336] hover:bg-[#fe3b2d] rounded-[12px]"
-      >
-        {shop ? "Run a node" : "Start"}{" "}
-        <FaArrowRightLong className="ml-2 font-[300]" />
-      </Button>
+      {shop ? (
+        <PaymentModal />
+      ) : (
+        <Button type="button" variant="custom">
+          Start
+          <FaArrowRightLong className="ml-2 font-[300]" />
+        </Button>
+      )}
     </div>
   )
 }

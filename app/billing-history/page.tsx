@@ -40,7 +40,7 @@ const BillingHistory = () => {
                 OS-5627415
               </TableCell>
               <TableCell className="text-[14px] font-[500] text-[#F44336]">
-                <div className="flex items-center gap-1 ">
+                <div className="flex items-center gap-2 ">
                   <Image
                     src="/icons/money-send.svg"
                     alt="money-sent"
@@ -51,7 +51,7 @@ const BillingHistory = () => {
                 </div>
               </TableCell>
               <TableCell className="text-[14px] font-[500] text-white">
-                <div className="flex items-center gap-1 ">
+                <div className="flex items-center gap-2 ">
                   <Image
                     src="/icons/tag.svg"
                     alt="money-sent"
@@ -62,12 +62,13 @@ const BillingHistory = () => {
                 </div>
               </TableCell>
               <TableCell className="text-[14px] font-[500] text-white">
-                <div className="flex items-center gap-1 ">
+                <div className="flex items-center gap-2 ">
                   <Image
                     src="/icons/token.svg"
                     alt="money-sent"
                     width={18}
                     height={18}
+                    className="translate-y-[-1px]"
                   />
                   BTC
                 </div>
@@ -76,7 +77,16 @@ const BillingHistory = () => {
                 Success
               </TableCell>
               <TableCell className="text-[14px] font-[500] text-white">
-                Jan 07, 2024
+                <div className="flex items-center gap-2">
+                  <Image
+                    src="/icons/calendar.svg"
+                    alt="money-sent"
+                    width={18}
+                    height={18}
+                    className="translate-y-[-2px]"
+                  />
+                  Jan 07, 2024
+                </div>
               </TableCell>
             </TableRow>
           </TableBody>
