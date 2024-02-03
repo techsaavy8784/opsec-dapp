@@ -49,8 +49,8 @@ const Sidebar = () => {
                 <div
                   className={`w-[16px] h-[16px] transition-all duration-200 absolute top-0 left-0 -translate-x-[6.5px] translate-y-[16px] rotate-45 border-t-2 border-r-2 border-t-white border-r-white`}
                 />
-                <div className="w-[2px] h-[20px] transition-all duration-200 bg-white absolute top-0  -translate-y-[6px] left-0" />
-                <div className="w-[2px] h-[20px] transition-all duration-200 bg-white absolute top-full  -translate-y-[18px] left-0" />
+                <div className="w-[1.5px] h-[20px] transition-all duration-200 bg-white absolute top-0  -translate-y-[6.3px] left-0" />
+                <div className="w-[1.5px] h-[20px] transition-all duration-200 bg-white absolute top-full  -translate-y-[17.8px] left-0" />
               </>
             )}
           </Link>
