@@ -1,13 +1,11 @@
 import type { Metadata } from "next"
-import { Inter } from "next/font/google"
+import { gilroy } from "@/fonts/gilroy"
 import { Providers } from "./providers"
 import "@rainbow-me/rainbowkit/styles.css"
 import "./globals.css"
 import { Sidebar } from "@/components/sidebar"
 import { Footer } from "@/components/footer"
 import { Navbar } from "@/components/navbar"
-
-const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -22,7 +20,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${inter.className} bg-[url(/backgrounds/dashboard.png)] bg-cover min-h-screen`}
+        className={`${gilroy.className} bg-[url(/backgrounds/dashboard.png)] bg-cover min-h-screen`}
       >
         <Providers>
           <main className="dark flex">
