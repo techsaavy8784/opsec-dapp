@@ -24,7 +24,7 @@ export const Navbar = () => {
   }
   return (
     <div className="sticky top-0 left-0 z-[10] w-full">
-      <nav className="px-12 py-8 grid grid-cols-5 items-start">
+      <nav className="py-8 grid grid-cols-5 items-start">
         <div className="col-span-4">{renderNavbar()}</div>
         <div className="col-span-1 rounded-[12px] border-2 border-[#FFFFFF80] mt-3">
           <div className="py-3 px-4 flex items-center gap-3 justify-center">
