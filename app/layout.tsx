@@ -25,7 +25,7 @@ export default function RootLayout({
         <Providers>
           <main className="dark flex">
             <Sidebar />
-            <div className="relative w-full px-12 ">
+            <div className="relative w-full pr-8">
               <Navbar />
               {children}
             </div>

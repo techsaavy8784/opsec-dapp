@@ -3,7 +3,11 @@ import React from "react"
 import { Button } from "@/components/ui/button"
 import { FaArrowRightLong } from "react-icons/fa6"
 
-export const NodeCard = () => {
+type Props = {
+  shop?: boolean
+}
+
+export const NodeCard = ({ shop }: Props) => {
   return (
     <div
       style={{
@@ -34,7 +38,8 @@ export const NodeCard = () => {
         type="button"
         className="text-white font-[600] text-[16px] bg-[#F44336] hover:bg-[#fe3b2d] rounded-[12px]"
       >
-        Start <FaArrowRightLong className="ml-2 font-[300]" />
+        {shop ? "Run a node" : "Start"}{" "}
+        <FaArrowRightLong className="ml-2 font-[300]" />
       </Button>
     </div>
   )
