@@ -1,14 +1,18 @@
+"use client"
+
 import Image from "next/image"
 import React from "react"
 import { Button } from "@/components/ui/button"
 import { PaymentModal } from "../payment-modal"
 import { FaArrowRightLong } from "react-icons/fa6"
+import { useRouter } from "next/navigation"
 
 type Props = {
   shop?: boolean
 }
 
 export const NodeCard = ({ shop }: Props) => {
+  const router = useRouter()
   return (
     <div
       style={{
@@ -38,7 +42,11 @@ export const NodeCard = ({ shop }: Props) => {
       {shop ? (
         <PaymentModal />
       ) : (
-        <Button type="button" variant="custom">
+        <Button
+          type="button"
+          onClick={() => router.push("/dashboard/123")}
+          variant="custom"
+        >
           Start
           <FaArrowRightLong className="ml-2 font-[300]" />
         </Button>
