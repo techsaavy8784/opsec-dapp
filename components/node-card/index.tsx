@@ -12,7 +12,11 @@ type Props = {
 }
 
 export const NodeCard = ({ shop }: Props) => {
+  const [slide, setSlide] = React.useState(0)
   const router = useRouter()
+  const [data, setData] = React.useState({
+    walletAddress: "",
+  })
   return (
     <div
       style={{
@@ -40,7 +44,12 @@ export const NodeCard = ({ shop }: Props) => {
         </p>
       </div>
       {shop ? (
-        <PaymentModal />
+        <PaymentModal
+          data={data}
+          setData={setData}
+          slide={slide}
+          setSlide={setSlide}
+        />
       ) : (
         <Button
           type="button"
