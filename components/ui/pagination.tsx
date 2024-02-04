@@ -47,7 +47,9 @@ const PaginationLink = ({
   <a
     aria-current={isActive ? "page" : undefined}
     className={cn(
-      `h-[35px] w-[35px] text-[12px] font-[500] bg-white rounded-[13px] flex items-center justify-center ${isActive ? "bg-[#F44336]" : "bg-[#FFFFFF1C]"}`,
+      `h-[35px] w-[35px] text-[12px] font-[500] bg-white rounded-[13px] flex items-center justify-center ${
+        isActive ? "bg-[#F44336]" : "bg-[#FFFFFF1C]"
+      }`,
       className,
     )}
     {...props}

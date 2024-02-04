@@ -36,11 +36,17 @@ const Sidebar = () => {
         {navItems?.map((item, index) => (
           <Link
             href={item?.path}
-            className={`relative py-3 ${item.path === pathName ? "" : "border-l-2 border-[#FFFFFF66]"}`}
+            className={`relative py-3 ${
+              item.path === pathName ? "" : "border-l-2 border-[#FFFFFF66]"
+            }`}
             key={index}
           >
             <h1
-              className={`pl-10 ${pathName === item?.path ? "text-white font-[600] " : "text-[#FFFFFF80] font-[500] "} cursor-pointer transition-all duration-200 text-lg`}
+              className={`pl-10 ${
+                pathName === item?.path
+                  ? "text-white font-[600] "
+                  : "text-[#FFFFFF80] font-[500] "
+              } cursor-pointer transition-all duration-200 text-lg`}
             >
               {item.name}
             </h1>

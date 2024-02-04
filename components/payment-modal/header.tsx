@@ -40,7 +40,9 @@ export const Header = ({ title, description, pay, loading }: Props) => {
             </div>
           </div>
           <p
-            className={`font-[monaco] text-[16px] font-[400] ${loading ? "text-[#FFEB3B]" : "text-[#10B981]"}`}
+            className={`font-[monaco] text-[16px] font-[400] ${
+              loading ? "text-[#FFEB3B]" : "text-[#10B981]"
+            }`}
           >
             {loading ? "Waiting for your payment" : "Successfully Paid"}
           </p>

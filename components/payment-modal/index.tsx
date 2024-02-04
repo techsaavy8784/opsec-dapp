@@ -60,7 +60,9 @@ export const PaymentModal = ({ data, setData, setSlide, slide }: Props) => {
         </Button>
       </DialogTrigger>
       <DialogContent
-        className={`bg-[#0E111C] border-none rounded-[24px] p-8 ${slide === 0 ? "" : "w-[370px]"}`}
+        className={`bg-[#0E111C] border-none rounded-[24px] p-8 ${
+          slide === 0 ? "" : "w-[370px]"
+        }`}
       >
         {renderHeader()}
         <form className="flex items-center justify-center flex-col px-8 gap-8">
