@@ -63,7 +63,7 @@ const uptime = [
 const Node = () => {
   return (
     <CardWrapper>
-      <div className="grid grid-cols-3 items-center gap-10">
+      <div className="grid grid-cols-1 md:grid-cols-3 items-center gap-10">
         <div className="col-span-1">
           <NodeData active title="Nodes Stats" stats={node} />
         </div>
