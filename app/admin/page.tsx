@@ -1,4 +1,14 @@
 "use client"
+import { Button } from "@/components/ui/button"
+import { Label } from "@/components/ui/label"
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table"
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 type Node = {
@@ -16,30 +26,42 @@ const Page = () => {
       const response = await fetch("/api/nodes")
       const data = await response.json()
       console.log(data)
-      setNodes(data)
+      setNodes(data.data)
     }
     fetchData()
   }, [])
-  if (!nodes) return <div>Loading...</div>
+  console.log(nodes)
+  if (!nodes || !Array.isArray(nodes)) return <div>Loading...</div>
 
   return (
     <div>
-      <h1>Admin Page</h1>
-      <h1>Available Nodes</h1>
-      <div>
-        {nodes.map((node) => (
-          <div key={node.name}>
-            <h2>{node.name}</h2>
-            <p>{node.description}</p>
-            <p>Fee: {node.fee}</p>
-            <p>Duration: {node.duration}</p>
-            <button onClick={() => router.push(`/${node.id}/edit`)}>
-              {" "}
-              Edit
-            </button>
-          </div>
-        ))}
+      <div className="w-full h-full flex justify-between items-center">
+        <Label className="text-white">Nodes</Label>
+        <Button onClick={() => router.push("/admin/addnode")}>Add Node</Button>
       </div>
+      <Table>
+        <TableHeader>
+          <TableHead>Name</TableHead>
+          <TableHead>Fee</TableHead>
+          <TableHead>Description</TableHead>
+          <TableHead>Edit</TableHead>
+        </TableHeader>
+        <TableBody>
+          {nodes.map((node) => (
+            <TableRow key={node.id}>
+              <TableCell className="text-white">{node.name}</TableCell>
+              <TableCell className="text-white">{node.fee}</TableCell>
+              <TableCell className="text-white">{node.description}</TableCell>
+              <TableCell>
+                <Button onClick={() => router.push(`/admin/${node.id}/edit`)}>
+                  {" "}
+                  Edit
+                </Button>
+              </TableCell>
+            </TableRow>
+          ))}
+        </TableBody>
+      </Table>
     </div>
   )
 }

@@ -1,5 +1,6 @@
 // This is your Prisma schema file,
 // learn more about it in the docs: https://pris.ly/d/prisma-schema
+
 generator client {
     provider = "prisma-client-js"
 }
@@ -9,9 +10,43 @@ datasource db {
     url      = env("DATABASE_URL")
 }
 
-model User {
-    id    Int     @id @default(autoincrement())
-    email String  @unique
-    name  String?
-    role  Int     @default(0)
+model user {
+    id            Int             @unique @default(autoincrement())
+    address       String          @unique
+    name          String?
+    role          Int             @default(0)
+    running_nodes running_nodes[]
+    payments      payments[]
+}
+
+model node_brand {
+    id          Int     @id @default(autoincrement())
+    name        String
+    fee         Float
+    description String?
+}
+
+model running_nodes {
+    id       Int      @id @default(autoincrement())
+    user_id  Int
+    name     String
+    duration Int
+    start    DateTime
+    end      DateTime
+    paid     Boolean
+    user     user?    @relation(fields: [userId], references: [id])
+    userId   Int?
+}
+
+model payments {
+    id        Int      @id @default(autoincrement())
+    address   String
+    amount    Int
+    user_id   Int
+    node_name String
+    txn_hash  String
+    duration  Int
+    date      DateTime @default(now())
+    user      user?    @relation(fields: [userId], references: [id])
+    userId    Int?
 }
