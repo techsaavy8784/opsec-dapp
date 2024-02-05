@@ -95,7 +95,7 @@ function EditForm() {
     toast({
       title: "Success",
       description: "Node updated Successfully!",
-      variant: "success",
+      variant: "default",
     })
     console.log(data)
     setSubmitting(false)

@@ -9,6 +9,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
+import { signOut } from "next-auth/react"
 import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 type Node = {
@@ -62,6 +63,9 @@ const Page = () => {
           ))}
         </TableBody>
       </Table>
+      <div className="">
+        <Button onClick={() => signOut()}>Sign Out</Button>
+      </div>
     </div>
   )
 }

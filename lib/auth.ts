@@ -1,67 +1,75 @@
-// import { NextAuthOptions } from 'next-auth'
-// import CredentialsProvider from 'next-auth/providers/credentials'
-// import { PrismaAdapter } from '@next-auth/prisma-adapter'
-// import { db } from './db'
+import { NextAuthOptions } from "next-auth"
+import CredentialsProvider from "next-auth/providers/credentials"
+import { db } from "./db"
+import { compare } from "bcrypt"
+import { PrismaAdapter } from "@next-auth/prisma-adapter"
 
-// export const authOptions: NextAuthOptions = {
-//     adapter: PrismaAdapter(db),
-//     secret: process.env.NEXTAUTH_SECRET,
-//     session: {
-//         strategy: 'jwt',
-//     },
-//     pages: {
-//         signIn: '/login',
-//     },
-//     providers: [
-//         CredentialsProvider({
-//             name: 'Credentials',
-//             credentials: {
-//                 address: { label: 'Address', type: 'text' }
-//             },
-//             async authorize(credentials, req) {
-//                 if (!credentials || !credentials.address) {
-//                     return null
-//                 }
+export const authOptions: NextAuthOptions = {
+  adapter: PrismaAdapter(db),
+  secret: process.env.NEXTAUTH_SECRET,
+  session: {
+    strategy: "jwt",
+  },
+  pages: {
+    signIn: "/adminlogin",
+    error: "/error",
+  },
+  providers: [
+    CredentialsProvider({
+      name: "Credentials",
+      credentials: {
+        email: {
+          label: "Email",
+          type: "email",
+          placeholder: "based@opsec.org",
+        },
+        password: { label: "Password", type: "password" },
+      },
+      async authorize(credentials) {
+        if (!credentials || !credentials.email || !credentials.password) {
+          return null
+        }
 
-//                 const user = await db.user.findUnique({
-//                     where: { address: credentials.address },
-//                 })
+        const user = await db.admin.findUnique({
+          where: { email: credentials.email },
+        })
 
-//                 if (!user) {
-//                     return null
-//                 }
-//                 const isAdmin = user.role === 1
-//                 if (!isAdmin) {
-//                     return null
-//                 }
+        if (!user) {
+          return null
+        }
 
-//                 return {
-//                     id: user.id.toString(),
-//                     address: user.address,
-//                     role: user.role,
-//                 }
-//             },
-//         }),
-//     ],
+        const isPasswordMatch = await compare(
+          credentials.password,
+          user.password,
+        )
 
-//     callbacks: {
-//         async jwt({ token, user }) {
-//             if (user) {
-//                 token.id = user.id
-//                 token.address = user.address
-//                 token.role = user.role
-//             }
-//             return token
-//         },
-//         async session({ session, token }) {
-//             session.user = {
-//                 ...session.user,
-//                 id: token.id as number,
-//                 address: token.address as string,
-//                 role: token.role as number,
-//             }
+        if (!isPasswordMatch) {
+          return null
+        }
 
-//             return session
-//         },
-//     },
-// }
+        return {
+          id: user.id.toString(),
+          email: user.email,
+        }
+      },
+    }),
+  ],
+
+  callbacks: {
+    async jwt({ token, user }) {
+      if (user) {
+        token.id = user.id
+        token.email = user.email
+      }
+      return token
+    },
+    async session({ session, token }) {
+      session.user = {
+        ...session.user,
+        email: token.email as string,
+      }
+
+      return session
+    },
+  },
+}

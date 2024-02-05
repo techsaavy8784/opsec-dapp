@@ -1,10 +1,16 @@
+import { authOptions } from "@/lib/auth"
 import { db } from "@/lib/db"
+import { getServerSession } from "next-auth"
 import { NextResponse, NextRequest } from "next/server"
 type Data = {
   fee: number | undefined
   description: string | undefined
 }
 export async function POST(req: NextRequest) {
+  const session = await getServerSession(authOptions)
+  if (!session) {
+    return NextResponse.json({ message: "Unauthorized" }, { status: 401 })
+  }
   const data: Data = {
     fee: undefined,
     description: undefined,
