@@ -1,5 +1,5 @@
 "use client"
-import { useRouter } from "next/router"
+import { useRouter } from "next/navigation"
 import { useEffect, useState } from "react"
 type Node = {
   id: number
