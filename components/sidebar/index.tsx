@@ -22,7 +22,7 @@ const Sidebar = () => {
     },
   ]
   return (
-    <aside className="hidden sticky top-0 left-0 h-screen min-w-[250px] pl-12 pt-8 md:flex flex-col gap-[68px]">
+    <aside className="absolute max-md:backdrop-blur-[50px] max-md:bg-[#0000006e] max-md:z-[15] md:sticky top-0 left-0 h-screen min-w-[250px] pl-12 pt-8 md:flex flex-col gap-[68px]">
       <div className="flex gap-3 items-center">
         <Image src="/icons/logo.svg" alt="logo" width={39} height={38} />
         <div className="flex flex-col  py-1">
