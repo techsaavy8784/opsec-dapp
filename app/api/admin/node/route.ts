@@ -1,6 +1,6 @@
 import { authOptions } from "@/lib/auth"
-import { db } from "@/lib/db"
 import { getServerSession } from "next-auth"
+import { db } from "@/lib/db"
 import { NextResponse, NextRequest } from "next/server"
 type Data = {
   fee: number | undefined

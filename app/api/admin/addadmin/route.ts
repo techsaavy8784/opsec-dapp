@@ -1,8 +1,14 @@
 import { db } from "@/lib/db"
 import { NextResponse, NextRequest } from "next/server"
 import { hash } from "bcrypt"
+import { authOptions } from "@/lib/auth"
+import { getServerSession } from "next-auth"
 
 export async function POST(req: NextRequest) {
+  const session = await getServerSession(authOptions)
+  if (!session) {
+    return NextResponse.json({ message: "Unauthorized" }, { status: 401 })
+  }
   try {
     const body = await req.json()
     console.log({ body })
