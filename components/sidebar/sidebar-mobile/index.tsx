@@ -9,7 +9,7 @@ export const SidebarMobile = () => {
   const [isOpen, setIsOpen] = React.useState(false)
 
   return (
-    <div>
+    <div className="md:hidden">
       <div className="absolute top-10 right-5 cursor-pointer md:hidden z-[11]">
         <div
           onClick={() => {
@@ -23,11 +23,7 @@ export const SidebarMobile = () => {
           )}
         </div>
       </div>
-      {isOpen && (
-        <div className="">
-          <Sidebar />
-        </div>
-      )}
+      <Sidebar isOpen={isOpen} />
     </div>
   )
 }
