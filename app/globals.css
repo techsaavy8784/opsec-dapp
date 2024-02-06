@@ -6,6 +6,10 @@
   display: none;
 }
 
+.grid-cols-100 {
+  grid-template-columns: repeat(100, minmax(0, 1fr));
+}
+
 @layer base {
   :root {
     --background: 0 0% 100%;

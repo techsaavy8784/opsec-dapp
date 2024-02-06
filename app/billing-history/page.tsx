@@ -36,11 +36,11 @@ const BillingHistory = () => {
               <TableCell className="text-[16px] font-[600] text-white">
                 1
               </TableCell>
-              <TableCell className="text-[16px] font-[600] text-white">
+              <TableCell className="text-[16px] font-[600] text-white max-md:min-w-[130px]">
                 OS-5627415
               </TableCell>
-              <TableCell className="text-[14px] font-[500] text-[#F44336]">
-                <div className="flex items-center gap-2 ">
+              <TableCell className="text-[14px] font-[500] text-[#F44336] max-md:min-w-[80px]">
+                <div className="flex items-center gap-1 md:gap-2 ">
                   <Image
                     src="/icons/money-send.svg"
                     alt="money-sent"
@@ -50,8 +50,8 @@ const BillingHistory = () => {
                   -$120
                 </div>
               </TableCell>
-              <TableCell className="text-[14px] font-[500] text-white">
-                <div className="flex items-center gap-2 ">
+              <TableCell className="text-[14px] font-[500] text-white max-md:min-w-[110px]">
+                <div className="flex items-center gap-1 md:gap-2 ">
                   <Image
                     src="/icons/tag.svg"
                     alt="money-sent"
@@ -76,7 +76,7 @@ const BillingHistory = () => {
               <TableCell className="text-[16px] font-[500] text-[#2EE48D]">
                 Success
               </TableCell>
-              <TableCell className="text-[14px] font-[500] text-white">
+              <TableCell className="text-[14px] font-[500] text-white max-md:min-w-[160px]">
                 <div className="flex items-center gap-2">
                   <Image
                     src="/icons/calendar.svg"
