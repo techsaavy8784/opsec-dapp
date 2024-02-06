@@ -6,6 +6,7 @@ import "./globals.css"
 import { Sidebar } from "@/components/sidebar"
 import { Footer } from "@/components/footer"
 import { Navbar } from "@/components/navbar"
+import { Toaster } from "@/components/ui/toaster"
 import { SidebarMobile } from "@/components/sidebar/sidebar-mobile"
 
 export const metadata: Metadata = {
@@ -32,6 +33,7 @@ export default function RootLayout({
             <div className="relative w-full px-3 md:px-0 md:pr-8 overflow-hidden h-screen">
               <Navbar />
               {children}
+              <Toaster />
             </div>
             <Footer />
           </main>
