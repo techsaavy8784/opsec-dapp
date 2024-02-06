@@ -6,6 +6,7 @@ import "./globals.css"
 import { Sidebar } from "@/components/sidebar"
 import { Footer } from "@/components/footer"
 import { Navbar } from "@/components/navbar"
+import { SidebarMobile } from "@/components/sidebar/sidebar-mobile"
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -24,8 +25,11 @@ export default function RootLayout({
       >
         <Providers>
           <main className="dark flex">
-            <Sidebar />
-            <div className="relative w-full pr-8 overflow-hidden h-screen">
+            <div className="max-md:hidden">
+              <Sidebar />
+            </div>
+            <SidebarMobile />
+            <div className="relative w-full px-3 md:px-0 md:pr-8 overflow-hidden h-screen">
               <Navbar />
               {children}
             </div>
