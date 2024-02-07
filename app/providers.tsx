@@ -12,29 +12,14 @@ import {
   ledgerWallet,
 } from "@rainbow-me/rainbowkit/wallets"
 import { configureChains, createConfig, WagmiConfig } from "wagmi"
-import {
-  mainnet,
-  polygon,
-  optimism,
-  arbitrum,
-  base,
-  zora,
-  goerli,
-} from "wagmi/chains"
+import { mainnet, sepolia, Chain } from "wagmi/chains"
 import { publicProvider } from "wagmi/providers/public"
 
-const { chains, publicClient, webSocketPublicClient } = configureChains(
-  [
-    mainnet,
-    polygon,
-    optimism,
-    arbitrum,
-    base,
-    zora,
-    ...(process.env.NEXT_PUBLIC_ENABLE_TESTNETS === "true" ? [goerli] : []),
-  ],
-  [publicProvider()],
-)
+const c: Chain[] = [process.env.NODE_ENV === "production" ? mainnet : sepolia]
+
+const { chains, publicClient, webSocketPublicClient } = configureChains(c, [
+  publicProvider(),
+])
 
 const projectId = process.env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID ?? ""
 
