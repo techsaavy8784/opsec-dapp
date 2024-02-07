@@ -22,8 +22,8 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${gilroy.className} bg-black dark`}>
         <Providers>
-          <main className="container">
-            <div className="flex h-screen p-2">
+          <main className="">
+            <div className="flex h-screen">
               <Sidebar />
               <div className="p-4 flex-1 flex flex-col overflow-hidden">
                 <Navbar />

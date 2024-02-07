@@ -1,17 +1,10 @@
 "use client"
 
 import Image from "next/image"
-import Link from "next/link"
+// import Link from "next/link"
 // import { usePathname } from "next/navigation"
 import React from "react"
-import {
-  NavigationMenu,
-  NavigationMenuItem,
-  NavigationMenuLink,
-  NavigationMenuList,
-} from "@/components/ui/navigation-menu"
-import { navigationMenuTriggerStyle } from "@/components/ui/navigation-menu"
-import { Badge } from "../ui/badge"
+import { MdChevronLeft } from "react-icons/md"
 
 const Sidebar = ({ isOpen }: { isOpen?: boolean }) => {
   //   const pathName = usePathname()
@@ -19,8 +12,11 @@ const Sidebar = ({ isOpen }: { isOpen?: boolean }) => {
   const open = isOpen ? "open" : ""
 
   return (
-    <div className="w-64 p-4 sticky top-0">
-      <div className="flex gap-3 items-center mb-5">
+    <aside className="w-64 sticky top-0 border-r border-[#27272A]">
+      <div className="flex gap-3 p-6 items-center mb-5 relative">
+        <div className="absolute right-0 w-5 h-10 bg-[#27272A] flex items-center justify-center rounded-l-[6px]">
+          <MdChevronLeft className="text-[20px]" />
+        </div>
         <Image
           src="/icons/logo.svg"
           alt="logo"
@@ -33,64 +29,12 @@ const Sidebar = ({ isOpen }: { isOpen?: boolean }) => {
         >
           <h1 className="text-[16px] font-[600] leading-6 text-white">OpSec</h1>
           <h1 className="text-[16px] font-[600] leading-6 text-white">
-            Node Managment
+            CloudVerse
           </h1>
         </div>
       </div>
-      <NavigationMenu orientation="vertical" className="flex-col text-lg">
-        <NavigationMenuList className="text-lg">
-          <NavigationMenuItem>
-            <Link href="/dashboard" legacyBehavior passHref>
-              <NavigationMenuLink className={navigationMenuTriggerStyle()}>
-                Dashboard
-              </NavigationMenuLink>
-            </Link>
-          </NavigationMenuItem>
-          <NavigationMenuItem>
-            <Link href="/marketplace" legacyBehavior passHref>
-              <NavigationMenuLink className={navigationMenuTriggerStyle()}>
-                Marketplace
-              </NavigationMenuLink>
-            </Link>
-          </NavigationMenuItem>
-          <NavigationMenuItem>
-            <Link href="/treasury" legacyBehavior passHref>
-              <NavigationMenuLink className={navigationMenuTriggerStyle()}>
-                Treasury
-                <Badge className="ml-2" variant={"secondary"}>
-                  Coming Soon
-                </Badge>
-              </NavigationMenuLink>
-            </Link>
-          </NavigationMenuItem>
-          <NavigationMenuItem>
-            <Link href="/nodes" legacyBehavior passHref>
-              <NavigationMenuLink className={navigationMenuTriggerStyle()}>
-                Nodes
-              </NavigationMenuLink>
-            </Link>
-          </NavigationMenuItem>
-          <NavigationMenuItem>
-            <Link href="/validators" legacyBehavior passHref>
-              <NavigationMenuLink className={navigationMenuTriggerStyle()}>
-                Validators
-                <Badge className="ml-2" variant={"secondary"}>
-                  Coming Soon
-                </Badge>
-              </NavigationMenuLink>
-            </Link>
-          </NavigationMenuItem>
-
-          <NavigationMenuItem>
-            <Link href="/billing" legacyBehavior passHref>
-              <NavigationMenuLink className={navigationMenuTriggerStyle()}>
-                Billing
-              </NavigationMenuLink>
-            </Link>
-          </NavigationMenuItem>
-        </NavigationMenuList>
-      </NavigationMenu>
-    </div>
+      <div></div>
+    </aside>
   )
 }
 
