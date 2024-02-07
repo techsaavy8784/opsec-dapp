@@ -2,39 +2,34 @@
 
 import Image from "next/image"
 import Link from "next/link"
-import { usePathname } from "next/navigation"
+// import { usePathname } from "next/navigation"
 import React from "react"
+import {
+  NavigationMenu,
+  NavigationMenuItem,
+  NavigationMenuLink,
+  NavigationMenuList,
+} from "@/components/ui/navigation-menu"
+import { navigationMenuTriggerStyle } from "@/components/ui/navigation-menu"
+import { Badge } from "../ui/badge"
 
 const Sidebar = ({ isOpen }: { isOpen?: boolean }) => {
-  const pathName = usePathname()
-  const navItems = [
-    {
-      name: "Dashboard",
-      path: "/dashboard",
-    },
-    {
-      name: "Shop",
-      path: "/shop",
-    },
-    {
-      name: "Billing History",
-      path: "/billing-history",
-    },
-  ]
+  //   const pathName = usePathname()
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const open = isOpen ? "open" : ""
+
   return (
-    <aside
-      className={`absolute max-md:backdrop-blur-[50px] max-md:bg-[#0000006e] max-md:z-[15] md:sticky top-0 left-0 h-screen md:min-w-[250px] pl-12 pt-8 md:flex flex-col gap-[68px] ${isOpen ? "max-md:w-[250px]" : "max-md:w-0 max-md:px-0"} max-md:overflow-hidden transition-all`}
-    >
-      <div className="flex gap-3 items-center">
+    <div className="w-64 p-4 sticky top-0">
+      <div className="flex gap-3 items-center mb-5">
         <Image
           src="/icons/logo.svg"
           alt="logo"
           width={39}
           height={38}
-          className={`${isOpen ? "max-md:w-[38px]" : "max-md:w-0"} max-md:overflow-hidden transition-all`}
+          className={`max-md:overflow-hidden transition-all`}
         />
         <div
-          className={`flex flex-col py-1 ${isOpen ? "max-md:w-full" : "max-md:w-0"} max-md:overflow-hidden transition-all`}
+          className={`flex flex-col py-1 max-md:overflow-hidden transition-all`}
         >
           <h1 className="text-[16px] font-[600] leading-6 text-white">OpSec</h1>
           <h1 className="text-[16px] font-[600] leading-6 text-white">
@@ -42,39 +37,60 @@ const Sidebar = ({ isOpen }: { isOpen?: boolean }) => {
           </h1>
         </div>
       </div>
-      <div
-        className={`flex flex-col py-5 ${isOpen ? "max-md:w-full" : "max-md:w-0 max-md:px-0"} max-md:overflow-hidden transition-all`}
-      >
-        {navItems?.map((item, index) => (
-          <Link
-            href={item?.path}
-            className={`relative py-3 ${
-              item.path === pathName ? "" : "border-l-2 border-[#FFFFFF66]"
-            }`}
-            key={index}
-          >
-            <h1
-              className={`pl-10 ${
-                pathName === item?.path
-                  ? "text-white font-[600] "
-                  : "text-[#FFFFFF80] font-[500] "
-              } cursor-pointer transition-all duration-200 text-lg`}
-            >
-              {item.name}
-            </h1>
-            {pathName === item?.path && (
-              <>
-                <div
-                  className={`w-[16px] h-[16px] transition-all duration-200 absolute top-0 left-0 -translate-x-[6.5px] translate-y-[16px] rotate-45 border-t-2 border-r-2 border-t-white border-r-white`}
-                />
-                <div className="w-[1.5px] h-[20px] transition-all duration-200 bg-white absolute top-0  -translate-y-[6.3px] left-0" />
-                <div className="w-[1.5px] h-[20px] transition-all duration-200 bg-white absolute top-full  -translate-y-[17.8px] left-0" />
-              </>
-            )}
-          </Link>
-        ))}
-      </div>
-    </aside>
+      <NavigationMenu orientation="vertical" className="flex-col text-lg">
+        <NavigationMenuList className="text-lg">
+          <NavigationMenuItem>
+            <Link href="/dashboard" legacyBehavior passHref>
+              <NavigationMenuLink className={navigationMenuTriggerStyle()}>
+                Dashboard
+              </NavigationMenuLink>
+            </Link>
+          </NavigationMenuItem>
+          <NavigationMenuItem>
+            <Link href="/marketplace" legacyBehavior passHref>
+              <NavigationMenuLink className={navigationMenuTriggerStyle()}>
+                Marketplace
+              </NavigationMenuLink>
+            </Link>
+          </NavigationMenuItem>
+          <NavigationMenuItem>
+            <Link href="/treasury" legacyBehavior passHref>
+              <NavigationMenuLink className={navigationMenuTriggerStyle()}>
+                Treasury
+                <Badge className="ml-2" variant={"secondary"}>
+                  Coming Soon
+                </Badge>
+              </NavigationMenuLink>
+            </Link>
+          </NavigationMenuItem>
+          <NavigationMenuItem>
+            <Link href="/nodes" legacyBehavior passHref>
+              <NavigationMenuLink className={navigationMenuTriggerStyle()}>
+                Nodes
+              </NavigationMenuLink>
+            </Link>
+          </NavigationMenuItem>
+          <NavigationMenuItem>
+            <Link href="/validators" legacyBehavior passHref>
+              <NavigationMenuLink className={navigationMenuTriggerStyle()}>
+                Validators
+                <Badge className="ml-2" variant={"secondary"}>
+                  Coming Soon
+                </Badge>
+              </NavigationMenuLink>
+            </Link>
+          </NavigationMenuItem>
+
+          <NavigationMenuItem>
+            <Link href="/billing" legacyBehavior passHref>
+              <NavigationMenuLink className={navigationMenuTriggerStyle()}>
+                Billing
+              </NavigationMenuLink>
+            </Link>
+          </NavigationMenuItem>
+        </NavigationMenuList>
+      </NavigationMenu>
+    </div>
   )
 }
 
