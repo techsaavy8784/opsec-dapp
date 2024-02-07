@@ -10,15 +10,10 @@
         "address": {
           "type": "string"
         },
-        "name": {
-          "type": "string"
-        },
-        "role": {
-          "type": "string",
-          "default": "USER",
-          "enum": [
-            "USER",
-            "ADMIN"
+        "password": {
+          "type": [
+            "string",
+            "null"
           ]
         },
         "payments": {
@@ -29,8 +24,7 @@
         }
       },
       "required": [
-        "address",
-        "name"
+        "address"
       ]
     },
     "Node": {

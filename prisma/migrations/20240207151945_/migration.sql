@@ -1,12 +1,10 @@
--- CreateEnum
-CREATE TYPE "Role" AS ENUM ('USER', 'ADMIN');
-
 -- CreateTable
 CREATE TABLE "users" (
     "id" SERIAL NOT NULL,
     "address" TEXT NOT NULL,
-    "name" TEXT NOT NULL,
-    "role" "Role" NOT NULL DEFAULT 'USER'
+    "password" TEXT,
+
+    CONSTRAINT "users_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
@@ -52,7 +50,7 @@ CREATE TABLE "blockchains" (
 );
 
 -- CreateIndex
-CREATE UNIQUE INDEX "users_id_key" ON "users"("id");
+CREATE UNIQUE INDEX "users_address_key" ON "users"("address");
 
 -- AddForeignKey
 ALTER TABLE "nodes" ADD CONSTRAINT "nodes_server_id_fkey" FOREIGN KEY ("server_id") REFERENCES "servers"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

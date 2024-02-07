@@ -12,14 +12,14 @@ export const authOptions: NextAuthOptions = {
     strategy: "jwt",
   },
   pages: {
-    signIn: "/adminlogin",
+    signIn: "/admin/login",
     error: "/error",
   },
   providers: [
     CredentialsProvider({
       name: "Credentials",
       credentials: {
-        email: {
+        address: {
           label: "Email",
           type: "email",
           placeholder: "based@opsec.org",
@@ -31,7 +31,11 @@ export const authOptions: NextAuthOptions = {
           return null
         }
 
-        if ("address" in credentials) {
+        if (!credentials.address) {
+          return null
+        }
+
+        if (!credentials.password) {
           if (isAddress(credentials.address as string)) {
             return {
               address: credentials.address,
@@ -41,12 +45,8 @@ export const authOptions: NextAuthOptions = {
           return null
         }
 
-        if (!credentials.email || !credentials.password) {
-          return null
-        }
-
-        const user = await db.admin.findUnique({
-          where: { email: credentials.email },
+        const user = await prisma.user.findUnique({
+          where: { address: credentials.address },
         })
 
         if (!user) {
@@ -55,7 +55,7 @@ export const authOptions: NextAuthOptions = {
 
         const isPasswordMatch = await compare(
           credentials.password,
-          user.password,
+          user.password ?? "",
         )
 
         if (!isPasswordMatch) {
@@ -64,7 +64,7 @@ export const authOptions: NextAuthOptions = {
 
         return {
           id: user.id.toString(),
-          email: user.email,
+          email: user.address,
         }
       },
     }),
@@ -74,14 +74,14 @@ export const authOptions: NextAuthOptions = {
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id
-        token.email = user.email
+        token.email = user.address
       }
       return token
     },
     async session({ session, token }) {
       session.user = {
         ...session.user,
-        email: token.email as string,
+        email: token.address as string,
       }
 
       return session

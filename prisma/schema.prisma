@@ -15,16 +15,10 @@ datasource db {
     url      = env("DATABASE_URL")
 }
 
-enum Role {
-    USER
-    ADMIN
-}
-
 model User {
-    id       Int       @unique @default(autoincrement())
-    address  String
-    name     String
-    role     Role      @default(USER)
+    id       Int       @id @default(autoincrement())
+    address  String    @unique // address is used as email for admins
+    password String? // if password is not null, he is admin, otherwise user
     payments Payment[]
 
     @@map("users")

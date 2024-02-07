@@ -40,7 +40,7 @@ function LoginForm() {
     setLoading(true)
     const result = await signIn("credentials", {
       redirect: true,
-      email: values.email,
+      address: values.email,
       password: values.password,
     })
 
