@@ -4,8 +4,8 @@ import { NextResponse } from "next/server"
 export default withAuth(
   function middleware(request) {
     const token = request.nextauth?.token
-    console.log({ token })
     const pathname = request.nextUrl?.pathname
+
     if (pathname === "/admin/login") {
       if (token) {
         const adminurl = new URL("/admin", request.nextUrl.origin)

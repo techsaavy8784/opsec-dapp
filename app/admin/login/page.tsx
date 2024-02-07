@@ -39,7 +39,7 @@ function LoginForm() {
   const onSubmit = async (values: z.infer<typeof loginSchema>) => {
     setLoading(true)
     const result = await signIn("credentials", {
-      redirect: true,
+      redirect: false,
       address: values.email,
       password: values.password,
     })
@@ -78,7 +78,7 @@ function LoginForm() {
                   <FormLabel className="text-white">email</FormLabel>
                   <FormControl>
                     <Input
-                      className="bg-white"
+                      className="bg-white text-black"
                       placeholder="admin@opsec.org"
                       {...field}
                     />
@@ -96,7 +96,7 @@ function LoginForm() {
                   <FormControl>
                     <Input
                       type="password"
-                      className="bg-white"
+                      className="bg-white text-black"
                       placeholder="Password"
                       {...field}
                     />

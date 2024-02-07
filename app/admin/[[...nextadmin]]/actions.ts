@@ -1,12 +1,9 @@
 "use server"
 
-import { ActionParams, NextAdminOptions } from "@premieroctet/next-admin"
+import { ActionParams } from "@premieroctet/next-admin"
 import { submitForm } from "@premieroctet/next-admin/dist/actions"
 import prisma from "@/prisma"
-
-export const options: NextAdminOptions = {
-  basePath: "/admin",
-}
+import options from "./options"
 
 export const submitFormAction = async (
   params: ActionParams,
