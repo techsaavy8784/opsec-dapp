@@ -6,7 +6,7 @@ import { ConnectButton } from "@rainbow-me/rainbowkit"
 
 export const Navbar = () => {
   const pathName = usePathname()
-  const path = pathName.split("/")[1] // TODO: Uppercase first letter
+  const path = pathName.split("/")[1]
 
   return (
     <div className="sticky top-0 left-0 z-[10] w-full py-5">
