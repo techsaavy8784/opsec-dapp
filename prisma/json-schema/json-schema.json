@@ -65,6 +65,9 @@
     "Payment": {
       "type": "object",
       "properties": {
+        "id": {
+          "type": "integer"
+        },
         "User": {
           "$ref": "#/definitions/User"
         },

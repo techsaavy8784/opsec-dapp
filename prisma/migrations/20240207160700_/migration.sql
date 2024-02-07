@@ -20,10 +20,11 @@ CREATE TABLE "nodes" (
 
 -- CreateTable
 CREATE TABLE "payments" (
+    "id" SERIAL NOT NULL,
     "user_id" INTEGER NOT NULL,
     "node_id" INTEGER NOT NULL,
 
-    CONSTRAINT "payments_pkey" PRIMARY KEY ("user_id","node_id")
+    CONSTRAINT "payments_pkey" PRIMARY KEY ("id")
 );
 
 -- CreateTable
