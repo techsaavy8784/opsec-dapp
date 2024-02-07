@@ -84,7 +84,7 @@ export const PaymentModal = ({ data, setData, setSlide, slide }: Props) => {
           )}
           {slide < 2 && (
             <Button type="button" onClick={handleSlide} variant="custom">
-              {slide === 1 ? "Continue" : "Pay"}
+              {slide === 0 ? "Continue" : "Pay"}
             </Button>
           )}
         </form>
