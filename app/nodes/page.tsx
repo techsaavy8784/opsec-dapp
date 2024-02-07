@@ -1,14 +1,5 @@
 import { NodeCard } from "@/components/node-card"
 import React from "react"
-import {
-  Pagination,
-  PaginationContent,
-  PaginationEllipsis,
-  PaginationItem,
-  PaginationLink,
-  PaginationNext,
-  PaginationPrevious,
-} from "@/components/ui/pagination"
 
 const Shop = () => {
   return (
@@ -22,35 +13,6 @@ const Shop = () => {
             <NodeCard key={item} shop />
           ))}
         </div>
-        <Pagination className="py-4 md:py-8">
-          <PaginationContent>
-            <PaginationItem>
-              <PaginationPrevious
-                className="h-[35px] w-[35px] bg-white rounded-[13px] flex items-center justify-center"
-                href="#"
-              />
-            </PaginationItem>
-            <PaginationItem>
-              <PaginationLink isActive href="#" className="text-white">
-                1
-              </PaginationLink>
-            </PaginationItem>
-            <PaginationItem>
-              <PaginationLink isActive={false} href="#" className="text-white">
-                2
-              </PaginationLink>
-            </PaginationItem>
-            <PaginationItem>
-              <PaginationEllipsis />
-            </PaginationItem>
-            <PaginationItem>
-              <PaginationNext
-                className="h-[35px] w-[35px] bg-white rounded-[13px] flex items-center justify-center"
-                href="#"
-              />
-            </PaginationItem>
-          </PaginationContent>
-        </Pagination>
       </div>
     </div>
   )

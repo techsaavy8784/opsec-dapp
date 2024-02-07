@@ -23,7 +23,7 @@ export default function RootLayout({
       <body className={`${gilroy.className} bg-black dark`}>
         <Providers>
           {/* <ProtectRoutes> */}
-          <main className="">
+          <main className="container">
             <div className="flex h-screen">
               <Sidebar />
               <div className="flex-1 flex flex-col">
