@@ -1,4 +1,6 @@
 "use client"
+
+import { useState } from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { signIn } from "next-auth/react"
@@ -16,11 +18,12 @@ import { useRouter } from "next/navigation"
 import { useToast } from "@/components/ui/use-toast"
 import { Button } from "@/components/ui/button"
 import { PulseLoader } from "react-spinners"
-import { useState } from "react"
+
 const loginSchema = z.object({
   email: z.string().email(),
   password: z.string().min(8),
 })
+
 function LoginForm() {
   const [loading, setLoading] = useState(false)
   const router = useRouter()
