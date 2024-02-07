@@ -5,40 +5,39 @@ import Image from "next/image"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import React from "react"
-import { MdChevronLeft, MdChevronRight } from "react-icons/md"
 
 const Sidebar = () => {
-  const pathName = usePathname()
-
+  const path = usePathname()
+  const pathName = path.split("/")[1]
   const navItems = [
     {
       title: "Dashbaord",
       icon: "dashboard.svg",
-      link: "/dashboard",
+      link: "dashboard",
       activeIcon: "dashboard-active.svg",
     },
     {
       title: "Nodes",
       icon: "nodes.svg",
-      link: "/nodes",
+      link: "nodes",
       activeIcon: "nodes-active.svg",
     },
     {
       title: "Validators",
       icon: "validators.svg",
-      link: "/validators",
+      link: "validators",
       activeIcon: "validators-active.svg",
     },
     {
       title: "Treasuries",
       icon: "treasuries.svg",
-      link: "/treasuries",
+      link: "treasuries",
       activeIcon: "treasuries-active.svg",
     },
     {
       title: "Billing History",
       icon: "billing-history.svg",
-      link: "/billing-history",
+      link: "billing-history",
       activeIcon: "billing-history-active.svg",
     },
   ]
@@ -63,7 +62,7 @@ const Sidebar = () => {
           {navItems?.map((item, index) => (
             <Link
               key={index}
-              href={item.link}
+              href={`/${item.link}`}
               className={`flex items-center gap-4 pl-8 py-2 hover:bg-[#48474761] transition-all ease-in duration-100 border-l-[3px] ${pathName === item.link ? "border-[#F44336]" : "border-transparent"}`}
             >
               <Image
