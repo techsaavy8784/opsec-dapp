@@ -3,6 +3,7 @@ import CredentialsProvider from "next-auth/providers/credentials"
 import { db } from "./db"
 import { compare } from "bcrypt"
 import { PrismaAdapter } from "@next-auth/prisma-adapter"
+import { isAddress } from "viem"
 
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(db),
@@ -26,7 +27,21 @@ export const authOptions: NextAuthOptions = {
         password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
-        if (!credentials || !credentials.email || !credentials.password) {
+        if (!credentials) {
+          return null
+        }
+
+        if ("address" in credentials) {
+          if (isAddress(credentials.address as string)) {
+            return {
+              address: credentials.address,
+            }
+          }
+
+          return null
+        }
+
+        if (!credentials.email || !credentials.password) {
           return null
         }
 
