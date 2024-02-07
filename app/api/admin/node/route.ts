@@ -1,6 +1,6 @@
 import { authOptions } from "@/lib/auth"
 import { getServerSession } from "next-auth"
-import { db } from "@/lib/db"
+import prisma from "@/prisma"
 import { NextResponse, NextRequest } from "next/server"
 type Data = {
   fee: number | undefined
@@ -18,13 +18,13 @@ export async function POST(req: NextRequest) {
   const { name, fee, description } = await req.json()
   if (description) data.description = description
   if (fee) data.fee = fee
-  const node_exist = await db.node_brand.findFirst({
+  const node_exist = await prisma.node_brand.findFirst({
     where: {
       name: name,
     },
   })
   if (node_exist) {
-    const update = await db.node_brand.update({
+    const update = await prisma.node_brand.update({
       where: {
         id: node_exist.id,
       },
@@ -33,7 +33,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ message: "Node Updated", data: update })
   }
 
-  const node = await db.node_brand.create({
+  const node = await prisma.node_brand.create({
     data: {
       name,
       description,

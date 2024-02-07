@@ -1,4 +1,4 @@
-import { db } from "@/lib/db"
+import prisma from "@/prisma"
 import { NextResponse, NextRequest } from "next/server"
 import { hash } from "bcrypt"
 import { authOptions } from "@/lib/auth"
@@ -14,7 +14,7 @@ export async function POST(req: NextRequest) {
     console.log({ body })
     const { email, password } = body
 
-    const existingUser = await db.admin.findFirst({
+    const existingUser = await prisma.admin.findFirst({
       where: { email: body.email },
     })
     if (existingUser) {
@@ -26,7 +26,7 @@ export async function POST(req: NextRequest) {
 
     // Create user
     const hashedPassword = await hash(password, 10)
-    const newUser = await db.admin.create({
+    const newUser = await prisma.admin.create({
       data: {
         email,
         password: hashedPassword,
