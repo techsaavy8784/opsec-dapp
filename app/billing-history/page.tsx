@@ -20,7 +20,7 @@ const BillingHistory = () => {
     "Date",
   ]
   return (
-    <div className="p-6">
+    <div className="p-6 max-md:w-screen overflow-hidden">
       <div className="border border-[#FFFFFF33] rounded-[16px]">
         <Table>
           <TableHeader>

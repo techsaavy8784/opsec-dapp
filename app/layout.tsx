@@ -4,7 +4,7 @@ import { Providers } from "./providers"
 import { Sidebar } from "@/components/sidebar"
 import { Navbar } from "@/components/navbar"
 import { Toaster } from "@/components/ui/toaster"
-import ProtectRoutes from "./protect-routes"
+// import ProtectRoutes from "./protect-routes"
 import "@rainbow-me/rainbowkit/styles.css"
 import "./globals.css"
 
@@ -22,17 +22,19 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${gilroy.className} bg-black dark`}>
         <Providers>
-          <ProtectRoutes>
-            <main className="container">
-              <div className="flex h-screen">
+          {/* <ProtectRoutes> */}
+          <main className="md:container">
+            <div className="flex h-screen">
+              <div className="max-md:hidden">
                 <Sidebar />
-                <div className="flex-1 flex flex-col">
-                  <Navbar />
-                  <div className="overflow-y-scroll">{children}</div>
-                </div>
               </div>
-            </main>
-          </ProtectRoutes>
+              <div className="flex-1 flex flex-col">
+                <Navbar />
+                <div className="overflow-y-scroll">{children}</div>
+              </div>
+            </div>
+          </main>
+          {/* </ProtectRoutes> */}
           <Toaster />
         </Providers>
       </body>

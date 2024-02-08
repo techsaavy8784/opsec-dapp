@@ -17,7 +17,7 @@ export const DashCards = ({
   blockchains,
 }: Props) => {
   return (
-    <div className="px-4 border-r border-[#27272A]">
+    <div className="px-4 md:border-r border-[#27272A] col-span-1">
       <div
         className={`col-span-1 flex flex-col gap-2 p-4 pr-0 ${linear ? "bg-gradient-to-b rounded-lg from-[#1A1A1A] to-[#1A1A1A00]" : ""}`}
       >

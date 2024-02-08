@@ -8,15 +8,15 @@ const Dashboard = () => {
   return (
     <div className="flex flex-col">
       <div className="p-6">
-        <div className="w-full flex px-[34px] py-6 rounded-[24px] justify-end flex-col bg-[url(/backgrounds/dashboard.png)] bg-center bg-cover bg-no-repeat h-[172px]">
+        <div className="w-full flex px-[20px] md:px-[34px] py-6 rounded-[24px] justify-end flex-col bg-[url(/backgrounds/dashboard.png)] bg-center bg-cover bg-no-repeat h-[172px]">
           <h1 className="uppercase text-[28px] font-[300]">Welcome</h1>
           <h1 className="uppercase text-[28px] font-[300]">
             To <span className="font-[900]">OPSEC CLOUDVERSE</span>
           </h1>
         </div>
       </div>
-      <div className="px-2">
-        <div className="grid grid-cols-6">
+      <div className="md:px-2">
+        <div className="grid grid-cols-2 md:grid-cols-6">
           <DashCards
             title="My running nodes"
             value={4}

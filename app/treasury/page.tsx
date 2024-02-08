@@ -18,11 +18,11 @@ const Treasury = () => {
       <div>
         <h1 className="text-white text-[22px] font-[600]">Value</h1>
       </div>
-      <div className="grid grid-cols-6 gap-6 h-[430px]">
-        <div className="col-span-4 rounded-[24px] bg-[#18181B] p-2">
+      <div className="grid grid-cols-2 md:grid-cols-6 gap-6">
+        <div className="col-span-2 md:col-span-4 rounded-[24px] bg-[#18181B] p-2 h-[330px] md:h-[430px]">
           <TreasuryChart />
         </div>
-        <div className="col-span-2 flex flex-col justify-between p-8 bg-[url(/backgrounds/treasury.png)] bg-cover bg-center rounded-[24px]">
+        <div className="col-span-2 h-[280px] md:h-[430px] flex flex-col justify-between p-8 bg-[url(/backgrounds/treasury.png)] bg-cover bg-center rounded-[24px]">
           <div>
             <h1 className="text-[22px] text-white font-[500]">Changes in</h1>
             <h1 className="text-[22px] text-white font-[500]">24 ago</h1>
@@ -40,7 +40,7 @@ const Treasury = () => {
       <div>
         <h1 className="text-white text-[22px] font-[600]">All Treasuries</h1>
       </div>
-      <div className="border border-[#FFFFFF33] rounded-[16px]">
+      <div className="border border-[#FFFFFF33] rounded-[16px] max-md:w-screen overflow-hidden">
         <Table>
           <TableHeader>
             <TableRow className="border-b-[#FFFFFF4D]">
