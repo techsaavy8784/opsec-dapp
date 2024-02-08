@@ -10,20 +10,20 @@ export const SidebarMobile = () => {
 
   return (
     <div className="md:hidden">
-      <div className="absolute top-10 right-5 cursor-pointer md:hidden z-[11]">
+      <div className="absolute top-7 right-6 cursor-pointer md:hidden z-[11]">
         <div
           onClick={() => {
             setIsOpen((prev) => !prev)
           }}
         >
           {isOpen ? (
-            <IoCloseOutline className="text-white text-xl" />
+            <IoCloseOutline className="text-white text-3xl" />
           ) : (
-            <GiHamburgerMenu className="text-white text-xl" />
+            <GiHamburgerMenu className="text-white text-3xl" />
           )}
         </div>
       </div>
-      <Sidebar isOpen={isOpen} />
+      {isOpen && <Sidebar setOpen={setIsOpen} />}
     </div>
   )
 }

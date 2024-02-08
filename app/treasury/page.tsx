@@ -40,7 +40,7 @@ const Treasury = () => {
       <div>
         <h1 className="text-white text-[22px] font-[600]">All Treasuries</h1>
       </div>
-      <div className="border border-[#FFFFFF33] rounded-[16px] max-md:w-screen overflow-hidden">
+      <div className="border border-[#FFFFFF33] rounded-[16px] max-md:w-[calc(100vw-40px)] overflow-hidden">
         <Table>
           <TableHeader>
             <TableRow className="border-b-[#FFFFFF4D]">

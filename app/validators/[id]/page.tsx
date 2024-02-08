@@ -34,10 +34,10 @@ const Dymension = () => {
   return (
     <div className="p-6 flex flex-col gap-6">
       <div className="max-md:px-4 m-0 p-0">
-        <div className="grid grid-cols-6 rounded-[16px] bg-[#18181B] px-4 py-6">
+        <div className="grid grid-cols-1 max-md:gap-4 md:grid-cols-6 rounded-[16px] bg-[#18181B] px-4 py-6">
           {dummyDym?.map((item, i) => (
             <div
-              className={`col-span-1 flex flex-col gap-2 pl-4 ${i !== 5 ? "border-r border-[#3F3F46]" : ""}`}
+              className={`col-span-1 max-md:items-center max-md:border-b-[2px] max-md:border-[#3F3F46] max-md:py-3 flex flex-col gap-2 md:pl-4 ${i !== 5 ? "md:border-r border-[#3F3F46]" : ""}`}
               key={i}
             >
               <h4 className="text-[14px] font-[500] text-[#71717A]">
@@ -54,7 +54,7 @@ const Dymension = () => {
         <h1 className="text-white text-[22px] font-[600]">Funding</h1>
       </div>
       <div className="w-full flex items-center justify-center">
-        <div className="w-[464px] bg-[#18181B] p-6 rounded-[24px] flex flex-col gap-4">
+        <div className="w-[330px] md:w-[464px] bg-[#18181B] p-6 rounded-[24px] flex flex-col gap-4">
           <h1 className="text-white text-[22px] font-[600] text-center">
             Fund DYM
           </h1>

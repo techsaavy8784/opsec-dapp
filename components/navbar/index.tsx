@@ -14,7 +14,7 @@ export const Navbar = () => {
         <div className="flex-1">
           <h1 className="text-2xl font-semibold capitalize">{path}</h1>
         </div>
-        <div>
+        <div className="max-md:hidden">
           <ConnectButton />
         </div>
       </div>

@@ -1,12 +1,17 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 "use client"
 
+import { ConnectButton } from "@rainbow-me/rainbowkit"
 import Image from "next/image"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import React from "react"
 
-const Sidebar = () => {
+type Props = {
+  setOpen?: (value: boolean) => void
+}
+
+const Sidebar = ({ setOpen }: Props) => {
   const path = usePathname()
   const pathName = path.split("/")[1]
   const navItems = [
@@ -44,11 +49,13 @@ const Sidebar = () => {
 
   return (
     <aside
-      className={`sticky top-0 flex flex-col h-[100dvh] border-r border-[#27272A] w-64`}
+      className={`absolute md:sticky top-0 flex flex-col h-[100dvh] border-r border-[#27272A] w-screen max-md:bg-black max-md:z-[15] md:w-64`}
     >
-      <div className={`flex gap-3 p-6 items-center mb-5 relative`}>
+      <div
+        className={`flex gap-3 max-md:py-4 md:p-6 items-center max-md:justify-center mb-5 max-md:border-b max-md:border-[#27272A] relative`}
+      >
         <Image src="/icons/logo.svg" alt="logo" width={39} height={38} />
-        <div className={`flex flex-col py-1`}>
+        <div className={`flex md:flex-col py-1`}>
           <h1 className={`text-[16px] font-[600] leading-6 text-white`}>
             OpSec
           </h1>
@@ -58,11 +65,12 @@ const Sidebar = () => {
         </div>
       </div>
       <div className="flex flex-col flex-1 justify-between">
-        <div className={`flex flex-col gap-6`}>
+        <div className={`flex flex-col gap-14 md:gap-6`}>
           {navItems?.map((item, index) => (
             <Link
               key={index}
               href={`/${item.link}`}
+              onClick={() => setOpen && setOpen(false)}
               className={`flex items-center gap-4 pl-8 py-2 hover:bg-[#48474761] transition-all ease-in duration-100 border-l-[3px] ${pathName === item.link ? "border-[#F44336]" : "border-transparent"}`}
             >
               <Image
@@ -83,13 +91,17 @@ const Sidebar = () => {
             </Link>
           ))}
         </div>
-        <div className={`flex items-center justify-center py-4`}>
+        <div className={`flex items-center justify-center py-8 md:py-4`}>
           <Image
             src="/backgrounds/twitter-banner.png"
             alt="twitter-banner"
             width={210}
             height={260}
+            className="max-md:hidden"
           />
+          <div className="md:hidden">
+            <ConnectButton />
+          </div>
         </div>
       </div>
     </aside>
