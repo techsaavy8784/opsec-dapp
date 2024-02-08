@@ -29,9 +29,9 @@ const Sidebar = () => {
       activeIcon: "validators-active.svg",
     },
     {
-      title: "Treasuries",
+      title: "Treasury",
       icon: "treasuries.svg",
-      link: "treasuries",
+      link: "treasury",
       activeIcon: "treasuries-active.svg",
     },
     {

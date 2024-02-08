@@ -9,9 +9,10 @@ import { useRouter } from "next/navigation"
 
 type Props = {
   shop?: boolean
+  path?: string
 }
 
-export const NodeCard = ({ shop }: Props) => {
+export const NodeCard = ({ shop, path }: Props) => {
   const [slide, setSlide] = React.useState(0)
   const router = useRouter()
   const [data, setData] = React.useState({
@@ -48,7 +49,7 @@ export const NodeCard = ({ shop }: Props) => {
       ) : (
         <Button
           type="button"
-          onClick={() => router.push("/dashboard/123")}
+          onClick={() => router.push(`${path}`)}
           variant="custom"
         >
           Start

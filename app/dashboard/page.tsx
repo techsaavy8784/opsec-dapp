@@ -76,7 +76,9 @@ const Dashboard = () => {
         </div>
         <div className="pb-6">
           <div className="grid grid-cols-1 md:grid-cols-4 items-center gap-8">
-            {[1, 2, 3, 4]?.map((item) => <NodeCard key={item} />)}
+            {[1, 2, 3, 4]?.map((item) => (
+              <NodeCard key={item} path={`/dashboard/${item}`} />
+            ))}
           </div>
         </div>
       </div>
