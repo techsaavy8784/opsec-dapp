@@ -5,7 +5,7 @@ import { Button } from "@/components/ui/button"
 import { signOut } from "next-auth/react"
 
 const Layout: React.FC<LayoutProps> = ({ children }) => (
-  <div>
+  <div className="bg-white h-screen">
     <Button onClick={() => signOut()} className="fixed right-3 top-3 z-9">
       Sign out
     </Button>
