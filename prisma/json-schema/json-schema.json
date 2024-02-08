@@ -132,6 +132,10 @@
         "name": {
           "type": "string"
         },
+        "description": {
+          "type": "string",
+          "default": ""
+        },
         "url": {
           "type": "string"
         },

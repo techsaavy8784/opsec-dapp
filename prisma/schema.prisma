@@ -60,12 +60,13 @@ model Server {
 }
 
 model Blockchain {
-    id         Int      @id @default(autoincrement())
-    name       String
-    url        String
-    price      Float
-    launchedAt DateTime @default(now()) @map("launched_at")
-    servers    Server[]
+    id          Int      @id @default(autoincrement())
+    name        String
+    description String   @default("")
+    url         String
+    price       Float
+    launchedAt  DateTime @default(now()) @map("launched_at")
+    servers     Server[]
 
     @@map("blockchains")
 }

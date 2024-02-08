@@ -36,13 +36,25 @@ export const authOptions: NextAuthOptions = {
         }
 
         if (!credentials.password) {
-          if (isAddress(credentials.address as string)) {
-            return {
-              address: credentials.address,
-            }
+          if (!isAddress(credentials.address as string)) {
+            return null
           }
 
-          return null
+          await prisma.user.upsert({
+            where: {
+              address: credentials.address,
+            },
+            create: {
+              address: credentials.address,
+            },
+            update: {
+              address: credentials.address,
+            },
+          })
+
+          return {
+            address: credentials.address,
+          }
         }
 
         const user = await prisma.user.findUnique({
@@ -74,14 +86,13 @@ export const authOptions: NextAuthOptions = {
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id
-        token.email = user.address
+        token.address = user.address
       }
       return token
     },
     async session({ session, token }) {
       session.user = {
-        ...session.user,
-        email: token.address as string,
+        address: token.address as string,
       }
 
       return session
