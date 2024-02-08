@@ -5,6 +5,7 @@ import {
   RainbowKitProvider,
   getDefaultWallets,
   connectorsForWallets,
+  darkTheme,
 } from "@rainbow-me/rainbowkit"
 import {
   argentWallet,
@@ -12,29 +13,14 @@ import {
   ledgerWallet,
 } from "@rainbow-me/rainbowkit/wallets"
 import { configureChains, createConfig, WagmiConfig } from "wagmi"
-import {
-  mainnet,
-  polygon,
-  optimism,
-  arbitrum,
-  base,
-  zora,
-  goerli,
-} from "wagmi/chains"
+import { mainnet, sepolia, Chain } from "wagmi/chains"
 import { publicProvider } from "wagmi/providers/public"
 
-const { chains, publicClient, webSocketPublicClient } = configureChains(
-  [
-    mainnet,
-    polygon,
-    optimism,
-    arbitrum,
-    base,
-    zora,
-    ...(process.env.NEXT_PUBLIC_ENABLE_TESTNETS === "true" ? [goerli] : []),
-  ],
-  [publicProvider()],
-)
+const c: Chain[] = [process.env.NODE_ENV === "production" ? mainnet : sepolia]
+
+const { chains, publicClient, webSocketPublicClient } = configureChains(c, [
+  publicProvider(),
+])
 
 const projectId = process.env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID ?? ""
 
@@ -74,7 +60,17 @@ export function Providers({ children }: { children: React.ReactNode }) {
 
   return (
     <WagmiConfig config={wagmiConfig}>
-      <RainbowKitProvider chains={chains} appInfo={demoAppInfo}>
+      <RainbowKitProvider
+        chains={chains}
+        appInfo={demoAppInfo}
+        theme={darkTheme({
+          accentColor: "#F44336",
+          accentColorForeground: "white",
+          borderRadius: "large",
+          fontStack: "system",
+          overlayBlur: "small",
+        })}
+      >
         {mounted && children}
       </RainbowKitProvider>
     </WagmiConfig>
