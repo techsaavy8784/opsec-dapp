@@ -1,30 +1,45 @@
 import type { Metadata } from "next"
 import { gilroy } from "@/fonts/gilroy"
 import { Providers } from "./providers"
+import { Sidebar } from "@/components/sidebar"
+import { Navbar } from "@/components/navbar"
 import { Toaster } from "@/components/ui/toaster"
 import ProtectRoutes from "./protect-routes"
 import "@rainbow-me/rainbowkit/styles.css"
 import "./globals.css"
-import React from "react"
+import { SidebarMobile } from "@/components/sidebar/sidebar-mobile"
 
 export const metadata: Metadata = {
   title: "Opsec Nodes",
   description: "Secure node management for the masses",
 }
 
-export interface LayoutProps {
+export default function RootLayout({
+  children,
+}: {
   children: React.ReactNode
+}) {
+  return (
+    <html lang="en">
+      <body className={`${gilroy.className} bg-black dark`}>
+        <Providers>
+          <ProtectRoutes>
+            <main className="md:container">
+              <div className="flex h-screen">
+                <div className="max-md:hidden">
+                  <Sidebar />
+                </div>
+                <SidebarMobile />
+                <div className="flex-1 flex flex-col">
+                  <Navbar />
+                  <div className="overflow-y-scroll">{children}</div>
+                </div>
+              </div>
+            </main>
+          </ProtectRoutes>
+          <Toaster />
+        </Providers>
+      </body>
+    </html>
+  )
 }
-
-const RootLayout: React.FC<LayoutProps> = ({ children }) => (
-  <html lang="en">
-    <body className={`${gilroy.className} bg-black dark`}>
-      <Providers>
-        <ProtectRoutes>{children}</ProtectRoutes>
-        <Toaster />
-      </Providers>
-    </body>
-  </html>
-)
-
-export default RootLayout
