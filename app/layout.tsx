@@ -2,7 +2,7 @@ import type { Metadata } from "next"
 import { gilroy } from "@/fonts/gilroy"
 import { Providers } from "./providers"
 import { Toaster } from "@/components/ui/toaster"
-// import ProtectRoutes from "./protect-routes"
+import ProtectRoutes from "./protect-routes"
 import "@rainbow-me/rainbowkit/styles.css"
 import "./globals.css"
 import React from "react"
@@ -20,9 +20,7 @@ const RootLayout: React.FC<LayoutProps> = ({ children }) => (
   <html lang="en">
     <body className={`${gilroy.className} bg-black dark`}>
       <Providers>
-        {/* <ProtectRoutes> */}
-        {children}
-        {/* </ProtectRoutes> */}
+        <ProtectRoutes>{children}</ProtectRoutes>
         <Toaster />
       </Providers>
     </body>
