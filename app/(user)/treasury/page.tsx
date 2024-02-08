@@ -72,10 +72,10 @@ const Treasury = () => {
               <TableCell className="text-[14px] font-[500] text-white max-md:min-w-[110px]">
                 20%
               </TableCell>
-              <TableCell className="text-[14px] font-[500] text-white">
+              <TableCell className="text-[14px] font-[500] text-white  max-md:min-w-[110px]">
                 48,300 DYM
               </TableCell>
-              <TableCell className="text-[16px] font-[500] text-[#F44336]">
+              <TableCell className="text-[16px] font-[500] text-[#F44336] max-md:min-w-[110px]">
                 <div className="flex items-center gap-1 md:gap-2 ">
                   <Image
                     src="/icons/wallet.svg"

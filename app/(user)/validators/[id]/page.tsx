@@ -51,7 +51,7 @@ const Dymension = () => {
         </div>
       </div>
       <div>
-        <h1 className="text-white text-[22px] font-[600]">Funding</h1>
+        <h1 className="text-white text-[22px] font-[600] ml-6">Funding</h1>
       </div>
       <div className="w-full flex items-center justify-center">
         <div className="w-[330px] md:w-[464px] bg-[#18181B] p-6 rounded-[24px] flex flex-col gap-4">
