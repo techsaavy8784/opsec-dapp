@@ -38,9 +38,9 @@ model Node {
 
 model Payment {
     id     Int  @id @default(autoincrement())
-    User   User @relation(fields: [userId], references: [id])
+    user   User @relation(fields: [userId], references: [id])
     userId Int  @map("user_id")
-    Node   Node @relation(fields: [nodeId], references: [id])
+    node   Node @relation(fields: [nodeId], references: [id])
     nodeId Int  @map("node_id")
 
     @@map("payments")
@@ -52,8 +52,8 @@ model Server {
     command      String
     active       Boolean
     hasWallet    Boolean     @map("has_wallet")
-    node         Node[]
-    Blockchain   Blockchain? @relation(fields: [blockchainId], references: [id])
+    nodes        Node[]
+    blockchain   Blockchain? @relation(fields: [blockchainId], references: [id])
     blockchainId Int         @map("blockchain_id")
 
     @@map("servers")
@@ -65,7 +65,7 @@ model Blockchain {
     url        String
     price      Float
     launchedAt DateTime @default(now()) @map("launched_at")
-    Server     Server[]
+    servers    Server[]
 
     @@map("blockchains")
 }
