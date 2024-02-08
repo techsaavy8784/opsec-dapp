@@ -2,14 +2,13 @@
 
 import React, { useState } from "react"
 import { useQuery } from "@tanstack/react-query"
-import { Node } from "@prisma/client"
 import { NodeCard } from "@/components/node-card"
 import { PaymentModal } from "@/components/payment-modal"
 
 const Nodes: React.FC = () => {
   const [paymentModal, setPaymentModal] = useState(false)
 
-  const { isPending, data } = useQuery<Node[]>({
+  const { isPending, data } = useQuery<[]>({
     queryKey: ["nodes/available"],
     queryFn: () => fetch("/api/nodes?type=available").then((res) => res.json()),
   })
@@ -27,8 +26,8 @@ const Nodes: React.FC = () => {
       {data.map((node) => (
         <NodeCard
           key={node.id}
-          title={node.server.blockchain.name}
-          description={node.server.blockchain.description}
+          title={node.blockchain.name}
+          description={node.blockchain.description}
           onRunNodeClick={() => setPaymentModal(true)}
         />
       ))}

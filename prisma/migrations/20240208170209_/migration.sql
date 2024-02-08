@@ -10,8 +10,10 @@ CREATE TABLE "users" (
 -- CreateTable
 CREATE TABLE "nodes" (
     "id" SERIAL NOT NULL,
-    "wallet" TEXT,
+    "userId" INTEGER NOT NULL,
     "server_id" INTEGER NOT NULL,
+    "paymentId" INTEGER NOT NULL,
+    "wallet" TEXT,
     "is_live" BOOLEAN NOT NULL,
     "created_at" TIMESTAMP(3) NOT NULL,
 
@@ -21,8 +23,6 @@ CREATE TABLE "nodes" (
 -- CreateTable
 CREATE TABLE "payments" (
     "id" SERIAL NOT NULL,
-    "user_id" INTEGER NOT NULL,
-    "node_id" INTEGER NOT NULL,
 
     CONSTRAINT "payments_pkey" PRIMARY KEY ("id")
 );
@@ -43,6 +43,7 @@ CREATE TABLE "servers" (
 CREATE TABLE "blockchains" (
     "id" SERIAL NOT NULL,
     "name" TEXT NOT NULL,
+    "description" TEXT NOT NULL DEFAULT '',
     "url" TEXT NOT NULL,
     "price" DOUBLE PRECISION NOT NULL,
     "launched_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
@@ -53,14 +54,17 @@ CREATE TABLE "blockchains" (
 -- CreateIndex
 CREATE UNIQUE INDEX "users_address_key" ON "users"("address");
 
+-- CreateIndex
+CREATE UNIQUE INDEX "nodes_paymentId_key" ON "nodes"("paymentId");
+
+-- AddForeignKey
+ALTER TABLE "nodes" ADD CONSTRAINT "nodes_userId_fkey" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
 -- AddForeignKey
 ALTER TABLE "nodes" ADD CONSTRAINT "nodes_server_id_fkey" FOREIGN KEY ("server_id") REFERENCES "servers"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "payments" ADD CONSTRAINT "payments_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
-
--- AddForeignKey
-ALTER TABLE "payments" ADD CONSTRAINT "payments_node_id_fkey" FOREIGN KEY ("node_id") REFERENCES "nodes"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "nodes" ADD CONSTRAINT "nodes_paymentId_fkey" FOREIGN KEY ("paymentId") REFERENCES "payments"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "servers" ADD CONSTRAINT "servers_blockchain_id_fkey" FOREIGN KEY ("blockchain_id") REFERENCES "blockchains"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

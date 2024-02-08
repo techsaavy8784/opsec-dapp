@@ -13,31 +13,16 @@ export async function GET(request: Request) {
   const { searchParams } = new URL(request.url)
   const type = searchParams.get("type")
 
-  const payments = await prisma.payment.findMany({
+  const servers = await prisma.server.findMany({
     where: {
-      userId: session.user?.id,
-    },
-  })
-
-  const boughtNodeIds = payments.map((node) => node.nodeId)
-
-  const nodes = await prisma.node.findMany({
-    where: {
-      id: {
-        in: type === "available" ? undefined : boughtNodeIds,
-        notIn: type === "available" ? boughtNodeIds : undefined,
-      },
+      node: type === "available" ? null : { userId: session.user?.id },
     },
     include: {
-      server: {
-        include: {
-          blockchain: true,
-        },
-      },
+      blockchain: true,
     },
   })
 
-  return NextResponse.json(nodes)
+  return NextResponse.json(servers)
 }
 
 export async function POST(request: Request) {
@@ -47,12 +32,12 @@ export async function POST(request: Request) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 })
   }
 
-  const { id } = await request.json()
+  const { wallet, serverId } = await request.json()
 
-  const alreadyBought = await prisma.payment.findFirst({
+  const alreadyBought = await prisma.node.findFirst({
     where: {
       userId: session.user?.id,
-      nodeId: id,
+      serverId,
     },
   })
 
@@ -60,25 +45,31 @@ export async function POST(request: Request) {
     return NextResponse.json({ message: "Already bought" }, { status: 400 })
   }
 
-  await prisma.payment.create({
+  const payment = await prisma.payment.create({
     data: {
-      userId: session.user?.id,
-      nodeId: id,
+      tx: "dummy",
     },
   })
 
-  const node = await prisma.node.findFirst({
-    where: {
-      id,
+  const node = await prisma.node.create({
+    data: {
+      wallet,
+      serverId,
+      userId: session.user?.id,
+      paymentId: payment.id,
     },
-    include: {
-      server: {
-        include: {
-          blockchain: true,
-        },
+  })
+
+  const server = await prisma.server.findFirst({
+    where: {
+      node: {
+        id: node.id,
       },
     },
+    include: {
+      blockchain: true,
+    },
   })
 
-  return NextResponse.json(node)
+  return NextResponse.json(server)
 }

@@ -16,32 +16,33 @@ datasource db {
 }
 
 model User {
-    id       Int       @id @default(autoincrement())
-    address  String    @unique // address is used as email for admins
+    id       Int     @id @default(autoincrement())
+    address  String  @unique // address is used as email for admins
     password String? // if password is not null, he is admin, otherwise user
-    payments Payment[]
+    nodes    Node[]
 
     @@map("users")
 }
 
 model Node {
-    id        Int       @id @default(autoincrement())
-    payments  Payment[]
+    id        Int      @id @default(autoincrement())
+    userId    Int
+    user      User     @relation(fields: [userId], references: [id])
+    paymentId Int      @unique @map("payment_id")
+    payment   Payment  @relation(fields: [paymentId], references: [id])
+    serverId  Int      @unique @map("server_id")
+    Server    Server   @relation(fields: [serverId], references: [id])
     wallet    String?
-    serverId  Int       @map("server_id")
-    server    Server    @relation(fields: [serverId], references: [id])
-    isLive    Boolean   @map("is_live")
-    createdAt DateTime  @map("created_at")
+    isLive    Boolean  @map("is_live")
+    createdAt DateTime @default(now()) @map("created_at")
 
     @@map("nodes")
 }
 
 model Payment {
-    id     Int  @id @default(autoincrement())
-    user   User @relation(fields: [userId], references: [id])
-    userId Int  @map("user_id")
-    node   Node @relation(fields: [nodeId], references: [id])
-    nodeId Int  @map("node_id")
+    id   Int    @id @default(autoincrement())
+    tx   String
+    node Node?
 
     @@map("payments")
 }
@@ -52,7 +53,7 @@ model Server {
     command      String
     active       Boolean
     hasWallet    Boolean     @map("has_wallet")
-    nodes        Node[]
+    node         Node?
     blockchain   Blockchain? @relation(fields: [blockchainId], references: [id])
     blockchainId Int         @map("blockchain_id")
 
