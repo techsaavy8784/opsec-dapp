@@ -8,6 +8,7 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import Image from "next/image"
+import { TreasuryChart } from "@/components/charts/treasury-chart"
 
 const tablehead = ["#", "Vaults", "Blockchain", "Goal", "Funding", "Action"]
 
@@ -18,7 +19,9 @@ const Treasury = () => {
         <h1 className="text-white text-[22px] font-[600]">Value</h1>
       </div>
       <div className="grid grid-cols-6 gap-6 h-[430px]">
-        <div className="col-span-4 rounded-[24px]"></div>
+        <div className="col-span-4 rounded-[24px] bg-[#18181B] p-2">
+          <TreasuryChart />
+        </div>
         <div className="col-span-2 flex flex-col justify-between p-8 bg-[url(/backgrounds/treasury.png)] bg-cover bg-center rounded-[24px]">
           <div>
             <h1 className="text-[22px] text-white font-[500]">Changes in</h1>
