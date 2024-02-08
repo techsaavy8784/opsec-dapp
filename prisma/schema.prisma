@@ -5,53 +5,67 @@ generator client {
     provider = "prisma-client-js"
 }
 
+generator jsonSchema {
+    provider              = "prisma-json-schema-generator"
+    includeRequiredFields = "true"
+}
+
 datasource db {
     provider = "postgresql"
     url      = env("DATABASE_URL")
 }
 
-model user {
-    id            Int             @unique @default(autoincrement())
-    address       String          @unique
-    name          String?
-    role          Int             @default(1)
-    running_nodes running_nodes[]
-    payments      payments[]
+model User {
+    id       Int       @id @default(autoincrement())
+    address  String    @unique // address is used as email for admins
+    password String? // if password is not null, he is admin, otherwise user
+    payments Payment[]
+
+    @@map("users")
 }
 
-model admin {
-    id       Int    @id @default(autoincrement())
-    email    String @unique
-    password String
-    role     Int    @default(0)
+model Node {
+    id        Int       @id @default(autoincrement())
+    payments  Payment[]
+    wallet    String?
+    serverId  Int       @map("server_id")
+    server    Server    @relation(fields: [serverId], references: [id])
+    isLive    Boolean   @map("is_live")
+    createdAt DateTime  @map("created_at")
+
+    @@map("nodes")
 }
 
-model node_brand {
-    id          Int     @id @default(autoincrement())
-    name        String
-    fee         Float
-    description String?
+model Payment {
+    id     Int  @id @default(autoincrement())
+    User   User @relation(fields: [userId], references: [id])
+    userId Int  @map("user_id")
+    Node   Node @relation(fields: [nodeId], references: [id])
+    nodeId Int  @map("node_id")
+
+    @@map("payments")
 }
 
-model running_nodes {
-    id       Int      @id @default(autoincrement())
-    user_id  Int
-    name     String
-    duration Int
-    start    DateTime
-    end      DateTime
-    paid     Boolean
-    user     user?    @relation(fields: [user_id], references: [id])
+model Server {
+    id           Int         @id @default(autoincrement())
+    ssh          String
+    command      String
+    active       Boolean
+    hasWallet    Boolean     @map("has_wallet")
+    node         Node[]
+    Blockchain   Blockchain? @relation(fields: [blockchainId], references: [id])
+    blockchainId Int         @map("blockchain_id")
+
+    @@map("servers")
 }
 
-model payments {
-    id        Int      @id @default(autoincrement())
-    address   String
-    amount    Int
-    user_id   Int
-    node_name String
-    txn_hash  String
-    duration  Int
-    date      DateTime @default(now())
-    user      user?    @relation(fields: [user_id], references: [id])
+model Blockchain {
+    id         Int      @id @default(autoincrement())
+    name       String
+    url        String
+    price      Float
+    launchedAt DateTime @default(now()) @map("launched_at")
+    Server     Server[]
+
+    @@map("blockchains")
 }

@@ -1,6 +1,9 @@
 "use client"
+
+import { useState } from "react"
 import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
+import { signIn } from "next-auth/react"
 import { z } from "zod"
 import {
   Form,
@@ -10,80 +13,57 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form"
-import { Dialog, DialogContent } from "@/components/ui/dialog"
-import { PulseLoader } from "react-spinners"
 import { Input } from "@/components/ui/input"
+import { useRouter } from "next/navigation"
 import { useToast } from "@/components/ui/use-toast"
 import { Button } from "@/components/ui/button"
-import { useState } from "react"
+import { PulseLoader } from "react-spinners"
 
 const loginSchema = z.object({
   email: z.string().email(),
   password: z.string().min(8),
-  confirmPassword: z.string().min(8),
 })
+
 function LoginForm() {
   const [loading, setLoading] = useState(false)
+  const router = useRouter()
   const { toast } = useToast()
   const form = useForm({
     resolver: zodResolver(loginSchema),
     defaultValues: {
       email: "",
       password: "",
-      confirmPassword: "",
     },
   })
 
   const onSubmit = async (values: z.infer<typeof loginSchema>) => {
-    if (values.password !== values.confirmPassword) {
-      toast({
-        title: "Error",
-        description: "Passwords do not match",
-        variant: "destructive",
-      })
-      form.setError("password", {
-        type: "manual",
-        message: "Passwords do not match",
-      })
-      form.setError("confirmPassword", {
-        type: "manual",
-        message: "Passwords do not match",
-      })
-      return
-    }
     setLoading(true)
-    const res = await fetch("/api/admin/addadmin", {
-      method: "POST",
-      body: JSON.stringify(values),
+    const result = await signIn("credentials", {
+      redirect: false,
+      address: values.email,
+      password: values.password,
     })
-    if (!res.ok) {
+
+    if (!result?.error) {
+      router.push("/admin")
+      form.reset()
+    } else {
+      // Handle error...
       toast({
         title: "Error",
-        description: "Error adding admin!",
+        description: "Error logging in!",
         variant: "destructive",
       })
-      return
+      form.setError("email", {
+        type: "manual",
+        message: "Invalid email or password",
+      })
     }
-    const data = await res.json()
-    console.log(data)
-    toast({
-      title: "Success",
-      description: "Admin added successfully!",
-      variant: "default",
-    })
     setLoading(false)
-    form.reset()
   }
 
   return (
     <div className="relative">
-      <Dialog open={loading}>
-        <DialogContent>
-          <div className="w-full h-full flex justify-center">
-            <PulseLoader color="black" />
-          </div>
-        </DialogContent>
-      </Dialog>
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
@@ -98,7 +78,7 @@ function LoginForm() {
                   <FormLabel className="text-white">email</FormLabel>
                   <FormControl>
                     <Input
-                      className="bg-white"
+                      className="bg-white text-black"
                       placeholder="admin@opsec.org"
                       {...field}
                     />
@@ -116,7 +96,7 @@ function LoginForm() {
                   <FormControl>
                     <Input
                       type="password"
-                      className="bg-white"
+                      className="bg-white text-black"
                       placeholder="Password"
                       {...field}
                     />
@@ -125,27 +105,19 @@ function LoginForm() {
                 </FormItem>
               )}
             />
-            <FormField
-              control={form.control}
-              name="confirmPassword"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-white">Password</FormLabel>
-                  <FormControl>
-                    <Input
-                      type="password"
-                      className="bg-white"
-                      placeholder="Confirm Password"
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <Button className="w-full my-6" type="submit">
-              Add admin
-            </Button>
+            {loading ? (
+              <Button
+                className="w-full my-6 flex justify-center"
+                type="submit"
+                disabled
+              >
+                <PulseLoader color="black" />
+              </Button>
+            ) : (
+              <Button className="w-full my-6" type="submit">
+                Login
+              </Button>
+            )}
           </div>
         </form>
       </Form>
