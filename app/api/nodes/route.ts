@@ -15,7 +15,7 @@ export async function GET(request: Request) {
 
   const servers = await prisma.server.findMany({
     where: {
-      node: type === "available" ? null : { userId: session.user?.id },
+      node: type === "available" ? { is: null } : { userId: session.user?.id },
     },
     include: {
       blockchain: true,
