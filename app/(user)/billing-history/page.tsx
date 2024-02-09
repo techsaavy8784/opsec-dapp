@@ -1,4 +1,3 @@
-import { CardWrapper } from "@/components/card-wrapper"
 import {
   Table,
   TableBody,
@@ -21,7 +20,7 @@ const BillingHistory = () => {
     "Date",
   ]
   return (
-    <CardWrapper>
+    <div className="p-6 max-md:w-screen overflow-hidden">
       <div className="border border-[#FFFFFF33] rounded-[16px]">
         <Table>
           <TableHeader>
@@ -92,7 +91,7 @@ const BillingHistory = () => {
           </TableBody>
         </Table>
       </div>
-    </CardWrapper>
+    </div>
   )
 }
 

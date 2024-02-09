@@ -11,7 +11,7 @@ type Props = {
 
 export const Header = ({ title, description, pay, loading }: Props) => {
   return (
-    <DialogHeader className={`${pay ? "max-w-[270px]" : ""}`}>
+    <DialogHeader>
       {pay && (
         <div className="flex items-center justify-center w-full">
           <Image src="/image/pay.svg" alt="pay" width={138} height={138} />{" "}

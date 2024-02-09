@@ -55,14 +55,12 @@ export const PaymentModal = ({ data, setData, setSlide, slide }: Props) => {
     <Dialog>
       <DialogTrigger className="w-full">
         <Button type="button" variant="custom">
-          Run a node
+          Start
           <FaArrowRightLong className="ml-2 font-[300]" />
         </Button>
       </DialogTrigger>
       <DialogContent
-        className={`bg-[#0E111C] border-none rounded-[24px] p-8 ${
-          slide === 0 ? "" : "w-[370px]"
-        }`}
+        className={`bg-[#18181B] border-none rounded-[24px] p-8 w-[350px] md:w-[450px]`}
       >
         {renderHeader()}
         <form className="flex items-center justify-center flex-col px-8 gap-8">
@@ -86,7 +84,7 @@ export const PaymentModal = ({ data, setData, setSlide, slide }: Props) => {
           )}
           {slide < 2 && (
             <Button type="button" onClick={handleSlide} variant="custom">
-              Pay
+              {slide === 0 ? "Continue" : "Pay"}
             </Button>
           )}
         </form>
