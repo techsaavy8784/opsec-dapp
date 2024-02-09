@@ -46,9 +46,7 @@ export const PaymentModal: React.FC<DialogProps> = (props) => {
   return (
     <Dialog {...props}>
       <DialogContent
-        className={`bg-[#0E111C] border-none rounded-[24px] p-8 ${
-          slide === 0 ? "" : "w-[370px]"
-        }`}
+        className={`bg-[#18181B] border-none rounded-[24px] p-8 w-[350px] md:w-[450px]`}
       >
         {renderHeader()}
         <form className="flex items-center justify-center flex-col px-8 gap-8">
