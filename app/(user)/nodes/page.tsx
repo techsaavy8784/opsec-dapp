@@ -1,21 +1,40 @@
-import { NodeCard } from "@/components/node-card"
-import React from "react"
+"use client"
 
-const Shop = () => {
+import React, { useState } from "react"
+import { useQuery } from "@tanstack/react-query"
+import { NodeCard } from "@/components/node-card"
+import { PaymentModal } from "@/components/payment-modal"
+
+const Nodes: React.FC = () => {
+  const [paymentModal, setPaymentModal] = useState(false)
+
+  const { isPending, data } = useQuery<[]>({
+    queryKey: ["nodes/available"],
+    queryFn: () => fetch("/api/nodes?type=available").then((res) => res.json()),
+  })
+
+  if (isPending) {
+    return "Loading"
+  }
+
+  if (!data) {
+    return "No data"
+  }
+
   return (
-    <div className="p-6 flex flex-col gap-6">
-      <div>
-        <h1 className="text-white text-[22px] font-[600]">Available nodes</h1>
-      </div>
-      <div className="max-md:px-4 m-0 p-0">
-        <div className="grid grid-cols-1 md:grid-cols-4 items-center gap-8">
-          {[1, 2, 3, 4, 5, 6, 7, 8]?.map((item) => (
-            <NodeCard key={item} shop />
-          ))}
-        </div>
-      </div>
+    <div className="grid grid-cols-1 md:grid-cols-3 items-center gap-8">
+      {data.map((node) => (
+        <NodeCard
+          key={node.id}
+          title={node.blockchain.name}
+          description={node.blockchain.description}
+          onRunNodeClick={() => setPaymentModal(true)}
+        />
+      ))}
+
+      <PaymentModal open={paymentModal} onOpenChange={setPaymentModal} />
     </div>
   )
 }
 
-export default Shop
+export default Nodes

@@ -3,59 +3,52 @@
 import Image from "next/image"
 import React from "react"
 import { Button } from "@/components/ui/button"
-import { PaymentModal } from "../payment-modal"
 import { FaArrowRightLong } from "react-icons/fa6"
-import { useRouter } from "next/navigation"
+import Link from "next/link"
 
-type Props = {
-  shop?: boolean
-  path?: string
+type NodeCardProps = {
+  title: string
+  description: string
+  onRunNodeClick?: () => void
 }
 
-export const NodeCard = ({ shop, path }: Props) => {
-  const [slide, setSlide] = React.useState(0)
-  const router = useRouter()
-  const [data, setData] = React.useState({
-    walletAddress: "",
-  })
-  return (
-    <div className="col-span-1 p-4 rounded-[16px] bg-[#18181B] flex flex-col gap-4">
-      <div className="flex-1">
-        <Image
-          src="/image/node.png"
-          alt=""
-          width={216}
-          height={118}
-          className="rounded-[16px] w-full"
-        />
-      </div>
-      <div className="flex flex-col gap-2">
-        <h1 className="text-white font-[600] text-[16px]">Bittensor</h1>
-        <p className="text-[#71717A] font-[500] text-[12px]">
-          {"A decentralized machine learning network built on blockchain technology, empowering users to train and reward models, access and extract information, and hold a token that incentivizes their contributions."?.substring(
-            0,
-            100,
-          )}
-          ...
-        </p>
-      </div>
-      {shop ? (
-        <PaymentModal
-          data={data}
-          setData={setData}
-          slide={slide}
-          setSlide={setSlide}
-        />
-      ) : (
-        <Button
-          type="button"
-          onClick={() => router.push(`${path}`)}
-          variant="custom"
-        >
+export const NodeCard: React.FC<NodeCardProps> = ({
+  title,
+  description,
+  onRunNodeClick,
+}) => (
+  <div
+    style={{
+      background:
+        "radial-gradient(0.51% 35.77% at 99.5% 53.54%, rgb(255, 255, 255) 0.55%, rgba(255, 255, 255, 0.06) 100%), linear-gradient(0deg, rgba(255, 255, 255, 0.05), rgba(255, 255, 255, 0.05))",
+    }}
+    className="col-span-1 p-4 rounded-[16px] backdrop:blur-[100px] overflow-hidden flex flex-col gap-4"
+  >
+    <div className="flex-1">
+      <Image
+        src="/image/node.png"
+        alt=""
+        width={216}
+        height={118}
+        className="rounded-[16px] w-full"
+      />
+    </div>
+    <div className="flex flex-col gap-2">
+      <h1 className="text-white font-[600] text-[16px]">{title}</h1>
+      <p className="text-[#BDBDBD] font-[500] text-[12px]">{description}</p>
+    </div>
+    {onRunNodeClick ? (
+      <Button type="button" variant="custom" onClick={onRunNodeClick}>
+        Start
+        <FaArrowRightLong className="ml-2 font-[300]" />
+      </Button>
+    ) : (
+      <Button asChild variant="custom">
+        <Link href="/dashboard/123">
           Start
           <FaArrowRightLong className="ml-2 font-[300]" />
-        </Button>
-      )}
-    </div>
-  )
-}
+        </Link>
+      </Button>
+    )}
+  </div>
+)

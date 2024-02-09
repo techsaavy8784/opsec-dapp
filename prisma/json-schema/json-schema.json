@@ -16,10 +16,10 @@
             "null"
           ]
         },
-        "payments": {
+        "nodes": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/Payment"
+            "$ref": "#/definitions/Node"
           }
         }
       },
@@ -33,20 +33,20 @@
         "id": {
           "type": "integer"
         },
-        "payments": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/Payment"
-          }
+        "user": {
+          "$ref": "#/definitions/User"
+        },
+        "payment": {
+          "$ref": "#/definitions/Payment"
+        },
+        "Server": {
+          "$ref": "#/definitions/Server"
         },
         "wallet": {
           "type": [
             "string",
             "null"
           ]
-        },
-        "server": {
-          "$ref": "#/definitions/Server"
         },
         "isLive": {
           "type": "boolean"
@@ -57,9 +57,10 @@
         }
       },
       "required": [
+        "userId",
+        "paymentId",
         "serverId",
-        "isLive",
-        "createdAt"
+        "isLive"
       ]
     },
     "Payment": {
@@ -68,16 +69,22 @@
         "id": {
           "type": "integer"
         },
-        "user": {
-          "$ref": "#/definitions/User"
+        "tx": {
+          "type": "string"
         },
         "node": {
-          "$ref": "#/definitions/Node"
+          "anyOf": [
+            {
+              "$ref": "#/definitions/Node"
+            },
+            {
+              "type": "null"
+            }
+          ]
         }
       },
       "required": [
-        "userId",
-        "nodeId"
+        "tx"
       ]
     },
     "Server": {
@@ -98,11 +105,15 @@
         "hasWallet": {
           "type": "boolean"
         },
-        "nodes": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/Node"
-          }
+        "node": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/Node"
+            },
+            {
+              "type": "null"
+            }
+          ]
         },
         "blockchain": {
           "anyOf": [
@@ -131,6 +142,10 @@
         },
         "name": {
           "type": "string"
+        },
+        "description": {
+          "type": "string",
+          "default": ""
         },
         "url": {
           "type": "string"
