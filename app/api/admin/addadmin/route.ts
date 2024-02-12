@@ -14,7 +14,7 @@ export async function POST(req: NextRequest) {
     console.log({ body })
     const { email, password } = body
 
-    const existingUser = await db.admin.findFirst({
+    const existingUser = await db.admins.findFirst({
       where: { email: body.email },
     })
     if (existingUser) {
@@ -26,7 +26,7 @@ export async function POST(req: NextRequest) {
 
     // Create user
     const hashedPassword = await hash(password, 10)
-    const newUser = await db.admin.create({
+    const newUser = await db.admins.create({
       data: {
         email,
         password: hashedPassword,

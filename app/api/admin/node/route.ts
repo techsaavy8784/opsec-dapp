@@ -18,13 +18,13 @@ export async function POST(req: NextRequest) {
   const { name, fee, description } = await req.json()
   if (description) data.description = description
   if (fee) data.fee = fee
-  const node_exist = await db.node_brand.findFirst({
+  const node_exist = await db.nodes.findFirst({
     where: {
       name: name,
     },
   })
   if (node_exist) {
-    const update = await db.node_brand.update({
+    const update = await db.nodes.update({
       where: {
         id: node_exist.id,
       },
@@ -33,7 +33,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ message: "Node Updated", data: update })
   }
 
-  const node = await db.node_brand.create({
+  const node = await db.nodes.create({
     data: {
       name,
       description,
