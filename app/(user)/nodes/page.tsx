@@ -23,14 +23,14 @@ const Nodes: React.FC = () => {
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-3 items-center gap-8">
-      {data.map((node) => (
+      {/* {data.map((node:any) => (
         <NodeCard
           key={node.id}
-          title={node.blockchain.name}
+          name={node.name}
           description={node.blockchain.description}
           onRunNodeClick={() => setPaymentModal(true)}
         />
-      ))}
+      ))} */}
 
       <PaymentModal open={paymentModal} onOpenChange={setPaymentModal} />
     </div>

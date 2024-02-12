@@ -8,6 +8,8 @@
     "plugin:prettier/recommended"
   ],
   "rules": {
-    "semi": ["error", "never"]
+    "semi": ["error", "never"],
+    "@typescript-eslint/no-unused-vars": "off",
+    "@typescript-eslint/no-explicit-any": "off"
   }
 }

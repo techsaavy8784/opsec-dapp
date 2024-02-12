@@ -12,7 +12,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => (
       <SidebarMobile />
       <div className="flex-1 flex flex-col">
         <Navbar />
-        <div className="overflow-y-scroll">{children}</div>
+        <div className="overflow-y-scroll px-6">{children}</div>
       </div>
     </div>
   </main>

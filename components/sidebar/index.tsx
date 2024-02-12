@@ -6,44 +6,58 @@ import Image from "next/image"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import React from "react"
+import {
+  DashboardIcon,
+  MarketplaceIcon,
+  NodesIcon,
+  ValidatorsIcon,
+  TreasuryIcon,
+  BillingIcon,
+} from "@/components/icons"
 
 type Props = {
   setOpen?: (value: boolean) => void
 }
 
+type NavItem = {
+  title: string
+  link: string
+  icon: React.ElementType
+}
+
 const Sidebar = ({ setOpen }: Props) => {
   const path = usePathname()
   const pathName = path.split("/")[1]
-  const navItems = [
+  const navItems: NavItem[] = [
     {
       title: "Dashbaord",
-      icon: "dashboard.svg",
       link: "dashboard",
-      activeIcon: "dashboard-active.svg",
+      icon: DashboardIcon,
+    },
+    {
+      title: "Marketplace",
+      link: "marketplace",
+      icon: MarketplaceIcon,
     },
     {
       title: "Nodes",
-      icon: "nodes.svg",
       link: "nodes",
-      activeIcon: "nodes-active.svg",
+      icon: NodesIcon,
     },
     {
       title: "Validators",
-      icon: "validators.svg",
       link: "validators",
-      activeIcon: "validators-active.svg",
+      icon: ValidatorsIcon,
     },
     {
       title: "Treasury",
-      icon: "treasuries.svg",
       link: "treasury",
-      activeIcon: "treasuries-active.svg",
+      icon: TreasuryIcon,
     },
     {
-      title: "Billing History",
-      icon: "billing-history.svg",
-      link: "billing-history",
-      activeIcon: "billing-history-active.svg",
+      title: "Billing",
+      link: "billing",
+      icon: BillingIcon,
     },
   ]
 
@@ -71,20 +85,17 @@ const Sidebar = ({ setOpen }: Props) => {
               key={index}
               href={`/${item.link}`}
               onClick={() => setOpen && setOpen(false)}
-              className={`flex items-center gap-4 pl-8 py-2 hover:bg-[#48474761] transition-all ease-in duration-100 border-l-[3px] ${pathName === item.link ? "border-[#F44336]" : "border-transparent"}`}
+              className={`flex items-center gap-4 pl-8 py-2 hover:bg-[#48474761] transition-all ease-in duration-100 border-l-[3px] cursor-pointer ${
+                pathName === item.link
+                  ? "border-[#F44336]"
+                  : "border-transparent"
+              }`}
             >
-              <Image
-                src={
-                  pathName === item.link
-                    ? `/icons/nav/${item.activeIcon}`
-                    : `/icons/nav/${item.icon}`
-                }
-                alt="dash-icon"
-                width={24}
-                height={24}
-              />
+              <item.icon isActive={pathName === item.link} />
               <h1
-                className={` ${pathName === item.link ? "text-white" : "text-[#52525B]"} font-[600] text-[16px]`}
+                className={` ${
+                  pathName === item.link ? "text-white" : "text-[#52525B]"
+                } font-[600] text-[16px]`}
               >
                 {item.title}
               </h1>
@@ -92,13 +103,15 @@ const Sidebar = ({ setOpen }: Props) => {
           ))}
         </div>
         <div className={`flex items-center justify-center py-8 md:py-4`}>
-          <Image
-            src="/backgrounds/twitter-banner.png"
-            alt="twitter-banner"
-            width={210}
-            height={260}
-            className="max-md:hidden"
-          />
+          <Link href="https://x.com/">
+            <Image
+              src="/backgrounds/twitter-banner.png"
+              alt="twitter-banner"
+              width={210}
+              height={260}
+              className="max-md:hidden"
+            />
+          </Link>
           <div className="md:hidden">
             <ConnectButton />
           </div>

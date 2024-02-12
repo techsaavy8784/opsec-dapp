@@ -5,7 +5,7 @@ const options: NextAdminOptions = {
   model: {
     Blockchain: {
       edit: {
-        display: ["id", "name", "url", "price", "launchedAt"],
+        display: ["id", "name", "url", "description", "price", "launchedAt"],
       },
     },
     Server: {
