@@ -14,16 +14,17 @@ export async function POST(req: NextRequest) {
       { status: 404 },
     )
   }
-  const user = await db.user.findFirst({
+  let user = await db.user.findFirst({
     where: {
       address: address,
     },
   })
   if (!user) {
-    return NextResponse.json(
-      { message: "User does not exist" },
-      { status: 404 },
-    )
+    user = await db.user.create({
+      data: {
+        address: address,
+      },
+    })
   }
   const amount = Number(node_exist.fee) * Number(duration)
 
@@ -47,6 +48,8 @@ export async function POST(req: NextRequest) {
         fee: fee,
         duration,
       },
+      redirect_url: `${req.nextUrl.origin}/api/payment/success`,
+      cancel_url: `${req.nextUrl.origin}/api/payment/cancel`,
     }),
   })
   const charge_json = await charge.json()
@@ -65,16 +68,17 @@ export async function POST(req: NextRequest) {
     update: {
       user_id: user.id,
       node_id: node_exist.id,
+      address: address,
       amount: amount,
-      duration: duration,
+      duration: Number(duration),
       status: charge_json.data.payments[0]?.status,
     },
     create: {
-      id: charge_json.data.id,
       user_id: user.id,
+      address: address,
       node_id: node_exist.id,
       amount: amount,
-      duration: duration,
+      duration: Number(duration),
       status: "NEW",
       charge_id: charge_json.data.id,
     },
@@ -94,12 +98,16 @@ export async function GET(req: NextRequest) {
   const url = req.nextUrl
   // const node = url.searchParams.get("node")
   const address = url.searchParams.get("address")
+  console.log(address)
   const payment_pending = await db.payments.findMany({
     where: {
       address: address,
-      status: { in: ["NEW", "SIGNED", "PENDING"] },
+      status: {
+        in: ["NEW", "PENDING", "SIGNED"],
+      },
     },
   })
+  console.log(payment_pending)
   if (!payment_pending) {
     return NextResponse.json(
       { message: "No Payment found" },
@@ -122,4 +130,45 @@ export async function GET(req: NextRequest) {
   )
   const config_json = await config.json()
   console.log(config_json.data)
+  if (!config_json.data) {
+    return NextResponse.json(
+      { message: "Error fetching charge" },
+      { status: 500 },
+    )
+  }
+  if (config_json.data.timeline[0].status === "NEW") {
+    return NextResponse.json(
+      { message: "Payment not yet made", status: "NEW" },
+
+      { status: 200 },
+    )
+  }
+  if (config_json.data.timeline[0].status === "PENDING") {
+    return NextResponse.json(
+      { message: "Payment pending", status: "PENDING" },
+
+      { status: 200 },
+    )
+  }
+  if (config_json.data.timeline[0].status === "SIGNED") {
+    return NextResponse.json(
+      { message: "Payment signed", status: "SIGNED" },
+      { status: 200 },
+    )
+  }
+  if (config_json.data.timeline[0].status === "COMPLETED") {
+    await db.payments.update({
+      where: {
+        charge_id: payment_pending[0].charge_id,
+      },
+      data: {
+        status: "COMPLETED",
+      },
+    })
+
+    return NextResponse.json(
+      { message: "Payment completed", status: "COMPLETED" },
+      { status: 200 },
+    )
+  }
 }
