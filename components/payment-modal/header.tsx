@@ -2,14 +2,19 @@ import React from "react"
 import { DialogDescription, DialogHeader, DialogTitle } from "../ui/dialog"
 import Image from "next/image"
 
-type Props = {
+type HeaderProps = {
   title: string
   description: string
   pay?: boolean
   loading?: boolean
 }
 
-export const Header = ({ title, description, pay, loading }: Props) => {
+export const Header: React.FC<HeaderProps> = ({
+  title,
+  description,
+  pay,
+  loading,
+}) => {
   return (
     <DialogHeader>
       {pay && (

@@ -1,11 +1,33 @@
-import React, { useEffect, useState } from "react"
+import React, { useCallback, useEffect, useState } from "react"
 import { DialogProps } from "@radix-ui/react-dialog"
 import { Dialog, DialogContent } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Header } from "./header"
 
-export const PaymentModal: React.FC<DialogProps> = (props) => {
+const headerProps = [
+  {
+    title: "Enter your wallet address",
+    description: "This wallet will be the one where you receive rewards",
+  },
+  {
+    title: "Pay service",
+    description: "Choose service you want to pay with",
+  },
+  {
+    title: "Waiting for payment",
+    description: "You need to complete your payment to receive node",
+  },
+]
+
+interface PaymentModalProps extends DialogProps {
+  onPay: (wallet: string) => void
+}
+
+export const PaymentModal: React.FC<PaymentModalProps> = ({
+  onPay,
+  ...props
+}) => {
   const [slide, setSlide] = useState(0)
 
   const [walletAddr, setWalletAddr] = useState("")
@@ -14,31 +36,23 @@ export const PaymentModal: React.FC<DialogProps> = (props) => {
     setSlide(0)
   }, [props.open])
 
+  const handlePayClick = useCallback(() => {
+    if (slide === 1) {
+      onPay(walletAddr)
+    }
+    setSlide((prev) => prev + 1)
+  }, [onPay, slide, walletAddr])
+
   return (
     <Dialog {...props}>
       <DialogContent
         className={`bg-[#18181B] border-none rounded-[24px] p-8 w-[350px] md:w-[450px]`}
       >
-        {slide === 0 ? (
-          <Header
-            title={"Enter your wallet address"}
-            description={
-              "This wallet will be the one where you receive rewards"
-            }
-          />
-        ) : slide === 1 ? (
-          <Header
-            title={"Pay service"}
-            description={"Choose service you want to pay with"}
-          />
-        ) : (
-          <Header
-            title={"Waiting for payment"}
-            pay
-            loading={false}
-            description={"You need to complete your payment to receive node"}
-          />
-        )}
+        <Header
+          title={headerProps[slide].title}
+          description={headerProps[slide].description}
+          pay={slide === 2}
+        />
         <form className="flex items-center justify-center flex-col px-8 gap-8">
           {slide === 0 && (
             <Input
@@ -55,11 +69,7 @@ export const PaymentModal: React.FC<DialogProps> = (props) => {
             </div>
           )}
           {slide < 2 && (
-            <Button
-              type="button"
-              onClick={() => setSlide((prev) => prev + 1)}
-              variant="custom"
-            >
+            <Button type="button" onClick={handlePayClick} variant="custom">
               Pay
             </Button>
           )}

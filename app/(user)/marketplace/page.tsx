@@ -1,19 +1,30 @@
 "use client"
 
-import React, { useState } from "react"
-import { useQuery } from "@tanstack/react-query"
+import React, { useCallback, useRef, useState } from "react"
+import { useMutation, useQuery } from "@tanstack/react-query"
 import { NodeCard } from "@/components/node-card"
 import { PaymentModal } from "@/components/payment-modal"
 
 const Nodes: React.FC = () => {
   const [paymentModal, setPaymentModal] = useState(false)
 
+  const serverId = useRef<string>()
+
   const { isPending, data } = useQuery<[]>({
     queryKey: ["server/list"],
     queryFn: () => fetch("/api/server/list").then((res) => res.json()),
   })
 
-  console.log(data)
+  const { mutate } = useMutation<void, void, string>({
+    mutationFn: (data) =>
+      fetch("/api/purchase", {
+        body: JSON.stringify({
+          wallet: data,
+          serverId: serverId.current,
+          duration: 1,
+        }),
+      }),
+  })
 
   if (isPending) {
     return "Loading"
@@ -37,10 +48,17 @@ const Nodes: React.FC = () => {
             key={server.id}
             name={server.name}
             description={server.description}
-            onRunNodeClick={() => setPaymentModal(true)}
+            onRunNodeClick={() => {
+              serverId.current = server.id
+              setPaymentModal(true)
+            }}
           />
         ))}
-        <PaymentModal open={paymentModal} onOpenChange={setPaymentModal} />
+        <PaymentModal
+          open={paymentModal}
+          onOpenChange={setPaymentModal}
+          onPay={(wallet) => mutate(wallet)}
+        />
       </div>
     </>
   )
