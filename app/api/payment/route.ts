@@ -64,13 +64,22 @@ export async function POST(request: NextRequest) {
       description: "Payment for node",
       local_price: {
         amount,
-        currency: "ETH",
+        currency: "USDT",
       },
       pricing_type: "fixed_price",
       redirect_url: `${request.nextUrl.origin}/api/payment/success?verifier=${verifier}`,
       cancel_url: `${request.nextUrl.origin}/api/payment/cancel`,
     }),
-  }).then((res) => res.json())
+  })
+    .then((res) => res.json())
+    .catch((e) => console.log("error making coinbase charge:", e))
+
+  if (!data) {
+    return NextResponse.json(
+      { message: "Error making payment" },
+      { status: 500 },
+    )
+  }
 
   tx[verifier] = {
     serverId,
@@ -78,13 +87,6 @@ export async function POST(request: NextRequest) {
     wallet,
     userId: session.user?.id,
     tx: data.id,
-  }
-
-  if (!data) {
-    return NextResponse.json(
-      { message: "Error making payment" },
-      { status: 500 },
-    )
   }
 
   return NextResponse.json({
