@@ -41,8 +41,10 @@ model Node {
 
 model Server {
     id           Int        @id @default(autoincrement())
-    ssh          String
-    command      String
+    host         String     @default("")
+    port         Int        @default(22)
+    username     String     @default("")
+    password     String     @default("")
     active       Boolean
     node         Node?
     blockchain   Blockchain @relation(fields: [blockchainId], references: [id])

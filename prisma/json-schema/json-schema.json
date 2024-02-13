@@ -69,11 +69,21 @@
         "id": {
           "type": "integer"
         },
-        "ssh": {
-          "type": "string"
+        "host": {
+          "type": "string",
+          "default": ""
         },
-        "command": {
-          "type": "string"
+        "port": {
+          "type": "integer",
+          "default": 22
+        },
+        "username": {
+          "type": "string",
+          "default": ""
+        },
+        "password": {
+          "type": "string",
+          "default": ""
         },
         "active": {
           "type": "boolean"
@@ -93,8 +103,6 @@
         }
       },
       "required": [
-        "ssh",
-        "command",
         "active",
         "blockchainId"
       ]
