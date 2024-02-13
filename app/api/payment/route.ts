@@ -63,13 +63,17 @@ export async function POST(req: NextRequest) {
   }
   const payment = await db.payments.upsert({
     where: {
-      charge_id: charge_json.data.id,
+      node_id_address: {
+        node_id: node_exist.id,
+        address: address,
+      },
     },
     update: {
       user_id: user.id,
       node_id: node_exist.id,
       address: address,
       amount: amount,
+      charge_id: charge_json.data.id,
       duration: Number(duration),
       status: charge_json.data.payments[0]?.status,
     },
@@ -96,12 +100,23 @@ export async function POST(req: NextRequest) {
 }
 export async function GET(req: NextRequest) {
   const url = req.nextUrl
-  // const node = url.searchParams.get("node")
+  const node = url.searchParams.get("node")
   const address = url.searchParams.get("address")
-  console.log(address)
+  const node_exist = await db.node_brand.findFirst({
+    where: {
+      name: node as string,
+    },
+  })
+  if (!node_exist) {
+    return NextResponse.json(
+      { message: "Node does not exist" },
+      { status: 404 },
+    )
+  }
   const payment_pending = await db.payments.findMany({
     where: {
       address: address,
+      node_id: node_exist.id,
       status: {
         in: ["NEW", "PENDING", "SIGNED"],
       },
@@ -165,7 +180,6 @@ export async function GET(req: NextRequest) {
         status: "COMPLETED",
       },
     })
-
     return NextResponse.json(
       { message: "Payment completed", status: "COMPLETED" },
       { status: 200 },

@@ -54,7 +54,7 @@ model Server {
 
 model payments {
     id        Int         @id @default(autoincrement())
-    address   String?
+    address   String
     node_id   Int
     duration  Int
     amount    Int
@@ -64,6 +64,8 @@ model payments {
     date      DateTime    @default(now())
     user      user?       @relation(fields: [user_id], references: [id])
     node      node_brand? @relation(fields: [node_id], references: [id])
+
+    @@unique([node_id, address])
 }
 
 model Blockchain {
