@@ -9,7 +9,7 @@ import Link from "next/link"
 type NodeCardProps = {
   name: string
   description: string
-  enabled: boolean
+  enabled?: boolean
   onRunNodeClick?: () => void
 }
 

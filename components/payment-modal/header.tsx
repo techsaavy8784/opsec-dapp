@@ -2,17 +2,20 @@ import React from "react"
 import { DialogDescription, DialogHeader, DialogTitle } from "../ui/dialog"
 import Image from "next/image"
 
-type Props = {
+type HeaderProps = {
   title: string
   description: string
-  pay?: boolean
-  loading?: boolean
+  payment?: "waiting" | "complete"
 }
 
-export const Header = ({ title, description, pay, loading }: Props) => {
+export const Header: React.FC<HeaderProps> = ({
+  title,
+  description,
+  payment,
+}) => {
   return (
     <DialogHeader>
-      {pay && (
+      {payment && (
         <div className="flex items-center justify-center w-full">
           <Image src="/image/pay.svg" alt="pay" width={138} height={138} />{" "}
         </div>
@@ -23,7 +26,7 @@ export const Header = ({ title, description, pay, loading }: Props) => {
       <DialogDescription className="text-[#54597C] w-full text-center font-[500] text-[16px]">
         {description}
       </DialogDescription>
-      {pay && (
+      {payment && (
         <div className="flex gap-3 w-full flex-col pt-6">
           <div className="flex items-center justify-between w-full">
             <h1 className="text-[#fff] text-[16px] font-[500]">
@@ -40,11 +43,13 @@ export const Header = ({ title, description, pay, loading }: Props) => {
             </div>
           </div>
           <p
-            className={`font-[monaco] text-[16px] font-[400] ${
-              loading ? "text-[#FFEB3B]" : "text-[#10B981]"
+            className={`text-[16px] font-[400] ${
+              payment === "waiting" ? "text-[#FFEB3B]" : "text-[#10B981]"
             }`}
           >
-            {loading ? "Waiting for your payment" : "Successfully Paid"}
+            {payment === "waiting"
+              ? "Waiting for your payment"
+              : "Successfully Paid"}
           </p>
         </div>
       )}

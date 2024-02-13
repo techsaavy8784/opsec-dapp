@@ -63,30 +63,6 @@
         "isLive"
       ]
     },
-    "Payment": {
-      "type": "object",
-      "properties": {
-        "id": {
-          "type": "integer"
-        },
-        "tx": {
-          "type": "string"
-        },
-        "node": {
-          "anyOf": [
-            {
-              "$ref": "#/definitions/Node"
-            },
-            {
-              "type": "null"
-            }
-          ]
-        }
-      },
-      "required": [
-        "tx"
-      ]
-    },
     "Server": {
       "type": "object",
       "properties": {
@@ -116,14 +92,7 @@
           ]
         },
         "blockchain": {
-          "anyOf": [
-            {
-              "$ref": "#/definitions/Blockchain"
-            },
-            {
-              "type": "null"
-            }
-          ]
+          "$ref": "#/definitions/Blockchain"
         }
       },
       "required": [
@@ -132,6 +101,47 @@
         "active",
         "hasWallet",
         "blockchainId"
+      ]
+    },
+    "Payment": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer"
+        },
+        "tx": {
+          "type": "string"
+        },
+        "duration": {
+          "type": "integer",
+          "default": 0
+        },
+        "status": {
+          "type": "string",
+          "default": "NEW",
+          "enum": [
+            "NEW",
+            "PENDING",
+            "SIGNED"
+          ]
+        },
+        "node": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/Node"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "date": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "tx"
       ]
     },
     "Blockchain": {
@@ -179,11 +189,11 @@
     "node": {
       "$ref": "#/definitions/Node"
     },
-    "payment": {
-      "$ref": "#/definitions/Payment"
-    },
     "server": {
       "$ref": "#/definitions/Server"
+    },
+    "payment": {
+      "$ref": "#/definitions/Payment"
     },
     "blockchain": {
       "$ref": "#/definitions/Blockchain"
