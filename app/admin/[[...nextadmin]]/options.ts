@@ -18,7 +18,15 @@ const options: NextAdminOptions = {
     },
     Server: {
       edit: {
-        display: ["id", "ssh", "command", "active", "blockchain"],
+        display: [
+          "id",
+          "host",
+          "port",
+          "username",
+          "password",
+          "active",
+          "blockchain",
+        ],
       },
     },
     User: {},
