@@ -11,13 +11,14 @@ const Nodes: React.FC = () => {
   const serverId = useRef<string>()
 
   const { isPending, data } = useQuery<[]>({
-    queryKey: ["server/list"],
-    queryFn: () => fetch("/api/server/list").then((res) => res.json()),
+    queryKey: ["nodes/available"],
+    queryFn: () => fetch("/api/nodes?type=available").then((res) => res.json()),
   })
 
   const { mutate } = useMutation<void, void, string>({
     mutationFn: (data) =>
-      fetch("/api/purchase", {
+      fetch("/api/payment", {
+        method: "POST",
         body: JSON.stringify({
           wallet: data,
           serverId: serverId.current,
@@ -43,13 +44,13 @@ const Nodes: React.FC = () => {
         </div>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-3 items-center gap-8 pt-2">
-        {data.map((server: any) => (
+        {data.map((node: any) => (
           <NodeCard
-            key={server.id}
-            name={server.name}
-            description={server.description}
+            key={node.blockchain.id}
+            name={node.blockchain.name}
+            description={node.blockchain.description}
             onRunNodeClick={() => {
-              serverId.current = server.id
+              serverId.current = node.id
               setPaymentModal(true)
             }}
           />
