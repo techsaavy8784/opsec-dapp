@@ -1,140 +1,114 @@
-import { db } from "@/lib/db"
+import prisma from "@/prisma"
+import { authOptions } from "@/lib/auth"
+import { getServerSession } from "next-auth"
 import { NextResponse, NextRequest } from "next/server"
 
-export async function POST(req: NextRequest) {
-  const { name, fee, duration, address } = await req.json()
-  const node_exist = await db.node_brand.findFirst({
-    where: {
-      name: name,
-    },
-  })
-  if (!node_exist) {
-    return NextResponse.json(
-      { message: "Node does not exist" },
-      { status: 404 },
-    )
-  }
-  let user = await db.user.findFirst({
-    where: {
-      address: address,
-    },
-  })
-  if (!user) {
-    user = await db.user.create({
-      data: {
-        address: address,
-      },
-    })
-  }
-  const amount = Number(node_exist.fee) * Number(duration)
+export async function POST(request: NextRequest) {
+  const session = await getServerSession(authOptions)
 
-  const charge = await fetch("https://api.commerce.coinbase.com/charges/", {
+  if (!session) {
+    return NextResponse.json({ message: "Unauthorized" }, { status: 401 })
+  }
+
+  const { wallet, serverId, duration } = await request.json()
+
+  const server = await prisma.server.findFirst({
+    where: {
+      id: serverId,
+    },
+    include: {
+      blockchain: true,
+    },
+  })
+
+  if (!server) {
+    return NextResponse.json({ message: "Server not exist" }, { status: 400 })
+  }
+
+  const alreadyBought = await prisma.node.findFirst({
+    where: {
+      userId: session.user?.id,
+      serverId,
+    },
+  })
+
+  if (alreadyBought) {
+    return NextResponse.json({ message: "Already bought" }, { status: 400 })
+  }
+
+  const amount = server.blockchain.price * duration
+
+  const { data } = await fetch("https://api.commerce.coinbase.com/charges/", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
       "X-CC-Api-Key": process.env.COINBASE_API_KEY as string,
     },
-
     body: JSON.stringify({
       name: "Node Payment",
       description: "Payment for node",
       local_price: {
-        amount: amount,
+        amount,
         currency: "ETH",
       },
       pricing_type: "fixed_price",
-      metadata: {
-        node_id: node_exist.id,
-        fee: fee,
-        duration,
-      },
-      redirect_url: `${req.nextUrl.origin}/api/payment/success`,
-      cancel_url: `${req.nextUrl.origin}/api/payment/cancel`,
+      redirect_url: `${request.nextUrl.origin}/api/payment/success`,
+      cancel_url: `${request.nextUrl.origin}/api/payment/cancel`,
     }),
-  })
-  const charge_json = await charge.json()
-  console.log(charge_json.data)
+  }).then((res) => res.json())
 
-  if (!charge_json.data) {
+  if (!data) {
     return NextResponse.json(
-      { message: "Error creating charge" },
+      { message: "Error making payment" },
       { status: 500 },
     )
   }
-  const payment = await db.payments.upsert({
-    where: {
-      node_id_address: {
-        node_id: node_exist.id,
-        address: address,
-      },
-    },
-    update: {
-      user_id: user.id,
-      node_id: node_exist.id,
-      address: address,
-      amount: amount,
-      charge_id: charge_json.data.id,
-      duration: Number(duration),
-      status: charge_json.data.payments[0]?.status,
-    },
-    create: {
-      user_id: user.id,
-      address: address,
-      node_id: node_exist.id,
-      amount: amount,
-      duration: Number(duration),
-      status: "NEW",
-      charge_id: charge_json.data.id,
+
+  const payment = await prisma.payment.create({
+    data: {
+      duration,
+      tx: data.id,
     },
   })
-  if (!payment) {
-    return NextResponse.json({
-      message: "Charge created failed to update the db",
-      data: charge_json.data,
-    })
-  }
+
+  await prisma.node.create({
+    data: {
+      wallet,
+      serverId,
+      userId: session.user?.id,
+      paymentId: payment.id,
+      isLive: true,
+    },
+  })
+
   return NextResponse.json({
     message: "Charge created",
-    data: charge_json.data,
+    data,
   })
 }
-export async function GET(req: NextRequest) {
-  const url = req.nextUrl
-  const node = url.searchParams.get("node")
-  const address = url.searchParams.get("address")
-  const node_exist = await db.node_brand.findFirst({
+
+export async function GET(request: NextRequest) {
+  const url = request.nextUrl
+  const nodeId = Number(url.searchParams.get("node"))
+
+  const node = await prisma.node.findFirst({
     where: {
-      name: node as string,
+      id: nodeId,
+    },
+    include: {
+      payment: true,
     },
   })
-  if (!node_exist) {
+
+  if (!node) {
     return NextResponse.json(
       { message: "Node does not exist" },
       { status: 404 },
     )
   }
-  const payment_pending = await db.payments.findMany({
-    where: {
-      address: address,
-      node_id: node_exist.id,
-      status: {
-        in: ["NEW", "PENDING", "SIGNED"],
-      },
-    },
-  })
-  console.log(payment_pending)
-  if (!payment_pending) {
-    return NextResponse.json(
-      { message: "No Payment found" },
-      {
-        status: 500,
-      },
-    )
-  }
-  console.log(payment_pending)
 
-  const config = await fetch(
-    `https://api.commerce.coinbase.com/charges/${payment_pending[0].charge_id}`,
+  const { data } = await fetch(
+    `https://api.commerce.coinbase.com/charges/${node.payment.tx}`,
     {
       method: "GET",
       headers: {
@@ -142,47 +116,47 @@ export async function GET(req: NextRequest) {
         "X-CC-Api-Key": process.env.COINBASE_API_KEY as string,
       },
     },
-  )
-  const config_json = await config.json()
-  console.log(config_json.data)
-  if (!config_json.data) {
+  ).then((res) => res.json())
+
+  if (!data) {
     return NextResponse.json(
       { message: "Error fetching charge" },
       { status: 500 },
     )
   }
-  if (config_json.data.timeline[0].status === "NEW") {
+
+  if (data.timeline[0].status === "NEW") {
     return NextResponse.json(
       { message: "Payment not yet made", status: "NEW" },
-
       { status: 200 },
     )
   }
-  if (config_json.data.timeline[0].status === "PENDING") {
+
+  if (data.timeline[0].status === "PENDING") {
     return NextResponse.json(
       { message: "Payment pending", status: "PENDING" },
-
       { status: 200 },
     )
   }
-  if (config_json.data.timeline[0].status === "SIGNED") {
+
+  if (data.timeline[0].status === "SIGNED") {
     return NextResponse.json(
       { message: "Payment signed", status: "SIGNED" },
       { status: 200 },
     )
   }
-  if (config_json.data.timeline[0].status === "COMPLETED") {
-    await db.payments.update({
-      where: {
-        charge_id: payment_pending[0].charge_id,
-      },
-      data: {
-        status: "COMPLETED",
-      },
-    })
-    return NextResponse.json(
-      { message: "Payment completed", status: "COMPLETED" },
-      { status: 200 },
-    )
-  }
+
+  await prisma.payment.updateMany({
+    where: {
+      tx: node.payment.tx,
+    },
+    data: {
+      status: "COMPLETED",
+    },
+  })
+
+  return NextResponse.json(
+    { message: "Payment completed", status: "COMPLETED" },
+    { status: 200 },
+  )
 }

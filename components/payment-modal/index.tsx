@@ -14,41 +14,31 @@ export const PaymentModal: React.FC<DialogProps> = (props) => {
     setSlide(0)
   }, [props.open])
 
-  const renderHeader = () => {
-    switch (slide) {
-      case 0:
-        return (
+  return (
+    <Dialog {...props}>
+      <DialogContent
+        className={`bg-[#18181B] border-none rounded-[24px] p-8 w-[350px] md:w-[450px]`}
+      >
+        {slide === 0 ? (
           <Header
             title={"Enter your wallet address"}
             description={
               "This wallet will be the one where you receive rewards"
             }
           />
-        )
-      case 1:
-        return (
+        ) : slide === 1 ? (
           <Header
             title={"Pay service"}
             description={"Choose service you want to pay with"}
           />
-        )
-      case 2:
-        return (
+        ) : (
           <Header
             title={"Waiting for payment"}
             pay
             loading={false}
             description={"You need to complete your payment to receive node"}
           />
-        )
-    }
-  }
-  return (
-    <Dialog {...props}>
-      <DialogContent
-        className={`bg-[#18181B] border-none rounded-[24px] p-8 w-[350px] md:w-[450px]`}
-      >
-        {renderHeader()}
+        )}
         <form className="flex items-center justify-center flex-col px-8 gap-8">
           {slide === 0 && (
             <Input

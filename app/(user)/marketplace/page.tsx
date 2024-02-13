@@ -37,7 +37,6 @@ const Nodes: React.FC = () => {
             key={server.id}
             name={server.name}
             description={server.description}
-            enabled={false}
             onRunNodeClick={() => setPaymentModal(true)}
           />
         ))}
