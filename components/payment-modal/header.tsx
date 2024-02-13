@@ -4,7 +4,7 @@ import Image from "next/image"
 
 type HeaderProps = {
   title: string
-  description: string
+  description: React.ReactNode
   payment?: "waiting" | "complete"
 }
 
@@ -30,7 +30,7 @@ export const Header: React.FC<HeaderProps> = ({
         <div className="flex gap-3 w-full flex-col pt-6">
           <div className="flex items-center justify-between w-full">
             <h1 className="text-[#fff] text-[16px] font-[500]">
-              Payment stats:
+              Payment status:
             </h1>
             <div className="flex items-center gap-1">
               <p className="text-[#F44336] text-[16px] font-[500]">Refersh</p>

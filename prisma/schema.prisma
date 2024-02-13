@@ -41,10 +41,11 @@ model Node {
 
 model Server {
     id           Int        @id @default(autoincrement())
-    ssh          String
-    command      String
+    host         String     @default("")
+    port         Int        @default(22)
+    username     String     @default("")
+    password     String     @default("")
     active       Boolean
-    hasWallet    Boolean    @map("has_wallet")
     node         Node?
     blockchain   Blockchain @relation(fields: [blockchainId], references: [id])
     blockchainId Int        @map("blockchain_id")
@@ -68,6 +69,7 @@ model Blockchain {
     description String   @default("")
     url         String
     price       Float
+    hasWallet   Boolean  @default(false) @map("has_wallet")
     launchedAt  DateTime @default(now()) @map("launched_at")
     servers     Server[]
 

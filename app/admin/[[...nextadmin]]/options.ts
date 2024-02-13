@@ -5,15 +5,36 @@ const options: NextAdminOptions = {
   model: {
     Blockchain: {
       edit: {
-        display: ["id", "name", "url", "description", "price", "launchedAt"],
+        display: [
+          "id",
+          "name",
+          "url",
+          "description",
+          "price",
+          "hasWallet",
+          "launchedAt",
+        ],
       },
     },
     Server: {
       edit: {
-        display: ["id", "ssh", "command", "active", "hasWallet", "blockchain"],
+        display: [
+          "id",
+          "host",
+          "port",
+          "username",
+          "password",
+          "active",
+          "blockchain",
+        ],
       },
     },
     User: {},
+    Node: {
+      edit: {
+        display: ["id", "wallet"],
+      },
+    },
   },
 }
 
