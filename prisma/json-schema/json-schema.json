@@ -78,9 +78,6 @@
         "active": {
           "type": "boolean"
         },
-        "hasWallet": {
-          "type": "boolean"
-        },
         "node": {
           "anyOf": [
             {
@@ -99,7 +96,6 @@
         "ssh",
         "command",
         "active",
-        "hasWallet",
         "blockchainId"
       ]
     },
@@ -115,15 +111,6 @@
         "duration": {
           "type": "integer",
           "default": 0
-        },
-        "status": {
-          "type": "string",
-          "default": "NEW",
-          "enum": [
-            "NEW",
-            "PENDING",
-            "SIGNED"
-          ]
         },
         "node": {
           "anyOf": [
@@ -162,6 +149,10 @@
         },
         "price": {
           "type": "number"
+        },
+        "hasWallet": {
+          "type": "boolean",
+          "default": false
         },
         "launchedAt": {
           "type": "string",

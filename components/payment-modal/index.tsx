@@ -4,6 +4,8 @@ import { Dialog, DialogContent } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Header } from "./header"
+import { Blockchain } from "@prisma/client"
+import Image from "next/image"
 
 const headerProps = [
   {
@@ -21,22 +23,24 @@ const headerProps = [
 ]
 
 interface PaymentModalProps extends DialogProps {
+  chain?: Blockchain
   onPay: (wallet: string) => Promise<void>
 }
 
 export const PaymentModal: React.FC<PaymentModalProps> = ({
   onPay,
+  chain,
   ...props
 }) => {
-  const [slide, setSlide] = useState(0)
+  const [slide, setSlide] = useState(chain?.hasWallet ? 0 : 1)
 
   const [payment, setPayment] = useState<"waiting" | "complete">("waiting")
 
   const [walletAddr, setWalletAddr] = useState("")
 
   useEffect(() => {
-    setSlide(0)
-  }, [props.open])
+    setSlide(chain?.hasWallet ? 0 : 1)
+  }, [props.open, chain?.hasWallet])
 
   const handlePayClick = useCallback(() => {
     if (slide === 1) {
@@ -52,7 +56,25 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({
       >
         <Header
           title={headerProps[slide].title}
-          description={headerProps[slide].description}
+          description={
+            slide === 1 ? (
+              <div>
+                <Image
+                  src={`/icons/blockchain/${chain?.name
+                    .toLowerCase()
+                    .replace(/ /g, "-")}.png`}
+                  alt=""
+                  width={180}
+                  height={180}
+                  className="object-contain ml-1 mt-2"
+                />
+                <p>Blockchain: {chain?.name}</p>
+                <p>Price: {chain?.price}</p>
+              </div>
+            ) : (
+              headerProps[slide].description
+            )
+          }
           payment={slide < 2 ? undefined : payment}
         />
         <form className="flex items-center justify-center flex-col px-8 gap-8">
@@ -75,7 +97,9 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({
               type="button"
               onClick={handlePayClick}
               variant="custom"
-              disabled={!/^0x[0-9a-fA-F]{40}$/.test(walletAddr)}
+              disabled={
+                chain?.hasWallet && !/^0x[0-9a-fA-F]{40}$/.test(walletAddr)
+              }
             >
               Pay
             </Button>

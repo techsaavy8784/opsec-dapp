@@ -4,11 +4,10 @@ import React, { useCallback, useEffect, useRef, useState } from "react"
 import { useMutation, useQuery } from "@tanstack/react-query"
 import { NodeCard } from "@/components/node-card"
 import { PaymentModal } from "@/components/payment-modal"
+import { Blockchain } from "@prisma/client"
 
 const Nodes: React.FC = () => {
-  const [paymentModal, setPaymentModal] = useState(false)
-
-  const blockchainId = useRef<string>()
+  const [chain, setChain] = useState<Blockchain>()
 
   const timer = useRef<NodeJS.Timeout>()
 
@@ -23,7 +22,7 @@ const Nodes: React.FC = () => {
         method: "POST",
         body: JSON.stringify({
           wallet,
-          blockchainId: blockchainId.current,
+          blockchainId: chain?.id,
           duration: 1,
         }),
       })
@@ -85,21 +84,19 @@ const Nodes: React.FC = () => {
         </div>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-3 items-center gap-8 pt-2">
-        {data.map((node: any) => (
+        {data.map((chain: any) => (
           <NodeCard
-            key={node.id}
-            name={node.name}
-            description={node.description}
-            onRunNodeClick={() => {
-              blockchainId.current = node.id
-              setPaymentModal(true)
-            }}
+            key={chain.id}
+            name={chain.name}
+            description={chain.description}
+            onRunNodeClick={() => setChain(chain)}
           />
         ))}
         <PaymentModal
-          open={paymentModal}
+          open={!!chain}
+          chain={chain}
           onOpenChange={(open) => {
-            setPaymentModal(open)
+            setChain(undefined)
             if (!open) {
               clearInterval(timer.current)
             }

@@ -44,7 +44,6 @@ model Server {
     ssh          String
     command      String
     active       Boolean
-    hasWallet    Boolean    @map("has_wallet")
     node         Node?
     blockchain   Blockchain @relation(fields: [blockchainId], references: [id])
     blockchainId Int        @map("blockchain_id")
@@ -68,6 +67,7 @@ model Blockchain {
     description String   @default("")
     url         String
     price       Float
+    hasWallet   Boolean  @default(false) @map("has_wallet")
     launchedAt  DateTime @default(now()) @map("launched_at")
     servers     Server[]
 
