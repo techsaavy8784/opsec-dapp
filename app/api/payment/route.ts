@@ -2,6 +2,20 @@ import prisma from "@/prisma"
 import { authOptions } from "@/lib/auth"
 import { getServerSession } from "next-auth"
 import { NextResponse, NextRequest } from "next/server"
+import { generateRandomString } from "@/lib/utils"
+
+const tx: Record<
+  string,
+  {
+    serverId: number
+    userId: number
+    duration: number
+    wallet: string
+    tx: string
+  }
+> = {}
+
+export const getTx = () => tx
 
 export async function POST(request: NextRequest) {
   const session = await getServerSession(authOptions)
@@ -37,6 +51,7 @@ export async function POST(request: NextRequest) {
   }
 
   const amount = server.blockchain.price * duration
+  const verifier = generateRandomString()
 
   const { data } = await fetch("https://api.commerce.coinbase.com/charges/", {
     method: "POST",
@@ -52,10 +67,18 @@ export async function POST(request: NextRequest) {
         currency: "ETH",
       },
       pricing_type: "fixed_price",
-      redirect_url: `${request.nextUrl.origin}/api/payment/success`,
+      redirect_url: `${request.nextUrl.origin}/api/payment/success?verifier=${verifier}`,
       cancel_url: `${request.nextUrl.origin}/api/payment/cancel`,
     }),
   }).then((res) => res.json())
+
+  tx[verifier] = {
+    serverId,
+    duration,
+    wallet,
+    userId: session.user?.id,
+    tx: data.id,
+  }
 
   if (!data) {
     return NextResponse.json(
@@ -63,23 +86,6 @@ export async function POST(request: NextRequest) {
       { status: 500 },
     )
   }
-
-  const payment = await prisma.payment.create({
-    data: {
-      duration,
-      tx: data.id,
-    },
-  })
-
-  await prisma.node.create({
-    data: {
-      wallet,
-      serverId,
-      userId: session.user?.id,
-      paymentId: payment.id,
-      isLive: true,
-    },
-  })
 
   return NextResponse.json({
     message: "Charge created",
@@ -89,26 +95,10 @@ export async function POST(request: NextRequest) {
 
 export async function GET(request: NextRequest) {
   const url = request.nextUrl
-  const nodeId = Number(url.searchParams.get("node"))
-
-  const node = await prisma.node.findFirst({
-    where: {
-      id: nodeId,
-    },
-    include: {
-      payment: true,
-    },
-  })
-
-  if (!node) {
-    return NextResponse.json(
-      { message: "Node does not exist" },
-      { status: 404 },
-    )
-  }
+  const tx = Number(url.searchParams.get("tx"))
 
   const { data } = await fetch(
-    `https://api.commerce.coinbase.com/charges/${node.payment.tx}`,
+    `https://api.commerce.coinbase.com/charges/${tx}`,
     {
       method: "GET",
       headers: {
@@ -125,38 +115,29 @@ export async function GET(request: NextRequest) {
     )
   }
 
-  if (data.timeline[0].status === "NEW") {
+  if (data.timeline[0].status === "New") {
     return NextResponse.json(
-      { message: "Payment not yet made", status: "NEW" },
+      { message: "Payment not yet made", status: "New" },
       { status: 200 },
     )
   }
 
-  if (data.timeline[0].status === "PENDING") {
+  if (data.timeline[0].status === "Signed") {
     return NextResponse.json(
-      { message: "Payment pending", status: "PENDING" },
+      { message: "Payment signed", status: "Signed" },
       { status: 200 },
     )
   }
 
-  if (data.timeline[0].status === "SIGNED") {
+  if (data.timeline[0].status === "Pending") {
     return NextResponse.json(
-      { message: "Payment signed", status: "SIGNED" },
+      { message: "Payment pending", status: "Pending" },
       { status: 200 },
     )
   }
-
-  await prisma.payment.updateMany({
-    where: {
-      tx: node.payment.tx,
-    },
-    data: {
-      status: "COMPLETED",
-    },
-  })
 
   return NextResponse.json(
-    { message: "Payment completed", status: "COMPLETED" },
+    { message: "Payment completed", status: "Completed" },
     { status: 200 },
   )
 }

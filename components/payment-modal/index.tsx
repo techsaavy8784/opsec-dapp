@@ -21,7 +21,7 @@ const headerProps = [
 ]
 
 interface PaymentModalProps extends DialogProps {
-  onPay: (wallet: string) => void
+  onPay: (wallet: string) => Promise<void>
 }
 
 export const PaymentModal: React.FC<PaymentModalProps> = ({
@@ -29,6 +29,8 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({
   ...props
 }) => {
   const [slide, setSlide] = useState(0)
+
+  const [payment, setPayment] = useState<"waiting" | "complete">("waiting")
 
   const [walletAddr, setWalletAddr] = useState("")
 
@@ -38,7 +40,7 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({
 
   const handlePayClick = useCallback(() => {
     if (slide === 1) {
-      onPay(walletAddr)
+      onPay(walletAddr).then(() => setPayment("complete"))
     }
     setSlide((prev) => prev + 1)
   }, [onPay, slide, walletAddr])
@@ -51,7 +53,7 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({
         <Header
           title={headerProps[slide].title}
           description={headerProps[slide].description}
-          pay={slide === 2}
+          payment={slide < 2 ? undefined : payment}
         />
         <form className="flex items-center justify-center flex-col px-8 gap-8">
           {slide === 0 && (

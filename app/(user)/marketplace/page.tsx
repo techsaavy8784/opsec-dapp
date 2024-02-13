@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useCallback, useRef, useState } from "react"
+import React, { useCallback, useEffect, useRef, useState } from "react"
 import { useMutation, useQuery } from "@tanstack/react-query"
 import { NodeCard } from "@/components/node-card"
 import { PaymentModal } from "@/components/payment-modal"
@@ -10,22 +10,63 @@ const Nodes: React.FC = () => {
 
   const serverId = useRef<string>()
 
+  const timer = useRef<NodeJS.Timeout>()
+
   const { isPending, data } = useQuery<[]>({
     queryKey: ["nodes/available"],
     queryFn: () => fetch("/api/nodes?type=available").then((res) => res.json()),
   })
 
-  const { mutate } = useMutation<void, void, string>({
-    mutationFn: (data) =>
+  const { mutateAsync } = useMutation<void, void, string>({
+    mutationFn: (wallet) =>
       fetch("/api/payment", {
         method: "POST",
         body: JSON.stringify({
-          wallet: data,
+          wallet,
           serverId: serverId.current,
           duration: 1,
         }),
-      }),
+      })
+        .then((res) => res.json())
+        .then(({ data }) => {
+          const left = (window.innerWidth - 600) / 2
+          const top = (window.innerHeight - 800) / 2
+          const options = `width=${600},height=${800},left=${left},top=${top},resizable=yes,scrollbars=yes`
+          window.open(data.hosted_url, "_blank", options)
+          return data.id
+        }),
   })
+
+  const mutate = useCallback(
+    (wallet: string) =>
+      new Promise<void>((resolve) => {
+        mutateAsync(wallet).then((tx) => {
+          if (!tx) {
+            return
+          }
+          clearInterval(timer.current)
+          timer.current = setInterval(
+            () =>
+              fetch(`/api/payment?tx=${tx}`)
+                .then((res) => res.json())
+                .then((res) => {
+                  if (res.status === "Completed") {
+                    clearInterval(timer.current)
+                    resolve()
+                  }
+                }),
+            1000,
+          )
+        })
+      }),
+    [mutateAsync],
+  )
+
+  useEffect(() => {
+    return () => {
+      clearInterval(timer.current)
+    }
+  }, [])
 
   if (isPending) {
     return "Loading"
@@ -57,7 +98,12 @@ const Nodes: React.FC = () => {
         ))}
         <PaymentModal
           open={paymentModal}
-          onOpenChange={setPaymentModal}
+          onOpenChange={(open) => {
+            setPaymentModal(open)
+            if (!open) {
+              clearInterval(timer.current)
+            }
+          }}
           onPay={(wallet) => mutate(wallet)}
         />
       </div>
