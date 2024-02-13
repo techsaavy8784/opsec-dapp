@@ -39,14 +39,6 @@ model Node {
     @@map("nodes")
 }
 
-model Payment {
-    id   Int    @id @default(autoincrement())
-    tx   String
-    node Node?
-
-    @@map("payments")
-}
-
 model Server {
     id           Int         @id @default(autoincrement())
     ssh          String
@@ -58,6 +50,20 @@ model Server {
     blockchainId Int         @map("blockchain_id")
 
     @@map("servers")
+}
+
+model payments {
+    id        Int         @id @default(autoincrement())
+    address   String?
+    node_id   Int
+    duration  Int
+    amount    Int
+    user_id   Int
+    status    String
+    charge_id String      @unique
+    date      DateTime    @default(now())
+    user      user?       @relation(fields: [user_id], references: [id])
+    node      node_brand? @relation(fields: [node_id], references: [id])
 }
 
 model Blockchain {
