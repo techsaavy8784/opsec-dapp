@@ -104,7 +104,7 @@ const Nodes: React.FC = () => {
               clearInterval(timer.current)
             }
           }}
-          onPay={(wallet) => mutate(wallet)}
+          onPay={mutate}
         />
       </div>
     </>

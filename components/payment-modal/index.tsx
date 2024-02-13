@@ -71,7 +71,12 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({
             </div>
           )}
           {slide < 2 && (
-            <Button type="button" onClick={handlePayClick} variant="custom">
+            <Button
+              type="button"
+              onClick={handlePayClick}
+              variant="custom"
+              disabled={!/^0x[0-9a-fA-F]{40}$/.test(walletAddr)}
+            >
               Pay
             </Button>
           )}
