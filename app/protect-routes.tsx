@@ -25,7 +25,7 @@ const ProtectRoutes: React.FC<ProtectRoutesProps> = ({ children }) => {
     },
   })
 
-  if (pathname.startsWith("/admin/")) {
+  if (pathname.startsWith("/admin")) {
     return children
   }
 

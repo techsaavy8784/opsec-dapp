@@ -1,0 +1,192 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "definitions": {
+    "User": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer"
+        },
+        "address": {
+          "type": "string"
+        },
+        "password": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "nodes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Node"
+          }
+        }
+      },
+      "required": [
+        "address"
+      ]
+    },
+    "Node": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer"
+        },
+        "user": {
+          "$ref": "#/definitions/User"
+        },
+        "payment": {
+          "$ref": "#/definitions/Payment"
+        },
+        "Server": {
+          "$ref": "#/definitions/Server"
+        },
+        "wallet": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "isLive": {
+          "type": "boolean"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "userId",
+        "paymentId",
+        "serverId",
+        "isLive"
+      ]
+    },
+    "Payment": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer"
+        },
+        "tx": {
+          "type": "string"
+        },
+        "node": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/Node"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "tx"
+      ]
+    },
+    "Server": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer"
+        },
+        "ssh": {
+          "type": "string"
+        },
+        "command": {
+          "type": "string"
+        },
+        "active": {
+          "type": "boolean"
+        },
+        "hasWallet": {
+          "type": "boolean"
+        },
+        "node": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/Node"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "blockchain": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/Blockchain"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      },
+      "required": [
+        "ssh",
+        "command",
+        "active",
+        "hasWallet",
+        "blockchainId"
+      ]
+    },
+    "Blockchain": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer"
+        },
+        "name": {
+          "type": "string"
+        },
+        "description": {
+          "type": "string",
+          "default": ""
+        },
+        "url": {
+          "type": "string"
+        },
+        "price": {
+          "type": "number"
+        },
+        "launchedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "servers": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Server"
+          }
+        }
+      },
+      "required": [
+        "name",
+        "url",
+        "price"
+      ]
+    }
+  },
+  "type": "object",
+  "properties": {
+    "user": {
+      "$ref": "#/definitions/User"
+    },
+    "node": {
+      "$ref": "#/definitions/Node"
+    },
+    "payment": {
+      "$ref": "#/definitions/Payment"
+    },
+    "server": {
+      "$ref": "#/definitions/Server"
+    },
+    "blockchain": {
+      "$ref": "#/definitions/Blockchain"
+    }
+  }
+}

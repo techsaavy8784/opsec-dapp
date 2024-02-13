@@ -15,6 +15,7 @@ import {
 import { configureChains, createConfig, WagmiConfig } from "wagmi"
 import { mainnet, sepolia, Chain } from "wagmi/chains"
 import { publicProvider } from "wagmi/providers/public"
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query"
 
 const c: Chain[] = [process.env.NODE_ENV === "production" ? mainnet : sepolia]
 
@@ -53,6 +54,10 @@ const wagmiConfig = createConfig({
   webSocketPublicClient,
 })
 
+const theme = darkTheme()
+
+const queryClient = new QueryClient()
+
 export function Providers({ children }: { children: React.ReactNode }) {
   const [mounted, setMounted] = useState(false)
 
@@ -60,18 +65,10 @@ export function Providers({ children }: { children: React.ReactNode }) {
 
   return (
     <WagmiConfig config={wagmiConfig}>
-      <RainbowKitProvider
-        chains={chains}
-        appInfo={demoAppInfo}
-        theme={darkTheme({
-          accentColor: "#F44336",
-          accentColorForeground: "white",
-          borderRadius: "large",
-          fontStack: "system",
-          overlayBlur: "small",
-        })}
-      >
-        {mounted && children}
+      <RainbowKitProvider chains={chains} appInfo={demoAppInfo} theme={theme}>
+        <QueryClientProvider client={queryClient}>
+          {mounted && children}
+        </QueryClientProvider>
       </RainbowKitProvider>
     </WagmiConfig>
   )

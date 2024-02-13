@@ -1,25 +1,25 @@
 import { NextAuthOptions } from "next-auth"
 import CredentialsProvider from "next-auth/providers/credentials"
-import { db } from "./db"
 import { compare } from "bcrypt"
 import { PrismaAdapter } from "@next-auth/prisma-adapter"
 import { isAddress } from "viem"
+import prisma from "@/prisma"
 
 export const authOptions: NextAuthOptions = {
-  adapter: PrismaAdapter(db),
+  adapter: PrismaAdapter(prisma),
   secret: process.env.NEXTAUTH_SECRET,
   session: {
     strategy: "jwt",
   },
   pages: {
-    signIn: "/adminlogin",
+    signIn: "/admin/login",
     error: "/error",
   },
   providers: [
     CredentialsProvider({
       name: "Credentials",
       credentials: {
-        email: {
+        address: {
           label: "Email",
           type: "email",
           placeholder: "based@opsec.org",
@@ -31,22 +31,34 @@ export const authOptions: NextAuthOptions = {
           return null
         }
 
-        if ("address" in credentials) {
-          if (isAddress(credentials.address as string)) {
-            return {
-              address: credentials.address,
-            }
+        if (!credentials.address) {
+          return null
+        }
+
+        if (!credentials.password) {
+          if (!isAddress(credentials.address as string)) {
+            return null
           }
 
-          return null
+          await prisma.user.upsert({
+            where: {
+              address: credentials.address,
+            },
+            create: {
+              address: credentials.address,
+            },
+            update: {
+              address: credentials.address,
+            },
+          })
+
+          return {
+            address: credentials.address,
+          }
         }
 
-        if (!credentials.email || !credentials.password) {
-          return null
-        }
-
-        const user = await db.admin.findUnique({
-          where: { email: credentials.email },
+        const user = await prisma.user.findUnique({
+          where: { address: credentials.address },
         })
 
         if (!user) {
@@ -55,7 +67,7 @@ export const authOptions: NextAuthOptions = {
 
         const isPasswordMatch = await compare(
           credentials.password,
-          user.password,
+          user.password ?? "",
         )
 
         if (!isPasswordMatch) {
@@ -64,7 +76,7 @@ export const authOptions: NextAuthOptions = {
 
         return {
           id: user.id.toString(),
-          email: user.email,
+          email: user.address,
         }
       },
     }),
@@ -74,14 +86,13 @@ export const authOptions: NextAuthOptions = {
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id
-        token.email = user.email
+        token.address = user.address
       }
       return token
     },
     async session({ session, token }) {
       session.user = {
-        ...session.user,
-        email: token.email as string,
+        address: token.address as string,
       }
 
       return session

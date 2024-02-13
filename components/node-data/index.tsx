@@ -35,11 +35,11 @@ export const NodeData = ({ active, title, stats, uptime, icon }: Props) => {
         {stats?.map((item, i) => (
           <div key={i} className="flex flex-col gap-2">
             {i == 2 && uptime && (
-              <div className="grid grid-cols-100 max-md:gap-[0.5px]">
+              <div className="grid grid-cols-100 gap-2 max-md:gap-[0.5px]">
                 {uptimeArr?.map((_, i) => (
                   <div
                     key={i}
-                    className={`h-[48px] md:w-[9.79px] col-span-1 ${i === 24 || i === 25 ? "bg-[#F87171]" : "bg-[#10B981] "} rounded-[3px]`}
+                    className={`h-[48px] md:w-[7.79px] col-span-1 ${i === 24 || i === 25 ? "bg-[#F87171]" : "bg-[#10B981] "} rounded-[3px]`}
                   />
                 ))}
               </div>

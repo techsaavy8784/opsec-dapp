@@ -1,54 +1,75 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 "use client"
 
+import { ConnectButton } from "@rainbow-me/rainbowkit"
 import Image from "next/image"
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import React from "react"
+import {
+  DashboardIcon,
+  MarketplaceIcon,
+  NodesIcon,
+  ValidatorsIcon,
+  TreasuryIcon,
+  BillingIcon,
+} from "@/components/icons"
 
-const Sidebar = () => {
+type Props = {
+  setOpen?: (value: boolean) => void
+}
+
+type NavItem = {
+  title: string
+  link: string
+  icon: React.ElementType
+}
+
+const Sidebar = ({ setOpen }: Props) => {
   const path = usePathname()
   const pathName = path.split("/")[1]
-  const navItems = [
+  const navItems: NavItem[] = [
     {
       title: "Dashbaord",
-      icon: "dashboard.svg",
       link: "dashboard",
-      activeIcon: "dashboard-active.svg",
+      icon: DashboardIcon,
+    },
+    {
+      title: "Marketplace",
+      link: "marketplace",
+      icon: MarketplaceIcon,
     },
     {
       title: "Nodes",
-      icon: "nodes.svg",
       link: "nodes",
-      activeIcon: "nodes-active.svg",
+      icon: NodesIcon,
     },
     {
       title: "Validators",
-      icon: "validators.svg",
       link: "validators",
-      activeIcon: "validators-active.svg",
+      icon: ValidatorsIcon,
     },
     {
-      title: "Treasuries",
-      icon: "treasuries.svg",
-      link: "treasuries",
-      activeIcon: "treasuries-active.svg",
+      title: "Treasury",
+      link: "treasury",
+      icon: TreasuryIcon,
     },
     {
-      title: "Billing History",
-      icon: "billing-history.svg",
-      link: "billing-history",
-      activeIcon: "billing-history-active.svg",
+      title: "Billing",
+      link: "billing",
+      icon: BillingIcon,
     },
   ]
 
   return (
     <aside
-      className={`sticky top-0 flex flex-col h-[100dvh] border-r border-[#27272A] w-64`}
+      className={`absolute md:sticky top-0 flex flex-col h-[100dvh] border-r border-[#27272A] w-screen max-md:bg-black max-md:z-[15] md:w-64`}
     >
-      <div className={`flex gap-3 p-6 items-center mb-5 relative`}>
+      <div
+        className={`flex gap-3 max-md:py-4 md:p-6 items-center max-md:justify-center mb-5 max-md:border-b max-md:border-[#27272A] relative`}
+      >
         <Image src="/icons/logo.svg" alt="logo" width={39} height={38} />
-        <div className={`flex flex-col py-1`}>
+        <div className={`flex md:flex-col py-1`}>
           <h1 className={`text-[16px] font-[600] leading-6 text-white`}>
             OpSec
           </h1>
@@ -58,38 +79,42 @@ const Sidebar = () => {
         </div>
       </div>
       <div className="flex flex-col flex-1 justify-between">
-        <div className={`flex flex-col gap-6`}>
+        <div className={`flex flex-col gap-14 md:gap-6`}>
           {navItems?.map((item, index) => (
             <Link
               key={index}
               href={`/${item.link}`}
-              className={`flex items-center gap-4 pl-8 py-2 hover:bg-[#48474761] transition-all ease-in duration-100 border-l-[3px] ${pathName === item.link ? "border-[#F44336]" : "border-transparent"}`}
+              onClick={() => setOpen && setOpen(false)}
+              className={`flex items-center gap-4 pl-8 py-2 hover:bg-[#48474761] transition-all ease-in duration-100 border-l-[3px] cursor-pointer ${
+                pathName === item.link
+                  ? "border-[#F44336]"
+                  : "border-transparent"
+              }`}
             >
-              <Image
-                src={
-                  pathName === item.link
-                    ? `/icons/nav/${item.activeIcon}`
-                    : `/icons/nav/${item.icon}`
-                }
-                alt="dash-icon"
-                width={24}
-                height={24}
-              />
+              <item.icon isActive={pathName === item.link} />
               <h1
-                className={` ${pathName === item.link ? "text-white" : "text-[#52525B]"} font-[600] text-[16px]`}
+                className={` ${
+                  pathName === item.link ? "text-white" : "text-[#52525B]"
+                } font-[600] text-[16px]`}
               >
                 {item.title}
               </h1>
             </Link>
           ))}
         </div>
-        <div className={`flex items-center justify-center py-4`}>
-          <Image
-            src="/backgrounds/twitter-banner.png"
-            alt="twitter-banner"
-            width={210}
-            height={260}
-          />
+        <div className={`flex items-center justify-center py-8 md:py-4`}>
+          <Link href="https://x.com/">
+            <Image
+              src="/backgrounds/twitter-banner.png"
+              alt="twitter-banner"
+              width={210}
+              height={260}
+              className="max-md:hidden"
+            />
+          </Link>
+          <div className="md:hidden">
+            <ConnectButton />
+          </div>
         </div>
       </div>
     </aside>

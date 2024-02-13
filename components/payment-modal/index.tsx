@@ -1,27 +1,19 @@
-import React from "react"
-import { Dialog, DialogContent, DialogTrigger } from "@/components/ui/dialog"
+import React, { useEffect, useState } from "react"
+import { DialogProps } from "@radix-ui/react-dialog"
+import { Dialog, DialogContent } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
-import { FaArrowRightLong } from "react-icons/fa6"
 import { Header } from "./header"
 
-type Props = {
-  data: {
-    walletAddress: string
-  }
-  setData: React.Dispatch<
-    React.SetStateAction<{
-      walletAddress: string
-    }>
-  >
-  setSlide: React.Dispatch<React.SetStateAction<number>>
-  slide: number
-}
+export const PaymentModal: React.FC<DialogProps> = (props) => {
+  const [slide, setSlide] = useState(0)
 
-export const PaymentModal = ({ data, setData, setSlide, slide }: Props) => {
-  const handleSlide = () => {
-    setSlide(slide + 1)
-  }
+  const [walletAddr, setWalletAddr] = useState("")
+
+  useEffect(() => {
+    setSlide(0)
+  }, [props.open])
+
   const renderHeader = () => {
     switch (slide) {
       case 0:
@@ -52,15 +44,9 @@ export const PaymentModal = ({ data, setData, setSlide, slide }: Props) => {
     }
   }
   return (
-    <Dialog>
-      <DialogTrigger className="w-full">
-        <Button type="button" variant="custom">
-          Start
-          <FaArrowRightLong className="ml-2 font-[300]" />
-        </Button>
-      </DialogTrigger>
+    <Dialog {...props}>
       <DialogContent
-        className={`bg-[#18181B] border-none rounded-[24px] p-8 w-[450px]`}
+        className={`bg-[#18181B] border-none rounded-[24px] p-8 w-[350px] md:w-[450px]`}
       >
         {renderHeader()}
         <form className="flex items-center justify-center flex-col px-8 gap-8">
@@ -68,12 +54,8 @@ export const PaymentModal = ({ data, setData, setSlide, slide }: Props) => {
             <Input
               placeholder="Example: 0x56464...541584"
               type="text"
-              value={data.walletAddress}
-              onChange={(e) =>
-                setData((prev) => {
-                  return { ...prev, walletAddress: e.target.value }
-                })
-              }
+              value={walletAddr}
+              onChange={(e) => setWalletAddr(e.target.value)}
               className="border border-[#54597C] rounded-[12px] w-full bg-[#1D202D] placeholder:text-[#54597C]"
             />
           )}
@@ -83,8 +65,12 @@ export const PaymentModal = ({ data, setData, setSlide, slide }: Props) => {
             </div>
           )}
           {slide < 2 && (
-            <Button type="button" onClick={handleSlide} variant="custom">
-              {slide === 0 ? "Continue" : "Pay"}
+            <Button
+              type="button"
+              onClick={() => setSlide((prev) => prev + 1)}
+              variant="custom"
+            >
+              Pay
             </Button>
           )}
         </form>
