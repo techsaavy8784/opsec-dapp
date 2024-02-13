@@ -8,13 +8,13 @@ import { PaymentModal } from "@/components/payment-modal"
 const Nodes: React.FC = () => {
   const [paymentModal, setPaymentModal] = useState(false)
 
-  const serverId = useRef<string>()
+  const blockchainId = useRef<string>()
 
   const timer = useRef<NodeJS.Timeout>()
 
   const { isPending, data } = useQuery<[]>({
-    queryKey: ["nodes/available"],
-    queryFn: () => fetch("/api/nodes?type=available").then((res) => res.json()),
+    queryKey: ["server/list"],
+    queryFn: () => fetch("/api/server/list").then((res) => res.json()),
   })
 
   const { mutateAsync } = useMutation<void, void, string>({
@@ -23,7 +23,7 @@ const Nodes: React.FC = () => {
         method: "POST",
         body: JSON.stringify({
           wallet,
-          serverId: serverId.current,
+          blockchainId: blockchainId.current,
           duration: 1,
         }),
       })
@@ -87,11 +87,11 @@ const Nodes: React.FC = () => {
       <div className="grid grid-cols-1 md:grid-cols-3 items-center gap-8 pt-2">
         {data.map((node: any) => (
           <NodeCard
-            key={node.blockchain.id}
-            name={node.blockchain.name}
-            description={node.blockchain.description}
+            key={node.id}
+            name={node.name}
+            description={node.description}
             onRunNodeClick={() => {
-              serverId.current = node.id
+              blockchainId.current = node.id
               setPaymentModal(true)
             }}
           />

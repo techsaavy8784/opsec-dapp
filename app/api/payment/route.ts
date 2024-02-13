@@ -7,7 +7,7 @@ import { generateRandomString } from "@/lib/utils"
 const tx: Record<
   string,
   {
-    serverId: number
+    blockchainId: number
     userId: number
     duration: number
     wallet: string
@@ -24,11 +24,12 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 })
   }
 
-  const { wallet, serverId, duration } = await request.json()
+  const { wallet, blockchainId, duration } = await request.json()
 
   const server = await prisma.server.findFirst({
     where: {
-      id: serverId,
+      blockchainId,
+      node: null,
     },
     include: {
       blockchain: true,
@@ -37,17 +38,6 @@ export async function POST(request: NextRequest) {
 
   if (!server) {
     return NextResponse.json({ message: "Server not exist" }, { status: 400 })
-  }
-
-  const alreadyBought = await prisma.node.findFirst({
-    where: {
-      userId: session.user?.id,
-      serverId,
-    },
-  })
-
-  if (alreadyBought) {
-    return NextResponse.json({ message: "Already bought" }, { status: 400 })
   }
 
   const amount = server.blockchain.price * duration
@@ -82,7 +72,7 @@ export async function POST(request: NextRequest) {
   }
 
   tx[verifier] = {
-    serverId,
+    blockchainId,
     duration,
     wallet,
     userId: session.user?.id,
