@@ -48,9 +48,15 @@
             "null"
           ]
         },
-        "createdAt": {
+        "status": {
           "type": "string",
-          "format": "date-time"
+          "default": "CREATED",
+          "enum": [
+            "CREATED",
+            "INSTALLING",
+            "LIVE",
+            "FAILED"
+          ]
         },
         "nodeHistory": {
           "anyOf": [
@@ -61,6 +67,10 @@
               "type": "null"
             }
           ]
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
         }
       },
       "required": [

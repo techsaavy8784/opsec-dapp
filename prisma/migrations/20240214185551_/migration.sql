@@ -17,6 +17,7 @@ CREATE TABLE "nodes" (
     "payment_id" INTEGER NOT NULL,
     "server_id" INTEGER NOT NULL,
     "wallet" TEXT,
+    "status" "Status" NOT NULL DEFAULT 'CREATED',
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT "nodes_pkey" PRIMARY KEY ("id")

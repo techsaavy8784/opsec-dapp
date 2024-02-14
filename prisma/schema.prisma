@@ -25,27 +25,28 @@ model User {
     @@map("users")
 }
 
-model Node {
-    id          Int          @id @default(autoincrement())
-    userId      Int
-    user        User         @relation(fields: [userId], references: [id])
-    paymentId   Int          @unique @map("payment_id")
-    payment     Payment      @relation(fields: [paymentId], references: [id])
-    serverId    Int          @unique @map("server_id")
-    Server      Server       @relation(fields: [serverId], references: [id])
-    wallet      String?
-    status      Status       @default(CREATED)
-    nodeHistory NodeHistory?
-    createdAt   DateTime     @default(now()) @map("created_at")
-
-    @@map("nodes")
-}
-
 enum Status {
     CREATED
     INSTALLING
     LIVE
     FAILED
+}
+
+model Node {
+    id        Int      @id @default(autoincrement())
+    userId    Int
+    user      User     @relation(fields: [userId], references: [id])
+    paymentId Int      @unique @map("payment_id")
+    payment   Payment  @relation(fields: [paymentId], references: [id])
+    serverId  Int      @unique @map("server_id")
+    Server    Server   @relation(fields: [serverId], references: [id])
+    wallet    String?
+    status    Status   @default(CREATED)
+    createdAt DateTime @default(now()) @map("created_at")
+
+    nodeHistory NodeHistory?
+
+    @@map("nodes")
 }
 
 model NodeHistory {
