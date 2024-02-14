@@ -27,6 +27,27 @@ const options: NextAdminOptions = {
           "active",
           "blockchain",
         ],
+        fields: {
+          blockchain: {
+            optionFormatter: (values) => values.name,
+          },
+        },
+      },
+      list: {
+        display: [
+          "id",
+          "host",
+          "port",
+          "username",
+          "password",
+          "active",
+          "blockchain",
+        ],
+        fields: {
+          blockchain: {
+            formatter: (chain) => chain.name,
+          },
+        },
       },
     },
     User: {},
