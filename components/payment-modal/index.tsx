@@ -13,7 +13,7 @@ const headerProps = [
     description: "This wallet will be the one where you receive rewards",
   },
   {
-    title: "Pay service",
+    title: "Buy a node",
     description: "Choose service you want to pay with",
   },
   {
@@ -58,18 +58,22 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({
           title={headerProps[slide].title}
           description={
             slide === 1 ? (
-              <div>
+              <div className="flex flex-col items-center">
                 <Image
                   src={`/icons/blockchain/${chain?.name
                     .toLowerCase()
                     .replace(/ /g, "-")}.png`}
                   alt=""
-                  width={180}
-                  height={180}
-                  className="object-contain ml-1 mt-2"
+                  width={64}
+                  height={64}
+                  className="mt-10 mb-4"
                 />
-                <p>Blockchain: {chain?.name}</p>
-                <p>Price: {chain?.price}</p>
+                <p className="text-[#F44336] mb-10">
+                  <strong>1x</strong> {chain?.name}{" "}
+                  <span className="text-zinc-500">node for</span>{" "}
+                  <strong>{chain?.price}</strong>{" "}
+                  <span className="text-zinc-500">USD</span>
+                </p>
               </div>
             ) : (
               headerProps[slide].description
@@ -77,7 +81,7 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({
           }
           payment={slide < 2 ? undefined : payment}
         />
-        <form className="flex items-center justify-center flex-col px-8 gap-8">
+        <form className="flex flex-col items-center justify-center gap-8 px-8">
           {slide === 0 && (
             <Input
               placeholder="Example: 0x56464...541584"
@@ -87,11 +91,11 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({
               className="border border-[#54597C] rounded-[12px] w-full bg-[#1D202D] placeholder:text-[#54597C]"
             />
           )}
-          {slide === 1 && (
+          {/* {slide === 1 && (
             <div className="py-3 px-5 bg-[#F443361A] border border-[#F44336] rounded-[12px]">
               <h1 className="text-white text-[20px] font-[500]">coinbase</h1>
             </div>
-          )}
+          )} */}
           {slide < 2 && (
             <Button
               type="button"
@@ -101,7 +105,14 @@ export const PaymentModal: React.FC<PaymentModalProps> = ({
                 chain?.hasWallet && !/^0x[0-9a-fA-F]{40}$/.test(walletAddr)
               }
             >
-              Pay
+              <Image
+                src={`/icons/coinbase.svg`}
+                alt="coinbase"
+                width={24}
+                height={24}
+                className="mr-2"
+              />
+              Pay via coinbase
             </Button>
           )}
         </form>
