@@ -51,12 +51,52 @@
         "createdAt": {
           "type": "string",
           "format": "date-time"
+        },
+        "nodeHistory": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/NodeHistory"
+            },
+            {
+              "type": "null"
+            }
+          ]
         }
       },
       "required": [
         "userId",
         "paymentId",
         "serverId"
+      ]
+    },
+    "NodeHistory": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer"
+        },
+        "node": {
+          "$ref": "#/definitions/Node"
+        },
+        "message": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "status": {
+          "type": "string",
+          "default": "CREATED",
+          "enum": [
+            "CREATED",
+            "INSTALLING",
+            "LIVE",
+            "FAILED"
+          ]
+        }
+      },
+      "required": [
+        "nodeId"
       ]
     },
     "Server": {
@@ -183,6 +223,9 @@
     },
     "node": {
       "$ref": "#/definitions/Node"
+    },
+    "nodeHistory": {
+      "$ref": "#/definitions/NodeHistory"
     },
     "server": {
       "$ref": "#/definitions/Server"
