@@ -48,9 +48,6 @@
             "null"
           ]
         },
-        "isLive": {
-          "type": "boolean"
-        },
         "createdAt": {
           "type": "string",
           "format": "date-time"
@@ -59,8 +56,7 @@
       "required": [
         "userId",
         "paymentId",
-        "serverId",
-        "isLive"
+        "serverId"
       ]
     },
     "Server": {

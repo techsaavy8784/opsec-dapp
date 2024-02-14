@@ -33,7 +33,6 @@ model Node {
     serverId  Int      @unique @map("server_id")
     Server    Server   @relation(fields: [serverId], references: [id])
     wallet    String?
-    isLive    Boolean  @map("is_live")
     createdAt DateTime @default(now()) @map("created_at")
 
     @@map("nodes")
