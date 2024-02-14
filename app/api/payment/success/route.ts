@@ -49,7 +49,6 @@ export async function GET(request: NextRequest) {
       serverId: server.id,
       userId: session.user?.id,
       paymentId: payment.id,
-      isLive: true,
     },
   })
 
