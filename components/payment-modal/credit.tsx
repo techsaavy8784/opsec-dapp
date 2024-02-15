@@ -59,7 +59,8 @@ export const CreditPaymentModal: React.FC<CreditPaymentModalProps> = ({
   })
 
   const buyCredit = useCallback(
-    (data: any) =>
+    (data: any) => {
+      setStep(1)
       mutateAsync(data.amount).then((tx) => {
         if (!tx) {
           return
@@ -78,7 +79,8 @@ export const CreditPaymentModal: React.FC<CreditPaymentModalProps> = ({
               }),
           1000,
         )
-      }),
+      })
+    },
     [onComplete, mutateAsync],
   )
 
@@ -94,22 +96,26 @@ export const CreditPaymentModal: React.FC<CreditPaymentModalProps> = ({
         className={`bg-[#18181B] border-none rounded-[24px] p-8 w-[350px] md:w-[450px]`}
       >
         {step === 0 ? (
-          <form onSubmit={handleSubmit(buyCredit)}>
+          <form onSubmit={handleSubmit(buyCredit)} className="space-y-3">
             <label>Credit amount</label>
             <Input {...register("amount", { required: true, min: 50 })} />
             {errors && errors.amount && (
-              <label className="text-red-900">{errors.amount.message}</label>
+              <label className="text-red-900 block">
+                Amount should be greater than 50
+              </label>
             )}
-            <Button type="submit">
-              Pay via{" "}
-              <Image
-                src="https://nowpayments.io/images/logo/logo.svg"
-                alt="pay via nowpayments"
-                width={120}
-                height={30}
-                className="ml-2 mt-1"
-              />
-            </Button>
+            <div className="text-center">
+              <Button type="submit">
+                Pay via{" "}
+                <Image
+                  src="https://nowpayments.io/images/logo/logo.svg"
+                  alt="pay via nowpayments"
+                  width={120}
+                  height={30}
+                  className="ml-2 mt-1"
+                />
+              </Button>
+            </div>
           </form>
         ) : (
           <>

@@ -57,7 +57,7 @@ export const authOptions: NextAuthOptions = {
           }
         }
 
-        const user = await prisma.user.findUnique({
+        const user = await prisma.user.findFirst({
           where: { address: credentials.address },
         })
 

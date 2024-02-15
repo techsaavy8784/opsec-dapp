@@ -55,7 +55,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ message: "Server not exist" }, { status: 400 })
   }
 
-  const user = await prisma.user.findUnique({
+  const user = await prisma.user.findFirst({
     where: {
       id: session.user?.id
     },

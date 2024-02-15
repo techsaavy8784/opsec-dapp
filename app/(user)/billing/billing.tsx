@@ -19,19 +19,9 @@ const BillingHistory = () => {
     queryFn: () => fetch("/api/payment").then((res) => res.json()),
   })
 
-  if (isPending) {
-    return (
-      <Skeleton className="rounded-lg w-full h-[64px] mr-2 block"></Skeleton>
-    )
-  }
-
-  if (!data) {
-    return "No data"
-  }
-
   return (
     <div>
-      <p>Billing History</p>
+      <p className="my-3">Billing History</p>
       <div className="border border-[#FFFFFF33] rounded-[16px]">
         <Table>
           <TableHeader>
@@ -44,25 +34,39 @@ const BillingHistory = () => {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {data?.map((item, key) => (
-              <TableRow className="border-b-none" key={key}>
-                <TableCell className="text-[16px] font-[600] text-white">
-                  {key + 1}
-                </TableCell>
-                <TableCell className="text-[16px] font-[600] text-white max-md:min-w-[130px]">
-                  {item.node.server.blockchain.name}
-                </TableCell>
-                <TableCell className="text-[16px] font-[600] text-white max-md:min-w-[130px]">
-                  {item.duration}
-                </TableCell>
-                <TableCell className="text-[16px] font-[600] text-white max-md:min-w-[130px]">
-                  {item.credit}
-                </TableCell>
-                <TableCell className="text-[16px] font-[600] text-white max-md:min-w-[130px]">
-                  {item.date.toISOString()}
+            {isPending ? (
+              <TableRow>
+                <TableCell colSpan={5}>
+                  <Skeleton className="rounded-lg w-full h-[64px] mr-2 block"></Skeleton>
                 </TableCell>
               </TableRow>
-            ))}
+            ) : !data || data.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={5} className="text-center">
+                  No Data
+                </TableCell>
+              </TableRow>
+            ) : (
+              data.map((item, key) => (
+                <TableRow className="border-b-none" key={key}>
+                  <TableCell className="text-[16px] font-[600] text-white">
+                    {key + 1}
+                  </TableCell>
+                  <TableCell className="text-[16px] font-[600] text-white max-md:min-w-[130px]">
+                    {item.node.server.blockchain.name}
+                  </TableCell>
+                  <TableCell className="text-[16px] font-[600] text-white max-md:min-w-[130px]">
+                    {item.duration}
+                  </TableCell>
+                  <TableCell className="text-[16px] font-[600] text-white max-md:min-w-[130px]">
+                    {item.credit}
+                  </TableCell>
+                  <TableCell className="text-[16px] font-[600] text-white max-md:min-w-[130px]">
+                    {item.date.toISOString()}
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
           </TableBody>
         </Table>
       </div>

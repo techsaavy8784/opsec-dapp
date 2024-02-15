@@ -5,8 +5,12 @@ import BillingHistory from "./billing"
 const Component = () => {
   return (
     <div className="p-6 max-md:w-screen overflow-hidden">
-      <BillingHistory />
-      <CreditHistory />
+      <div>
+        <CreditHistory />
+      </div>
+      <div className="mt-8">
+        <BillingHistory />
+      </div>
     </div>
   )
 }

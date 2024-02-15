@@ -17,6 +17,11 @@ const Nodes: React.FC = () => {
     queryFn: () => fetch("/api/server/list").then((res) => res.json()),
   })
 
+  const { data: balance } = useQuery({
+    queryKey: ["credits/balance"],
+    queryFn: () => fetch("api/credits/balance").then((res) => res.json()),
+  })
+
   const { mutate } = useMutation({
     mutationFn: (wallet) =>
       fetch("/api/payment", {
@@ -77,6 +82,7 @@ const Nodes: React.FC = () => {
               clearInterval(timer.current)
             }
           }}
+          insufficientBalance={Number(balance?.balace) < Number(chain?.price)}
           onPay={mutate}
         />
       </div>

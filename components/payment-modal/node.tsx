@@ -1,3 +1,5 @@
+"use client"
+
 import React, { useState } from "react"
 import { DialogProps } from "@radix-ui/react-dialog"
 import { Blockchain } from "@prisma/client"
@@ -13,12 +15,14 @@ import { Button } from "../ui/button"
 
 interface PaymentModalProps extends DialogProps {
   chain?: Blockchain
+  insufficientBalance?: boolean
   onPay: (wallet: string) => void
 }
 
 export const NodePaymentModal: React.FC<PaymentModalProps> = ({
   onPay,
   chain,
+  insufficientBalance,
   ...props
 }) => {
   const [walletAddr, setWalletAddr] = useState("")
@@ -47,10 +51,16 @@ export const NodePaymentModal: React.FC<PaymentModalProps> = ({
                 <strong>1x</strong> {chain.name}{" "}
                 <span className="text-zinc-500">node for</span>{" "}
                 <strong>{chain.price}</strong>{" "}
-                <span className="text-zinc-500">USD</span>
+                <span className="text-zinc-500">credits</span>
               </p>
             </div>
           </DialogDescription>
+
+          {insufficientBalance && (
+            <p className="text-center text-gray-600">
+              Insufficient credit balance
+            </p>
+          )}
 
           <form className="flex flex-col items-center justify-center gap-8 px-8">
             {chain.hasWallet && (
@@ -74,17 +84,11 @@ export const NodePaymentModal: React.FC<PaymentModalProps> = ({
               onClick={() => onPay(walletAddr)}
               variant="custom"
               disabled={
-                chain.hasWallet && !/^0x[0-9a-fA-F]{40}$/.test(walletAddr)
+                insufficientBalance ||
+                (chain.hasWallet && !/^0x[0-9a-fA-F]{40}$/.test(walletAddr))
               }
             >
-              Pay via
-              <Image
-                src="https://nowpayments.io/images/logo/logo.svg"
-                alt="nowpayments"
-                width={120}
-                height={21}
-                className="ml-2 mt-2"
-              />
+              Purchase
             </Button>
           </form>
         </DialogContent>

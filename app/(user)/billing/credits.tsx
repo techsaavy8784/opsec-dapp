@@ -22,16 +22,6 @@ const CreditHistory = () => {
     queryFn: () => fetch("/api/credits").then((res) => res.json()),
   })
 
-  if (isPending) {
-    return (
-      <Skeleton className="rounded-lg w-full h-[64px] mr-2 block"></Skeleton>
-    )
-  }
-
-  if (!data) {
-    return "No data"
-  }
-
   return (
     <div>
       <Button onClick={() => setModal(true)}>Charge Credits</Button>
@@ -41,7 +31,7 @@ const CreditHistory = () => {
         onComplete={refetch}
       />
 
-      <p>Credit History</p>
+      <p className="my-3">Credit History</p>
       <div className="border border-[#FFFFFF33] rounded-[16px]">
         <Table>
           <TableHeader>
@@ -53,22 +43,36 @@ const CreditHistory = () => {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {data.map((item, key) => (
-              <TableRow className="border-b-none" key={key}>
-                <TableCell className="text-[16px] font-[600] text-white">
-                  {key + 1}
-                </TableCell>
-                <TableCell className="text-[16px] font-[600] text-white max-md:min-w-[130px]">
-                  {item.tx}
-                </TableCell>
-                <TableCell className="text-[16px] font-[600] text-white max-md:min-w-[130px]">
-                  {item.credits}
-                </TableCell>
-                <TableCell className="text-[16px] font-[600] text-white max-md:min-w-[130px]">
-                  {item.date.toISOString()}
+            {isPending ? (
+              <TableRow>
+                <TableCell colSpan={4}>
+                  <Skeleton className="rounded-lg w-full h-[64px] mr-2 block"></Skeleton>
                 </TableCell>
               </TableRow>
-            ))}
+            ) : !data || data.length === 0 ? (
+              <TableRow>
+                <TableCell colSpan={4} className="text-center">
+                  No Data
+                </TableCell>
+              </TableRow>
+            ) : (
+              data.map((item, key) => (
+                <TableRow className="border-b-none" key={key}>
+                  <TableCell className="text-[16px] font-[600] text-white">
+                    {key + 1}
+                  </TableCell>
+                  <TableCell className="text-[16px] font-[600] text-white max-md:min-w-[130px]">
+                    {item.tx}
+                  </TableCell>
+                  <TableCell className="text-[16px] font-[600] text-white max-md:min-w-[130px]">
+                    {item.credits}
+                  </TableCell>
+                  <TableCell className="text-[16px] font-[600] text-white max-md:min-w-[130px]">
+                    {item.date.toISOString()}
+                  </TableCell>
+                </TableRow>
+              ))
+            )}
           </TableBody>
         </Table>
       </div>
