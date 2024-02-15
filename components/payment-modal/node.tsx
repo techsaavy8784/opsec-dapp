@@ -1,0 +1,94 @@
+import React, { useState } from "react"
+import { DialogProps } from "@radix-ui/react-dialog"
+import { Blockchain } from "@prisma/client"
+import {
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogDescription,
+} from "../ui/dialog"
+import Image from "next/image"
+import { Input } from "../ui/input"
+import { Button } from "../ui/button"
+
+interface PaymentModalProps extends DialogProps {
+  chain?: Blockchain
+  onPay: (wallet: string) => void
+}
+
+export const NodePaymentModal: React.FC<PaymentModalProps> = ({
+  onPay,
+  chain,
+  ...props
+}) => {
+  const [walletAddr, setWalletAddr] = useState("")
+
+  return (
+    <Dialog {...props}>
+      {chain && (
+        <DialogContent
+          className={`bg-[#18181B] border-none rounded-[24px] p-8 w-[350px] md:w-[450px]`}
+        >
+          <DialogTitle className="text-white text-center font-[600] text-[28px]">
+            Buy a node{" "}
+          </DialogTitle>
+          <DialogDescription className="text-[#54597C] w-full text-center font-[500] text-[16px]">
+            <div className="flex flex-col items-center">
+              <Image
+                src={`/icons/blockchain/${chain.name
+                  .toLowerCase()
+                  .replace(/ /g, "-")}.png`}
+                alt=""
+                width={64}
+                height={64}
+                className="mt-10 mb-4"
+              />
+              <p className="text-[#F44336] mb-10">
+                <strong>1x</strong> {chain.name}{" "}
+                <span className="text-zinc-500">node for</span>{" "}
+                <strong>{chain.price}</strong>{" "}
+                <span className="text-zinc-500">USD</span>
+              </p>
+            </div>
+          </DialogDescription>
+
+          <form className="flex flex-col items-center justify-center gap-8 px-8">
+            {chain.hasWallet && (
+              <>
+                <label>Enter your wallet address</label>
+                <label>
+                  This wallet will be the one where you receive rewards
+                </label>
+                <Input
+                  placeholder="Example: 0x56464...541584"
+                  type="text"
+                  value={walletAddr}
+                  onChange={(e) => setWalletAddr(e.target.value)}
+                  className="border border-[#54597C] rounded-[12px] w-full bg-[#1D202D] placeholder:text-[#54597C]"
+                />
+              </>
+            )}
+
+            <Button
+              type="button"
+              onClick={() => onPay(walletAddr)}
+              variant="custom"
+              disabled={
+                chain.hasWallet && !/^0x[0-9a-fA-F]{40}$/.test(walletAddr)
+              }
+            >
+              Pay via
+              <Image
+                src="https://nowpayments.io/images/logo/logo.svg"
+                alt="nowpayments"
+                width={120}
+                height={21}
+                className="ml-2 mt-2"
+              />
+            </Button>
+          </form>
+        </DialogContent>
+      )}
+    </Dialog>
+  )
+}

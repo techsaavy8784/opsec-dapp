@@ -16,10 +16,20 @@
             "null"
           ]
         },
+        "balance": {
+          "type": "integer",
+          "default": 0
+        },
         "nodes": {
           "type": "array",
           "items": {
             "$ref": "#/definitions/Node"
+          }
+        },
+        "credits": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Credit"
           }
         }
       },
@@ -36,10 +46,7 @@
         "user": {
           "$ref": "#/definitions/User"
         },
-        "payment": {
-          "$ref": "#/definitions/Payment"
-        },
-        "Server": {
+        "server": {
           "$ref": "#/definitions/Server"
         },
         "wallet": {
@@ -58,24 +65,29 @@
             "FAILED"
           ]
         },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
         "nodeHistory": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/NodeHistory"
+          }
+        },
+        "payment": {
           "anyOf": [
             {
-              "$ref": "#/definitions/NodeHistory"
+              "$ref": "#/definitions/Payment"
             },
             {
               "type": "null"
             }
           ]
-        },
-        "createdAt": {
-          "type": "string",
-          "format": "date-time"
         }
       },
       "required": [
         "userId",
-        "paymentId",
         "serverId"
       ]
     },
@@ -159,22 +171,15 @@
         "id": {
           "type": "integer"
         },
-        "tx": {
-          "type": "string"
-        },
         "duration": {
           "type": "integer",
           "default": 0
         },
         "node": {
-          "anyOf": [
-            {
-              "$ref": "#/definitions/Node"
-            },
-            {
-              "type": "null"
-            }
-          ]
+          "$ref": "#/definitions/Node"
+        },
+        "credit": {
+          "type": "integer"
         },
         "date": {
           "type": "string",
@@ -182,7 +187,8 @@
         }
       },
       "required": [
-        "tx"
+        "nodeId",
+        "credit"
       ]
     },
     "Blockchain": {
@@ -224,6 +230,32 @@
         "url",
         "price"
       ]
+    },
+    "Credit": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer"
+        },
+        "tx": {
+          "type": "string"
+        },
+        "credits": {
+          "type": "integer"
+        },
+        "user": {
+          "$ref": "#/definitions/User"
+        },
+        "date": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "tx",
+        "credits",
+        "userId"
+      ]
     }
   },
   "type": "object",
@@ -245,6 +277,9 @@
     },
     "blockchain": {
       "$ref": "#/definitions/Blockchain"
+    },
+    "credit": {
+      "$ref": "#/definitions/Credit"
     }
   }
 }

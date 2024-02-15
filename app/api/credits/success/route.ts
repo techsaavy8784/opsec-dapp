@@ -19,36 +19,34 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ message: "Charge not made" }, { status: 401 })
   }
 
-  const { duration, blockchainId, userId, wallet, tx } = txInfo[verifier]
+  const { userId, amount, tx } = txInfo[verifier]
 
   if (userId !== session.user?.id) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 })
   }
 
-  const server = await prisma.server.findFirst({
-    where: {
-      blockchainId,
-      node: null,
-    },
-  })
+  const credits = amount
 
-  if (!server) {
-    return NextResponse.json({ message: "Server not exist" }, { status: 400 })
-  }
-
-  const payment = await prisma.payment.create({
+  await prisma.credit.create({
     data: {
-      duration,
+      userId,
       tx,
+      credits,
     },
   })
 
-  await prisma.node.create({
+  const user = await prisma.user.findUnique({
+    where: {
+      id: session.user?.id
+    },
+  })
+
+  await prisma.user.update({
     data: {
-      wallet,
-      serverId: server.id,
-      userId: session.user?.id,
-      paymentId: payment.id,
+      balance: user!.balance + credits,
+    },
+    where: {
+      id: session.user?.id
     },
   })
 

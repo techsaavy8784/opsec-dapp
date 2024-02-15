@@ -6,6 +6,7 @@ CREATE TABLE "users" (
     "id" SERIAL NOT NULL,
     "address" TEXT NOT NULL,
     "password" TEXT,
+    "balance" INTEGER NOT NULL DEFAULT 0,
 
     CONSTRAINT "users_pkey" PRIMARY KEY ("id")
 );
@@ -13,8 +14,7 @@ CREATE TABLE "users" (
 -- CreateTable
 CREATE TABLE "nodes" (
     "id" SERIAL NOT NULL,
-    "userId" INTEGER NOT NULL,
-    "payment_id" INTEGER NOT NULL,
+    "user_id" INTEGER NOT NULL,
     "server_id" INTEGER NOT NULL,
     "wallet" TEXT,
     "status" "Status" NOT NULL DEFAULT 'CREATED',
@@ -49,8 +49,9 @@ CREATE TABLE "servers" (
 -- CreateTable
 CREATE TABLE "payments" (
     "id" SERIAL NOT NULL,
-    "tx" TEXT NOT NULL,
     "duration" INTEGER NOT NULL DEFAULT 0,
+    "node_id" INTEGER NOT NULL,
+    "credit" INTEGER NOT NULL,
     "date" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
     CONSTRAINT "payments_pkey" PRIMARY KEY ("id")
@@ -69,11 +70,19 @@ CREATE TABLE "blockchains" (
     CONSTRAINT "blockchains_pkey" PRIMARY KEY ("id")
 );
 
--- CreateIndex
-CREATE UNIQUE INDEX "users_address_key" ON "users"("address");
+-- CreateTable
+CREATE TABLE "credits" (
+    "id" SERIAL NOT NULL,
+    "tx" TEXT NOT NULL,
+    "credits" INTEGER NOT NULL,
+    "user_id" INTEGER NOT NULL,
+    "date" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "credits_pkey" PRIMARY KEY ("id")
+);
 
 -- CreateIndex
-CREATE UNIQUE INDEX "nodes_payment_id_key" ON "nodes"("payment_id");
+CREATE UNIQUE INDEX "users_address_key" ON "users"("address");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "nodes_server_id_key" ON "nodes"("server_id");
@@ -81,11 +90,11 @@ CREATE UNIQUE INDEX "nodes_server_id_key" ON "nodes"("server_id");
 -- CreateIndex
 CREATE UNIQUE INDEX "node_histories_node_id_key" ON "node_histories"("node_id");
 
--- AddForeignKey
-ALTER TABLE "nodes" ADD CONSTRAINT "nodes_userId_fkey" FOREIGN KEY ("userId") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+-- CreateIndex
+CREATE UNIQUE INDEX "payments_node_id_key" ON "payments"("node_id");
 
 -- AddForeignKey
-ALTER TABLE "nodes" ADD CONSTRAINT "nodes_payment_id_fkey" FOREIGN KEY ("payment_id") REFERENCES "payments"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+ALTER TABLE "nodes" ADD CONSTRAINT "nodes_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "nodes" ADD CONSTRAINT "nodes_server_id_fkey" FOREIGN KEY ("server_id") REFERENCES "servers"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
@@ -95,3 +104,9 @@ ALTER TABLE "node_histories" ADD CONSTRAINT "node_histories_node_id_fkey" FOREIG
 
 -- AddForeignKey
 ALTER TABLE "servers" ADD CONSTRAINT "servers_blockchain_id_fkey" FOREIGN KEY ("blockchain_id") REFERENCES "blockchains"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "payments" ADD CONSTRAINT "payments_node_id_fkey" FOREIGN KEY ("node_id") REFERENCES "nodes"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
+
+-- AddForeignKey
+ALTER TABLE "credits" ADD CONSTRAINT "credits_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
