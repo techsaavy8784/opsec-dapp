@@ -38,6 +38,10 @@ export const CreditPaymentModal: React.FC<CreditPaymentModalProps> = ({
   useEffect(() => {
     setStep(0)
     setPayment("waiting")
+
+    if (!props.open) {
+      clearInterval(timer.current)
+    }
   }, [props.open])
 
   const { mutateAsync } = useMutation({
@@ -49,12 +53,12 @@ export const CreditPaymentModal: React.FC<CreditPaymentModalProps> = ({
         }),
       })
         .then((res) => res.json())
-        .then(({ data }) => {
+        .then(({ url, tx }) => {
           const left = (window.innerWidth - 600) / 2
           const top = (window.innerHeight - 800) / 2
           const options = `width=${600},height=${800},left=${left},top=${top},resizable=yes,scrollbars=yes`
-          window.open(data.invoice_url, "_blank", options)
-          return data.id
+          window.open(url, "_blank", options)
+          return tx
         }),
   })
 
@@ -68,7 +72,7 @@ export const CreditPaymentModal: React.FC<CreditPaymentModalProps> = ({
         clearInterval(timer.current)
         timer.current = setInterval(
           () =>
-            fetch(`/api/payment?tx=${tx}`)
+            fetch(`/api/credits/status?tx=${tx}`)
               .then((res) => res.json())
               .then((res) => {
                 if (res.status === "finished") {

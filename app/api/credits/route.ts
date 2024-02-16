@@ -61,21 +61,40 @@ export async function POST(request: NextRequest) {
       body: JSON.stringify({
         price_amount: amount,
         price_currency: "usd",
+        pay_currency: "USDTERC20",
         success_url: `${request.nextUrl.origin}/api/credits/success?verifier=${verifier}`
       }),
     })
       .then((res) => res.json())
       .catch((e) => console.log("error making coinbase charge:", e))
 
+    const { payment_id } = await fetch(
+      "https://api.nowpayments.io/v1/invoice-payment",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "x-api-key": String(process.env.NOW_PAYMENTS_API_KEY),
+        },
+        body: JSON.stringify({
+          iid: data.id,
+          pay_currency: "USDTERC20",
+        }),
+      },
+    )
+      .then((res) => res.json())
+      .catch((e) => console.log("error making coinbase charge:", e))
+
     tx[verifier] = {
       userId: session.user?.id,
       amount,
-      tx: data.id,
+      tx: payment_id,
     }
 
     return NextResponse.json({
       message: "Charge created",
-      data,
+      tx: payment_id,
+      url: data.invoice_url,
     })
   } catch (e) {
     return NextResponse.json(
