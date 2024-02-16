@@ -94,7 +94,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({
       message: "Charge created",
       tx: payment_id,
-      url: data.invoice_url,
+      url: `${data.invoice_url}&paymentId=${payment_id}`,
     })
   } catch (e) {
     return NextResponse.json(

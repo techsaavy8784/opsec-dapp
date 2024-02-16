@@ -25,7 +25,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 })
   }
 
-  const credits = amount
+  const credits = Number(amount)
 
   await prisma.credit.create({
     data: {

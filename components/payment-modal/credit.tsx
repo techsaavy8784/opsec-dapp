@@ -81,7 +81,7 @@ export const CreditPaymentModal: React.FC<CreditPaymentModalProps> = ({
                   onComplete()
                 }
               }),
-          1000,
+          5000,
         )
       })
     },
