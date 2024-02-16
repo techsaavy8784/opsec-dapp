@@ -19,13 +19,6 @@ export async function GET() {
         },
       },
     },
-    select: {
-      id: true,
-      name: true,
-      url: true,
-      description: true,
-      price: true,
-    },
   })
 
   return NextResponse.json(blockchainsWithServers)

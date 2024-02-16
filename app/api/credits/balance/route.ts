@@ -2,7 +2,6 @@ import prisma from "@/prisma"
 import { authOptions } from "@/lib/auth"
 import { getServerSession } from "next-auth"
 import { NextResponse, NextRequest } from "next/server"
-import { generateRandomString } from "@/lib/utils"
 
 export async function GET(request: NextRequest) {
   const session = await getServerSession(authOptions)

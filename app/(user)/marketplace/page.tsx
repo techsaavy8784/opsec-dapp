@@ -6,11 +6,14 @@ import { NodeCard } from "@/components/node-card"
 import { NodePaymentModal } from "@/components/payment-modal/node"
 import { Blockchain } from "@prisma/client"
 import { Skeleton } from "@/components/ui/skeleton"
+import { useToast } from "@/components/ui/use-toast"
 
 const Nodes: React.FC = () => {
   const [chain, setChain] = useState<Blockchain>()
 
   const timer = useRef<NodeJS.Timeout>()
+
+  const { toast } = useToast()
 
   const { isPending, data, refetch } = useQuery<[]>({
     queryKey: ["server/list"],
@@ -31,7 +34,13 @@ const Nodes: React.FC = () => {
           blockchainId: chain?.id,
           duration: 1,
         }),
-      }).then(() => refetch()),
+      }).then(() => {
+        setChain(undefined)
+        toast({
+          title: "Node purchased",
+        })
+        refetch()
+      }),
   })
 
   if (isPending) {
@@ -82,7 +91,7 @@ const Nodes: React.FC = () => {
               clearInterval(timer.current)
             }
           }}
-          insufficientBalance={Number(balance?.balace) < Number(chain?.price)}
+          insufficientBalance={Number(balance?.balance) < Number(chain?.price)}
           onPay={mutate}
         />
       </div>

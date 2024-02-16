@@ -62,7 +62,7 @@ const BillingHistory = () => {
                     {item.credit}
                   </TableCell>
                   <TableCell className="text-[16px] font-[600] text-white max-md:min-w-[130px]">
-                    {item.date.toISOString()}
+                    {String(item.date)}
                   </TableCell>
                 </TableRow>
               ))

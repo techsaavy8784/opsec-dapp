@@ -35,6 +35,14 @@ export const authOptions: NextAuthOptions = {
           return null
         }
 
+        const user = await prisma.user.findFirst({
+          where: { address: credentials.address },
+        })
+
+        if (!user) {
+          return null
+        }
+
         if (!credentials.password) {
           if (!isAddress(credentials.address as string)) {
             return null
@@ -52,17 +60,7 @@ export const authOptions: NextAuthOptions = {
             },
           })
 
-          return {
-            address: credentials.address,
-          }
-        }
-
-        const user = await prisma.user.findFirst({
-          where: { address: credentials.address },
-        })
-
-        if (!user) {
-          return null
+          return user
         }
 
         const isPasswordMatch = await compare(
@@ -92,6 +90,7 @@ export const authOptions: NextAuthOptions = {
     },
     async session({ session, token }) {
       session.user = {
+        id: token.id,
         address: token.address as string,
       }
 
