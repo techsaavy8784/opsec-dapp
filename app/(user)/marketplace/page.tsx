@@ -1,23 +1,31 @@
 "use client"
 
-import React, { useCallback, useEffect, useRef, useState } from "react"
+import React, { useRef, useState } from "react"
 import { useMutation, useQuery } from "@tanstack/react-query"
 import { NodeCard } from "@/components/node-card"
-import { PaymentModal } from "@/components/payment-modal"
+import { NodePaymentModal } from "@/components/payment-modal/node"
 import { Blockchain } from "@prisma/client"
 import { Skeleton } from "@/components/ui/skeleton"
+import { useToast } from "@/components/ui/use-toast"
 
 const Nodes: React.FC = () => {
   const [chain, setChain] = useState<Blockchain>()
 
   const timer = useRef<NodeJS.Timeout>()
 
-  const { isPending, data } = useQuery<[]>({
+  const { toast } = useToast()
+
+  const { isPending, data, refetch } = useQuery<[]>({
     queryKey: ["server/list"],
     queryFn: () => fetch("/api/server/list").then((res) => res.json()),
   })
 
-  const { mutateAsync } = useMutation<void, void, string>({
+  const { data: balance } = useQuery({
+    queryKey: ["credits/balance"],
+    queryFn: () => fetch("api/credits/balance").then((res) => res.json()),
+  })
+
+  const { mutate } = useMutation({
     mutationFn: (wallet) =>
       fetch("/api/payment", {
         method: "POST",
@@ -26,47 +34,14 @@ const Nodes: React.FC = () => {
           blockchainId: chain?.id,
           duration: 1,
         }),
-      })
-        .then((res) => res.json())
-        .then(({ data }) => {
-          const left = (window.innerWidth - 600) / 2
-          const top = (window.innerHeight - 800) / 2
-          const options = `width=${600},height=${800},left=${left},top=${top},resizable=yes,scrollbars=yes`
-          window.open(data.hosted_url, "_blank", options)
-          return data.id
-        }),
-  })
-
-  const mutate = useCallback(
-    (wallet: string) =>
-      new Promise<void>((resolve) => {
-        mutateAsync(wallet).then((tx) => {
-          if (!tx) {
-            return
-          }
-          clearInterval(timer.current)
-          timer.current = setInterval(
-            () =>
-              fetch(`/api/payment?tx=${tx}`)
-                .then((res) => res.json())
-                .then((res) => {
-                  if (res.status === "Completed") {
-                    clearInterval(timer.current)
-                    resolve()
-                  }
-                }),
-            1000,
-          )
+      }).then(() => {
+        setChain(undefined)
+        toast({
+          title: "Node purchased",
         })
+        refetch()
       }),
-    [mutateAsync],
-  )
-
-  useEffect(() => {
-    return () => {
-      clearInterval(timer.current)
-    }
-  }, [])
+  })
 
   if (isPending) {
     return (
@@ -107,7 +82,7 @@ const Nodes: React.FC = () => {
             onRunNodeClick={() => setChain(chain)}
           />
         ))}
-        <PaymentModal
+        <NodePaymentModal
           open={!!chain}
           chain={chain}
           onOpenChange={(open) => {
@@ -116,6 +91,7 @@ const Nodes: React.FC = () => {
               clearInterval(timer.current)
             }
           }}
+          insufficientBalance={Number(balance?.balance) < Number(chain?.price)}
           onPay={mutate}
         />
       </div>

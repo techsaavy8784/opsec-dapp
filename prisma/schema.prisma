@@ -17,10 +17,12 @@ datasource db {
 }
 
 model User {
-    id       Int     @id @default(autoincrement())
-    address  String  @unique // address is used as email for admins
+    id       Int      @id @default(autoincrement())
+    address  String   @unique // address is used as email for admins
     password String? // if password is not null, he is admin, otherwise user
+    balance  Int      @default(0)
     nodes    Node[]
+    credits  Credit[]
 
     @@map("users")
 }
@@ -33,18 +35,16 @@ enum Status {
 }
 
 model Node {
-    id        Int      @id @default(autoincrement())
-    userId    Int
-    user      User     @relation(fields: [userId], references: [id])
-    paymentId Int      @unique @map("payment_id")
-    payment   Payment  @relation(fields: [paymentId], references: [id])
-    serverId  Int      @unique @map("server_id")
-    Server    Server   @relation(fields: [serverId], references: [id])
-    wallet    String?
-    status    Status   @default(CREATED)
-    createdAt DateTime @default(now()) @map("created_at")
-
-    nodeHistory NodeHistory?
+    id          Int           @id @default(autoincrement())
+    userId      Int           @map("user_id")
+    user        User          @relation(fields: [userId], references: [id])
+    serverId    Int           @unique @map("server_id")
+    server      Server        @relation(fields: [serverId], references: [id])
+    wallet      String?
+    status      Status        @default(CREATED)
+    createdAt   DateTime      @default(now()) @map("created_at")
+    nodeHistory NodeHistory[]
+    payment     Payment?
 
     @@map("nodes")
 }
@@ -75,9 +75,10 @@ model Server {
 
 model Payment {
     id       Int      @id @default(autoincrement())
-    tx       String
     duration Int      @default(0)
-    node     Node?
+    nodeId   Int      @unique @map("node_id")
+    node     Node     @relation(fields: [nodeId], references: [id])
+    credit   Int
     date     DateTime @default(now())
 
     @@map("payments")
@@ -94,4 +95,15 @@ model Blockchain {
     servers     Server[]
 
     @@map("blockchains")
+}
+
+model Credit {
+    id      Int      @id @default(autoincrement())
+    tx      String
+    credits Int
+    user    User     @relation(fields: [userId], references: [id])
+    userId  Int      @map("user_id")
+    date    DateTime @default(now())
+
+    @@map("credits")
 }
