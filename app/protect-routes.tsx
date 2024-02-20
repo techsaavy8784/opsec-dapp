@@ -1,11 +1,10 @@
 "use client"
 
 import React from "react"
-import { useAccount, useNetwork } from "wagmi"
-import { signIn, signOut, useSession } from "next-auth/react"
-import { mainnet, sepolia, Chain } from "wagmi/chains"
+import { useAccount } from "wagmi"
+import { useSession } from "next-auth/react"
+import { mainnet, sepolia } from "wagmi/chains"
 import { redirect, usePathname } from "next/navigation"
-import { useState, useEffect } from "react"
 
 interface ProtectRoutesProps {
   children: React.ReactNode
@@ -14,31 +13,27 @@ interface ProtectRoutesProps {
 const chainId = (process.env.NODE_ENV === "production" ? mainnet : sepolia).id
 
 const ProtectRoutes: React.FC<ProtectRoutesProps> = ({ children }) => {
-  const { status, data: session } = useSession()
-  const { chain } = useNetwork()
+  const pathname = usePathname()
+  const { isConnected, chain } = useAccount()
+  const { status } = useSession()
 
-  console.log(`status: ${status}`)
-  console.log(`data:`)
-  console.log(session)
+  const connected =
+    isConnected && status === "authenticated" && chain?.id === chainId
 
-  useEffect(() => {
-    if (status === "unauthenticated") {
-      // Redirect to sign-in page
-      signIn()
-    } else if (chain?.id !== chainId) {
-      //   alert(
-      //     `Please switch to the ${
-      //       process.env.NODE_ENV === "production" ? "mainnet" : "sepolia"
-      //     } network.`,
-      //   )
-    }
-  }, [status, chain, session])
+  if (pathname.startsWith("/admin")) {
+    return children
+  }
 
-  if (
-    status === "loading" ||
-    (status === "authenticated" && chain?.id !== chainId)
-  ) {
-    return <div>Loading...</div>
+  if (status === "loading") {
+    return children
+  }
+
+  if (pathname === "/connect-wallet" && connected) {
+    redirect("/dashboard")
+  }
+
+  if (pathname !== "/connect-wallet" && !connected) {
+    redirect("/connect-wallet")
   }
 
   return children

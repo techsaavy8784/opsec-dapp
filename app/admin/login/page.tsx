@@ -38,9 +38,9 @@ function LoginForm() {
 
   const onSubmit = async (values: z.infer<typeof loginSchema>) => {
     setLoading(true)
-    const result = await signIn("credentials", {
+    const result = await signIn("admin", {
       redirect: false,
-      address: values.email,
+      email: values.email,
       password: values.password,
     })
 
