@@ -59,26 +59,27 @@ export function CardBlockchains() {
         ) : (
           <>
             <div className="flex flex-row w-full">
-              {data?.map((blockchain: any, index) => (
-                <a
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  href={blockchain?.url}
-                  key={index}
-                >
-                  <Image
-                    src={`/icons/blockchain/${blockchain?.name
-                      .toLowerCase()
-                      .replace(/ /g, "-")}.png`}
-                    alt={blockchain?.name}
-                    width={32}
-                    height={32}
-                    className={`${
-                      index !== 0 ? "ml-[-8px]" : ""
-                    } rounded-[5px]`}
-                  />
-                </a>
-              ))}
+              {Array.isArray(data) &&
+                data?.map((blockchain: any, index) => (
+                  <a
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    href={blockchain?.url}
+                    key={index}
+                  >
+                    <Image
+                      src={`/icons/blockchain/${blockchain?.name
+                        .toLowerCase()
+                        .replace(/ /g, "-")}.png`}
+                      alt={blockchain?.name}
+                      width={32}
+                      height={32}
+                      className={`${
+                        index !== 0 ? "ml-[-8px]" : ""
+                      } rounded-[5px]`}
+                    />
+                  </a>
+                ))}
             </div>
             <p className="mt-6 text-xs text-muted-foreground">
               on {data?.length} blockchains

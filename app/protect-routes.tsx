@@ -2,9 +2,10 @@
 
 import React from "react"
 import { useAccount, useNetwork } from "wagmi"
-import { signIn, signOut } from "next-auth/react"
+import { signIn, signOut, useSession } from "next-auth/react"
 import { mainnet, sepolia, Chain } from "wagmi/chains"
 import { redirect, usePathname } from "next/navigation"
+import { useState, useEffect } from "react"
 
 interface ProtectRoutesProps {
   children: React.ReactNode
@@ -13,36 +14,34 @@ interface ProtectRoutesProps {
 const chainId = (process.env.NODE_ENV === "production" ? mainnet : sepolia).id
 
 const ProtectRoutes: React.FC<ProtectRoutesProps> = ({ children }) => {
-  const pathname = usePathname()
+  const { status, data: session } = useSession()
   const { chain } = useNetwork()
-  const { isConnected } = useAccount({
-    onConnect: ({ address }) => {
-      signIn("credentials", {
-        address,
-        redirect: false,
-        callbackUrl: "/dashboard",
-      })
-    },
-    onDisconnect: () => {
-      signOut()
-    },
-  })
 
-  if (pathname.startsWith("/admin")) {
-    return children
-  }
+  console.log(`status: ${status}`)
+  console.log(`data:`)
+  console.log(session)
 
-  if (pathname === "/connect-wallet") {
-    if (isConnected && chain?.id === chainId) {
-      redirect("/dashboard")
-    } else {
-      return children
+  useEffect(() => {
+    if (status === "unauthenticated") {
+      // Redirect to sign-in page
+      signIn()
+    } else if (chain?.id !== chainId) {
+      //   alert(
+      //     `Please switch to the ${
+      //       process.env.NODE_ENV === "production" ? "mainnet" : "sepolia"
+      //     } network.`,
+      //   )
     }
-  } else if (isConnected && chain?.id === chainId) {
-    return children
-  } else {
-    redirect("/connect-wallet")
+  }, [status, chain, session])
+
+  if (
+    status === "loading" ||
+    (status === "authenticated" && chain?.id !== chainId)
+  ) {
+    return <div>Loading...</div>
   }
+
+  return children
 }
 
 export default ProtectRoutes

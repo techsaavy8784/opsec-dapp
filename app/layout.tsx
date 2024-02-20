@@ -2,6 +2,7 @@ import type { Metadata } from "next"
 import { gilroy } from "@/fonts/gilroy"
 import { Providers } from "./providers"
 import { Toaster } from "@/components/ui/toaster"
+import { SessionProvider } from "next-auth/react"
 import ProtectRoutes from "./protect-routes"
 import "@rainbow-me/rainbowkit/styles.css"
 import "./globals.css"
@@ -12,15 +13,16 @@ export const metadata: Metadata = {
   description: "Secure node management for the masses",
 }
 
-export interface LayoutProps {
+interface LayoutProps {
   children: React.ReactNode
 }
 
 const RootLayout: React.FC<LayoutProps> = ({ children }) => (
+  // Wrap the Providers component with SessionProvider
   <html lang="en">
     <body className={`${gilroy.className} bg-black dark`}>
       <Providers>
-        <ProtectRoutes>{children}</ProtectRoutes>
+        {children}
         <Toaster />
       </Providers>
     </body>

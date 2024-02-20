@@ -1,21 +1,33 @@
+"use client"
+
 import { Sidebar } from "@/components/sidebar"
 import { Navbar } from "@/components/navbar"
-import { LayoutProps } from "../layout"
+import { SessionProvider } from "next-auth/react"
+import ProtectRoutes from "../protect-routes"
 import { SidebarMobile } from "@/components/sidebar/sidebar-mobile"
 
-const Layout: React.FC<LayoutProps> = ({ children }) => (
-  <main className="md:container">
-    <div className="flex h-screen">
-      <div className="max-md:hidden">
-        <Sidebar />
+interface LayoutProps {
+  children: React.ReactNode
+  session: any
+}
+
+const Layout: React.FC<LayoutProps> = ({ children, session }) => (
+  <SessionProvider session={session}>
+    <main className="md:container">
+      <div className="flex h-screen">
+        <div className="max-md:hidden">
+          <Sidebar />
+        </div>
+        <SidebarMobile />
+        <div className="flex flex-col flex-1">
+          <Navbar />
+          <div className="px-6 overflow-y-scroll">
+            <ProtectRoutes>{children}</ProtectRoutes>
+          </div>
+        </div>
       </div>
-      <SidebarMobile />
-      <div className="flex-1 flex flex-col">
-        <Navbar />
-        <div className="overflow-y-scroll px-6">{children}</div>
-      </div>
-    </div>
-  </main>
+    </main>
+  </SessionProvider>
 )
 
 export default Layout

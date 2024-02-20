@@ -2,7 +2,6 @@ import { NextAuthOptions } from "next-auth"
 import CredentialsProvider from "next-auth/providers/credentials"
 import { compare } from "bcrypt"
 import { PrismaAdapter } from "@next-auth/prisma-adapter"
-import { isAddress } from "viem"
 import prisma from "@/prisma"
 
 export const authOptions: NextAuthOptions = {
@@ -16,22 +15,19 @@ export const authOptions: NextAuthOptions = {
     error: "/error",
   },
   providers: [
+    // SIWE (Sign-In
     CredentialsProvider({
-      name: "Credentials",
+      id: "ethereum",
+      name: "Ethereum",
       credentials: {
         address: {
-          label: "Email",
-          type: "email",
-          placeholder: "based@opsec.org",
+          label: "Ethereum Address",
+          type: "text",
+          placeholder: "0x",
         },
-        password: { label: "Password", type: "password" },
       },
       async authorize(credentials) {
-        if (!credentials) {
-          return null
-        }
-
-        if (!credentials.address) {
+        if (!credentials || !credentials.address) {
           return null
         }
 
@@ -43,38 +39,47 @@ export const authOptions: NextAuthOptions = {
           return null
         }
 
-        if (!credentials.password) {
-          if (!isAddress(credentials.address as string)) {
-            return null
-          }
+        // For demo purposes, returning a mock user object
+        return {
+          id: credentials.address,
+          address: credentials.address,
+        }
+      },
+    }),
 
-          await prisma.user.upsert({
-            where: {
-              address: credentials.address,
-            },
-            create: {
-              address: credentials.address,
-            },
-            update: {
-              address: credentials.address,
-            },
-          })
+    // Username/Password
+    CredentialsProvider({
+      id: "admin",
+      name: "Credentials",
+      credentials: {
+        username: { label: "Username", type: "text" },
+        password: { label: "Password", type: "password" },
+      },
+      async authorize(credentials) {
+        if (!credentials || !credentials.username || !credentials.password) {
+          return null
+        }
 
-          return user
+        const user = await prisma.user.findUnique({
+          where: { username: credentials.username },
+        })
+
+        if (!user) {
+          return null
         }
 
         const isPasswordMatch = await compare(
           credentials.password,
-          user.password ?? "",
+          user.password,
         )
-
         if (!isPasswordMatch) {
           return null
         }
 
         return {
-          id: user.id.toString(),
-          email: user.address,
+          id: user.id,
+          name: user.name,
+          email: user.email,
         }
       },
     }),
@@ -85,15 +90,19 @@ export const authOptions: NextAuthOptions = {
       if (user) {
         token.id = user.id
         token.address = user.address
+
+        if (user.balance !== undefined) {
+          token.balance = user.balance
+        }
       }
       return token
     },
     async session({ session, token }) {
       session.user = {
         id: token.id,
-        address: token.address as string,
+        address: token.address,
+        balance: token.balance,
       }
-
       return session
     },
   },
