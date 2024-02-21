@@ -110,9 +110,9 @@ export const authOptions: NextAuthOptions = {
     },
     async session({ session, token }) {
       session.user = {
-        id: token.id,
+        id: Number(token.id),
         address: token.address as string,
-      } as DefaultSession["user"]
+      }
 
       return session
     },
