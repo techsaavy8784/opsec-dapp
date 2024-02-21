@@ -8,16 +8,16 @@ import {
 import { Button } from "@/components/ui/button"
 import { FiCloud } from "react-icons/fi"
 
-export function CardNodesUser() {
+export function CardNodesAll() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Your Nodes</CardTitle>
+        <CardTitle>All Nodes</CardTitle>
         <CardDescription>Currently running nodes</CardDescription>
       </CardHeader>
       <CardContent>
-        <div className="text-4xl font-bold">5</div>
-        <p className="text-xs text-muted-foreground">on 2 blockchains</p>
+        <div className="text-4xl font-bold">10</div>
+        <p className="text-xs text-muted-foreground">on 5 blockchains</p>
         <Button className="mt-6 w-full items-center">
           <FiCloud className="mr-2" />
           View
