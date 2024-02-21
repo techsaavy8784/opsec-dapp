@@ -16,7 +16,7 @@ export async function GET(request: NextRequest) {
 
   const payments = await prisma.credit.findMany({
     where: {
-      userId: (session.user as any).id,
+      userId: session.user.id,
     },
   })
 
@@ -78,7 +78,7 @@ export async function POST(request: NextRequest) {
       .catch((e) => console.log("error making coinbase charge:", e))
 
     tx[verifier] = {
-      userId: (session.user as any).id,
+      userId: session.user.id,
       amount,
       tx: payment_id,
     }

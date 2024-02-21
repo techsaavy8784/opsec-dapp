@@ -21,7 +21,7 @@ export async function GET(request: NextRequest) {
 
   const { userId, amount, tx } = txInfo[verifier]
 
-  if (userId !== (session.user as any).id) {
+  if (userId !== session.user.id) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 })
   }
 
@@ -37,7 +37,7 @@ export async function GET(request: NextRequest) {
 
   const user = await prisma.user.findFirst({
     where: {
-      id: (session.user as any).id,
+      id: session.user.id,
     },
   })
 
@@ -46,7 +46,7 @@ export async function GET(request: NextRequest) {
       balance: user!.balance + credits,
     },
     where: {
-      id: (session.user as any).id,
+      id: session.user.id,
     },
   })
 

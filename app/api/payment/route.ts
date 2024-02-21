@@ -13,7 +13,7 @@ export async function GET(request: NextRequest) {
   const payments = await prisma.payment.findMany({
     where: {
       node: {
-        userId: (session.user as any).id,
+        userId: session.user.id,
       },
     },
     include: {
@@ -57,7 +57,7 @@ export async function POST(request: NextRequest) {
 
   const user = await prisma.user.findFirst({
     where: {
-      id: (session.user as any).id,
+      id: session.user.id,
     },
   })
 
@@ -74,7 +74,7 @@ export async function POST(request: NextRequest) {
     data: {
       wallet,
       serverId: server.id,
-      userId: (session.user as any).id,
+      userId: session.user.id,
     },
   })
 
@@ -91,7 +91,7 @@ export async function POST(request: NextRequest) {
       balance: user!.balance - amount,
     },
     where: {
-      id: (session.user as any).id,
+      id: session.user.id,
     },
   })
 
