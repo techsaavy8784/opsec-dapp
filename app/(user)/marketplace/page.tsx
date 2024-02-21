@@ -26,7 +26,7 @@ const Nodes: React.FC = () => {
   })
 
   const { mutate } = useMutation({
-    mutationFn: (wallet) =>
+    mutationFn: (wallet: string) =>
       fetch("/api/payment", {
         method: "POST",
         body: JSON.stringify({

@@ -9,14 +9,12 @@ import Link from "next/link"
 type NodeCardProps = {
   name: string
   description: string
-  enabled?: boolean
   onRunNodeClick?: () => void
 }
 
 export const NodeCard: React.FC<NodeCardProps> = ({
   name,
   description,
-  enabled,
   onRunNodeClick,
 }) => (
   <div className="col-span-1 p-4 rounded-[16px] backdrop:blur-[100px] overflow-hidden flex flex-col gap-4 border border-zinc-600">
