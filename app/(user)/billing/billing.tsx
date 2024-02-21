@@ -10,11 +10,11 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { Payment } from "@prisma/client"
+import { Payment, Node } from "@prisma/client"
 import { Skeleton } from "@/components/ui/skeleton"
 
 const BillingHistory = () => {
-  const { isPending, data } = useQuery<Payment[]>({
+  const { isPending, data } = useQuery<(Payment & { node: any })[]>({
     queryKey: ["payment-history"],
     queryFn: () => fetch("/api/payment").then((res) => res.json()),
   })

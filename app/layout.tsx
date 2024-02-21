@@ -13,7 +13,7 @@ export const metadata: Metadata = {
   description: "Secure node management for the masses",
 }
 
-interface LayoutProps {
+export interface LayoutProps {
   children: React.ReactNode
 }
 

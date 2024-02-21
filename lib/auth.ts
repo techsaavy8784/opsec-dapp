@@ -1,4 +1,4 @@
-import { NextAuthOptions } from "next-auth"
+import { DefaultSession, NextAuthOptions } from "next-auth"
 import CredentialsProvider from "next-auth/providers/credentials"
 import { compare } from "bcrypt"
 import { PrismaAdapter } from "@next-auth/prisma-adapter"
@@ -93,7 +93,7 @@ export const authOptions: NextAuthOptions = {
         })
 
         return {
-          id: Number(user?.id),
+          id: Number(user?.id) as unknown as string,
           address,
         }
       },
@@ -104,7 +104,7 @@ export const authOptions: NextAuthOptions = {
     async jwt({ token, user }) {
       if (user) {
         token.id = user.id
-        token.address = user.address
+        token.address = (user as any).address
       }
       return token
     },
@@ -112,7 +112,7 @@ export const authOptions: NextAuthOptions = {
       session.user = {
         id: token.id,
         address: token.address as string,
-      }
+      } as DefaultSession["user"]
 
       return session
     },

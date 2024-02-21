@@ -3,17 +3,9 @@ import { authOptions } from "@/lib/auth"
 import { getServerSession } from "next-auth"
 import { NextResponse, NextRequest } from "next/server"
 import { generateRandomString } from "@/lib/utils"
+import { getTx } from "./verify"
 
-const tx: Record<
-  string,
-  {
-    userId: number
-    amount: number
-    tx: string
-  }
-> = {}
-
-export const getTx = () => tx
+const tx = getTx()
 
 export async function GET(request: NextRequest) {
   const session = await getServerSession(authOptions)
@@ -24,7 +16,7 @@ export async function GET(request: NextRequest) {
 
   const payments = await prisma.credit.findMany({
     where: {
-      userId: session.user?.id
+      userId: (session.user as any).id,
     },
   })
 
@@ -62,7 +54,7 @@ export async function POST(request: NextRequest) {
         price_amount: amount,
         price_currency: "usd",
         pay_currency: "USDTERC20",
-        success_url: `${request.nextUrl.origin}/api/credits/success?verifier=${verifier}`
+        success_url: `${request.nextUrl.origin}/api/credits/success?verifier=${verifier}`,
       }),
     })
       .then((res) => res.json())
@@ -86,7 +78,7 @@ export async function POST(request: NextRequest) {
       .catch((e) => console.log("error making coinbase charge:", e))
 
     tx[verifier] = {
-      userId: session.user?.id,
+      userId: (session.user as any).id,
       amount,
       tx: payment_id,
     }
@@ -99,7 +91,7 @@ export async function POST(request: NextRequest) {
   } catch (e) {
     return NextResponse.json(
       {
-        message: `Error making payment: ${e.message}`,
+        message: `Error making payment: ${e}`,
       },
       { status: 500 },
     )

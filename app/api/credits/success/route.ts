@@ -2,7 +2,7 @@ import prisma from "@/prisma"
 import { authOptions } from "@/lib/auth"
 import { getServerSession } from "next-auth"
 import { NextResponse, NextRequest } from "next/server"
-import { getTx } from "../route"
+import { getTx } from "../verify"
 
 export async function GET(request: NextRequest) {
   const session = await getServerSession(authOptions)
@@ -21,7 +21,7 @@ export async function GET(request: NextRequest) {
 
   const { userId, amount, tx } = txInfo[verifier]
 
-  if (userId !== session.user?.id) {
+  if (userId !== (session.user as any).id) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 })
   }
 
@@ -37,7 +37,7 @@ export async function GET(request: NextRequest) {
 
   const user = await prisma.user.findFirst({
     where: {
-      id: session.user?.id
+      id: (session.user as any).id,
     },
   })
 
@@ -46,7 +46,7 @@ export async function GET(request: NextRequest) {
       balance: user!.balance + credits,
     },
     where: {
-      id: session.user?.id
+      id: (session.user as any).id,
     },
   })
 
