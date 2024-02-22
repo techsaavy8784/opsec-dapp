@@ -12,6 +12,9 @@ export async function GET(request: NextApiRequest) {
   }
 
   const nodes = await prisma.node.findMany({
+    where: {
+      userId: session.user.id,
+    },
     include: {
       server: {
         include: {
