@@ -21,11 +21,11 @@ const ProtectRoutes: React.FC<ProtectRoutesProps> = ({ children }) => {
     isConnected && status === "authenticated" && chain?.id === chainId
 
   if (pathname.startsWith("/admin")) {
-    return children
+    return <>{children}</>
   }
 
   if (status === "loading") {
-    return children
+    return <>{children}</>
   }
 
   if (pathname === "/connect-wallet" && connected) {
@@ -36,7 +36,7 @@ const ProtectRoutes: React.FC<ProtectRoutesProps> = ({ children }) => {
     redirect("/connect-wallet")
   }
 
-  return children
+  return <>{children}</>
 }
 
 export default ProtectRoutes

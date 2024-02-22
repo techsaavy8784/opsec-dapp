@@ -15,7 +15,7 @@ import { WagmiProvider } from "wagmi"
 import { mainnet, sepolia } from "wagmi/chains"
 import { QueryClientProvider, QueryClient } from "@tanstack/react-query"
 
-const projectId = process.env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID ?? ""
+const projectId = process.env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID!
 
 const config = getDefaultConfig({
   appName: "Opsec",
