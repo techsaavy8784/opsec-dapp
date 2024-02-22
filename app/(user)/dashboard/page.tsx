@@ -1,6 +1,7 @@
 import { DashCards } from "@/components/dash-card"
-import { CardNodes } from "@/components/dashboard/user-nodes"
+import { CardNodesUser } from "@/components/dashboard/user-nodes"
 import { CardBlockchains } from "@/components/dashboard/blockchains"
+import { CardNodesAll } from "@/components/dashboard/all-nodes"
 // import { NodeCard } from "@/components/node-card"
 // import { Button } from "@/components/ui/button"
 // import { FiPlus } from "react-icons/fi"
@@ -20,10 +21,10 @@ const Dashboard = () => {
       <div className="py-6 pt-0">
         <div className="grid grid-cols-2 gap-6 md:grid-cols-6">
           <div className="col-span-2">
-            <CardNodes />
+            <CardNodesUser />
           </div>
           <div className="col-span-3">
-            <CardNodes />
+            <CardNodesAll />
           </div>
           <div className="col-span-1">{/* <CardNodes /> */}</div>
           <div className="col-span-3">

@@ -13,10 +13,10 @@ import { FiCloud } from "react-icons/fi"
 import { useQuery } from "@tanstack/react-query"
 import { useMemo } from "react"
 
-export function CardNodesUser() {
+export function CardNodesAll() {
   const { isPending, data } = useQuery<[]>({
-    queryKey: ["node/list"],
-    queryFn: () => fetch("/api/nodes/list").then((res) => res.json()),
+    queryKey: ["node/list/all"],
+    queryFn: () => fetch("/api/nodes/list/all").then((res) => res.json()),
   })
 
   const blockchainCnt = useMemo(() => {
@@ -32,7 +32,7 @@ export function CardNodesUser() {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Your Nodes</CardTitle>
+        <CardTitle>All Nodes</CardTitle>
         <CardDescription>Currently running nodes</CardDescription>
       </CardHeader>
       <CardContent>
