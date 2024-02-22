@@ -14,3 +14,11 @@ export const generateRandomString = (length: number = 10) => {
   }
   return result
 }
+
+const intl = new Intl.DateTimeFormat("en-US", {
+  dateStyle: "medium",
+  timeStyle: "medium",
+})
+
+export const formatDate = (date: string | Date) =>
+  intl.format(new Date(date)).toString()

@@ -79,7 +79,7 @@ const Nodes: React.FC = () => {
             key={chain.id}
             name={chain.name}
             description={chain.description}
-            onRunNodeClick={() => setChain(chain)}
+            onBuy={() => setChain(chain)}
           />
         ))}
         <NodePaymentModal

@@ -1,4 +1,3 @@
-import { NodeCard } from "@/components/node-card"
 import React from "react"
 
 const Validators = () => {
