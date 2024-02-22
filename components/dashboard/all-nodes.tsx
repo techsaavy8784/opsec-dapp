@@ -15,8 +15,8 @@ import { useMemo } from "react"
 
 export function CardNodesAll() {
   const { isPending, data } = useQuery<[]>({
-    queryKey: ["node/list"],
-    queryFn: () => fetch("/api/nodes/all").then((res) => res.json()),
+    queryKey: ["node/list/all"],
+    queryFn: () => fetch("/api/nodes/list/all").then((res) => res.json()),
   })
 
   const blockchainCnt = useMemo(() => {
