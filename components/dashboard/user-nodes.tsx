@@ -1,3 +1,5 @@
+"use client"
+
 import {
   Card,
   CardContent,
@@ -6,9 +8,16 @@ import {
   CardTitle,
 } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
+import { Skeleton } from "@/components/ui/skeleton"
 import { FiCloud } from "react-icons/fi"
+import { useQuery } from "@tanstack/react-query"
 
 export function CardNodesUser() {
+  const { isPending, data } = useQuery<[]>({
+    queryKey: ["node/list"],
+    queryFn: () => fetch("/api/nodes/list").then((res) => res.json()),
+  })
+
   return (
     <Card>
       <CardHeader>
@@ -16,8 +25,19 @@ export function CardNodesUser() {
         <CardDescription>Currently running nodes</CardDescription>
       </CardHeader>
       <CardContent>
-        <div className="text-4xl font-bold">5</div>
-        <p className="text-xs text-muted-foreground">on 2 blockchains</p>
+        {isPending ? (
+          <div className="flex flex-row w-full">
+            <Skeleton className="rounded-lg w-[32px] h-[32px] mr-2"></Skeleton>
+            <Skeleton className="rounded-lg w-[32px] h-[32px] mr-2"></Skeleton>
+            <Skeleton className="rounded-lg w-[32px] h-[32px] mr-2"></Skeleton>
+            <Skeleton className="rounded-lg w-[32px] h-[32px]"></Skeleton>
+          </div>
+        ) : (
+          <>
+            <div className="text-4xl font-bold">{data?.length}</div>
+            <p className="text-xs text-muted-foreground">on 2 blockchains</p>
+          </>
+        )}
         <Button className="mt-6 w-full items-center">
           <FiCloud className="mr-2" />
           View
