@@ -12,7 +12,7 @@ import {
   RainbowKitProvider,
 } from "@rainbow-me/rainbowkit"
 import { WagmiProvider } from "wagmi"
-import { mainnet, sepolia } from "wagmi/chains"
+import { mainnet } from "wagmi/chains"
 import { QueryClientProvider, QueryClient } from "@tanstack/react-query"
 
 const projectId = process.env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID!
@@ -20,7 +20,7 @@ const projectId = process.env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID!
 const config = getDefaultConfig({
   appName: "Opsec",
   projectId,
-  chains: [process.env.NODE_ENV === "production" ? mainnet : sepolia],
+  chains: [mainnet],
 })
 
 const theme = darkTheme()
@@ -28,7 +28,7 @@ const theme = darkTheme()
 const queryClient = new QueryClient()
 
 const getSiweMessageOptions: GetSiweMessageOptions = () => ({
-  statement: "Sign in to my RainbowKit app",
+  statement: "Sign in to Opsec",
 })
 
 interface ProvidersProps {

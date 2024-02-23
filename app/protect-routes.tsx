@@ -10,7 +10,8 @@ interface ProtectRoutesProps {
   children: React.ReactNode
 }
 
-const chainId = (process.env.NODE_ENV === "production" ? mainnet : sepolia).id
+// const chainId = (process.env.NODE_ENV === "production" ? mainnet : sepolia).id
+const chainId = mainnet.id
 
 const ProtectRoutes: React.FC<ProtectRoutesProps> = ({ children }) => {
   const pathname = usePathname()
