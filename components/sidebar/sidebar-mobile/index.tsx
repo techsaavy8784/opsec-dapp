@@ -10,7 +10,7 @@ export const SidebarMobile = () => {
 
   return (
     <div className="md:hidden">
-      <div className="absolute top-7 right-6 cursor-pointer md:hidden z-[11]">
+      <div className="absolute top-7 right-6 cursor-pointer md:hidden z-[20]">
         <div
           onClick={() => {
             setIsOpen((prev) => !prev)
