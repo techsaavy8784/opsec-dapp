@@ -14,6 +14,7 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { Credit } from "@prisma/client"
 import { CreditPaymentModal } from "@/components/payment-modal/credit"
 import { Button } from "@/components/ui/button"
+import { formatDate } from "@/lib/utils"
 
 const CreditHistory = () => {
   const [modal, setModal] = useState(false)
@@ -68,7 +69,7 @@ const CreditHistory = () => {
                     {item.credits}
                   </TableCell>
                   <TableCell className="text-[16px] font-[600] text-white max-md:min-w-[130px]">
-                    {String(item.date)}
+                    {formatDate(item.date)}
                   </TableCell>
                 </TableRow>
               ))
