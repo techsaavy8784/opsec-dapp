@@ -21,11 +21,12 @@ export function CardNodesAll() {
 
   const blockchainCnt = useMemo(() => {
     const blockchains: any[] = []
-    data?.forEach((node: any) => {
-      if (!blockchains.find(node.server.blockchain.id)) {
-        blockchains.push(node.server.blockchain.id)
-      }
-    })
+    Array.isArray(data) &&
+      data?.forEach((node: any) => {
+        if (!blockchains.find(node.server.blockchain.id)) {
+          blockchains.push(node.server.blockchain.id)
+        }
+      })
     return blockchains.length
   }, [data])
 
@@ -45,7 +46,7 @@ export function CardNodesAll() {
           </div>
         ) : (
           <>
-            <div className="text-4xl font-bold">{data?.length}</div>
+            <div className="text-4xl font-bold">{data?.length || 0}</div>
             <p className="text-xs text-muted-foreground">
               on {blockchainCnt} blockchains
             </p>
