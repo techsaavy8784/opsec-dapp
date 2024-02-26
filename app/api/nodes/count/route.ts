@@ -1,10 +1,9 @@
 import { authOptions } from "@/lib/auth"
 import prisma from "@/prisma"
-import { NextApiRequest } from "next"
 import { getServerSession } from "next-auth"
 import { NextResponse } from "next/server"
 
-export async function GET(request: NextApiRequest) {
+export async function GET() {
   const session = await getServerSession(authOptions)
 
   if (!session) {
@@ -12,9 +11,6 @@ export async function GET(request: NextApiRequest) {
   }
 
   const nodes = await prisma.node.findMany({
-    where: {
-      userId: session.user.id,
-    },
     include: {
       server: {
         include: {
@@ -24,5 +20,16 @@ export async function GET(request: NextApiRequest) {
     },
   })
 
-  return NextResponse.json(nodes)
+  const chains: number[] = []
+
+  nodes.forEach((node) => {
+    if (!chains.includes(node.server.blockchainId)) {
+      chains.push(node.server.blockchainId)
+    }
+  })
+
+  return NextResponse.json({
+    count: nodes.length,
+    chainCount: chains.length,
+  })
 }

@@ -1,13 +1,36 @@
+"use client"
+
+import React, { useMemo } from "react"
 import { DashCards } from "@/components/dash-card"
-import { CardNodesUser } from "@/components/dashboard/user-nodes"
 import { CardBlockchains } from "@/components/dashboard/blockchains"
-import { CardNodesAll } from "@/components/dashboard/all-nodes"
-// import { NodeCard } from "@/components/node-card"
-// import { Button } from "@/components/ui/button"
-// import { FiPlus } from "react-icons/fi"
-import React from "react"
+import Nodes from "@/components/dashboard/nodes"
+import { useQuery } from "@tanstack/react-query"
+import { NodeType } from "../nodes/page"
 
 const Dashboard = () => {
+  const { isPending, data } = useQuery<NodeType[]>({
+    queryKey: ["nodes/user"],
+    queryFn: () => fetch("/api/nodes/user").then((res) => res.json()),
+  })
+
+  const { isPending: isPendingCount, data: dataCount } = useQuery<{
+    count: number
+    chainCount: number
+  }>({
+    queryKey: ["nodes/count"],
+    queryFn: () => fetch("/api/nodes/count").then((res) => res.json()),
+  })
+
+  const chainCount = useMemo(() => {
+    const blockchains: number[] = []
+    data?.forEach((node) => {
+      if (!blockchains.includes(node.server.blockchain.id)) {
+        blockchains.push(node.server.blockchain.id)
+      }
+    })
+    return blockchains.length
+  }, [data])
+
   return (
     <div className="flex flex-col">
       <div className="pb-6">
@@ -21,10 +44,18 @@ const Dashboard = () => {
       <div className="py-6 pt-0">
         <div className="grid grid-cols-2 gap-6 md:grid-cols-6">
           <div className="col-span-2">
-            <CardNodesUser />
+            <Nodes
+              title="Your Nodes"
+              count={isPending ? undefined : data?.length}
+              chainCount={isPending ? undefined : chainCount}
+            />
           </div>
           <div className="col-span-3">
-            <CardNodesAll />
+            <Nodes
+              title="All Nodes"
+              count={isPendingCount ? undefined : dataCount?.count}
+              chainCount={isPendingCount ? undefined : dataCount?.chainCount}
+            />
           </div>
           <div className="col-span-1">{/* <CardNodes /> */}</div>
           <div className="col-span-3">
