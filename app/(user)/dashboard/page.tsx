@@ -48,6 +48,7 @@ const Dashboard = () => {
               title="Your Nodes"
               count={isPending ? undefined : data?.length}
               chainCount={isPending ? undefined : chainCount}
+              link="/nodes"
             />
           </div>
           <div className="col-span-3">

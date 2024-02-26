@@ -9,14 +9,16 @@ import {
 import { Button } from "@/components/ui/button"
 import { Skeleton } from "@/components/ui/skeleton"
 import { FiCloud } from "react-icons/fi"
+import Link from "next/link"
 
 interface NodesProps {
   title: string
   count?: number
   chainCount?: number
+  link?: string
 }
 
-const Nodes: React.FC<NodesProps> = ({ title, count, chainCount }) => (
+const Nodes: React.FC<NodesProps> = ({ title, count, chainCount, link }) => (
   <Card>
     <CardHeader>
       <CardTitle>{title}</CardTitle>
@@ -38,10 +40,14 @@ const Nodes: React.FC<NodesProps> = ({ title, count, chainCount }) => (
           </p>
         </>
       )}
-      <Button className="mt-6 w-full items-center">
-        <FiCloud className="mr-2" />
-        View
-      </Button>
+      {link && (
+        <Button asChild variant="custom" className="mt-6 w-full items-center">
+          <Link href={link}>
+            <FiCloud className="mr-2" />
+            View
+          </Link>
+        </Button>
+      )}
     </CardContent>
   </Card>
 )
