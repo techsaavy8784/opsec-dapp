@@ -11,8 +11,8 @@ export type NodeType = Node & { server: Server & { blockchain: Blockchain } }
 
 const Nodes: React.FC = () => {
   const { isPending, data } = useQuery<NodeType[]>({
-    queryKey: ["nodes/list"],
-    queryFn: () => fetch("/api/nodes/list").then((res) => res.json()),
+    queryKey: ["nodes/user"],
+    queryFn: () => fetch("/api/nodes/user").then((res) => res.json()),
   })
 
   if (isPending) {
