@@ -39,7 +39,9 @@ export const NodeData = ({ active, title, stats, uptime, icon }: Props) => {
                 {uptimeArr?.map((_, i) => (
                   <div
                     key={i}
-                    className={`h-[48px] md:w-[7.79px] col-span-1 ${i === 24 || i === 25 ? "bg-[#F87171]" : "bg-[#10B981] "} rounded-[3px]`}
+                    className={`h-[48px] md:w-[7.79px] col-span-1 ${
+                      i === 24 || i === 25 ? "bg-[#F87171]" : "bg-[#10B981] "
+                    } rounded-[3px]`}
                   />
                 ))}
               </div>

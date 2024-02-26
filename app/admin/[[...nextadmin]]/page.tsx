@@ -11,10 +11,13 @@ interface AdminPageProps {
   searchParams?: Record<string, string | string[] | undefined>
 }
 
-const AdminPage: React.FC<AdminPageProps> = async ({
+async function AdminPage({
   params,
   searchParams,
-}) => {
+}: {
+  params: { [key: string]: string[] }
+  searchParams: { [key: string]: string | string[] | undefined } | undefined
+}) {
   const props = await getPropsFromParams({
     params: params.nextadmin,
     searchParams,
