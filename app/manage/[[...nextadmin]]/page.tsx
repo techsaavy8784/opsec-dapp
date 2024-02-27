@@ -11,20 +11,22 @@ interface AdminPageProps {
   searchParams?: Record<string, string | string[] | undefined>
 }
 
-const AdminPage: React.FC<AdminPageProps> = async ({
+export default async function AdminPage({
   params,
   searchParams,
-}) => {
+}: {
+  params: { [key: string]: string[] | string }
+  searchParams: { [key: string]: string | string[] | undefined } | undefined
+}) {
   const props = await getPropsFromParams({
-    params: params.nextadmin,
+    params: params.nextadmin as string[],
     searchParams,
+    options,
     prisma,
     schema,
     action: submitFormAction,
-    options,
+    locale: params.locale as string,
   })
 
-  return <NextAdmin {...props} />
+  return <NextAdmin {...props} locale={params.locale as string} />
 }
-
-export default AdminPage
