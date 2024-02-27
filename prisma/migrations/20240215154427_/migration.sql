@@ -81,6 +81,15 @@ CREATE TABLE "credits" (
     CONSTRAINT "credits_pkey" PRIMARY KEY ("id")
 );
 
+-- CreateTable
+CREATE TABLE "tx_verifiers" (
+    "id" SERIAL NOT NULL,
+    "verifier" TEXT NOT NULL,
+    "tx" JSONB NOT NULL,
+
+    CONSTRAINT "tx_verifiers_pkey" PRIMARY KEY ("id")
+);
+
 -- CreateIndex
 CREATE UNIQUE INDEX "users_address_key" ON "users"("address");
 
@@ -92,6 +101,9 @@ CREATE UNIQUE INDEX "node_histories_node_id_key" ON "node_histories"("node_id");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "payments_node_id_key" ON "payments"("node_id");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "tx_verifiers_verifier_key" ON "tx_verifiers"("verifier");
 
 -- AddForeignKey
 ALTER TABLE "nodes" ADD CONSTRAINT "nodes_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
