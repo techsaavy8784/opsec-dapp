@@ -21,7 +21,7 @@ const ProtectRoutes: React.FC<ProtectRoutesProps> = ({ children }) => {
   const connected =
     isConnected && status === "authenticated" && chain?.id === chainId
 
-  if (pathname.startsWith("/admin")) {
+  if (pathname.startsWith("/manage")) {
     return <>{children}</>
   }
 
