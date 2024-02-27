@@ -14,9 +14,14 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "en_IE",
-    url: "{process.env.NEXT_PUBLIC_BASE_URL}/og.jpg",
+    url: `${process.env.NEXT_PUBLIC_BASE_URL}/og.jpg`,
     siteName: "Opsec Cloudverse",
   },
+  icons: [
+    {
+      url: `${process.env.NEXT_PUBLIC_BASE_URL}/favicon.ico`,
+    },
+  ],
 }
 
 export interface LayoutProps {
