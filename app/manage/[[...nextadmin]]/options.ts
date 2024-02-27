@@ -1,7 +1,7 @@
 import { NextAdminOptions } from "@premieroctet/next-admin"
 
 const options: NextAdminOptions = {
-  basePath: "/admin",
+  basePath: "/manage",
   model: {
     Blockchain: {
       edit: {
