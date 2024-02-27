@@ -9,8 +9,8 @@ import "./globals.css"
 import React from "react"
 
 export const metadata: Metadata = {
-  title: "Opsec Nodes",
-  description: "Secure node management for the masses",
+  title: "Opsec Cloudverse",
+  description: "Secure blockchain management for the people",
 }
 
 export interface LayoutProps {
@@ -18,7 +18,6 @@ export interface LayoutProps {
 }
 
 const RootLayout: React.FC<LayoutProps> = ({ children }) => (
-  // Wrap the Providers component with SessionProvider
   <html lang="en">
     <body className={`${gilroy.className} bg-black dark`}>
       <Providers>
