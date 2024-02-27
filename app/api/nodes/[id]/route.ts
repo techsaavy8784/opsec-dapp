@@ -1,6 +1,6 @@
 import { authOptions } from "@/lib/auth"
+import { protectServer } from "@/lib/utils"
 import prisma from "@/prisma"
-import { NextApiRequest } from "next"
 import { getServerSession } from "next-auth"
 import { NextResponse } from "next/server"
 
@@ -14,7 +14,7 @@ export async function GET(
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 })
   }
 
-  const nodes = await prisma.node.findUnique({
+  const node = await prisma.node.findUnique({
     where: {
       id: Number(params.id),
     },
@@ -27,5 +27,9 @@ export async function GET(
     },
   })
 
-  return NextResponse.json(nodes)
+  if (node?.server) {
+    node.server = protectServer(node.server) as any
+  }
+
+  return NextResponse.json(node)
 }

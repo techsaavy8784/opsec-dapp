@@ -1,4 +1,5 @@
 import { authOptions } from "@/lib/auth"
+import { protectServer } from "@/lib/utils"
 import prisma from "@/prisma"
 import { getServerSession } from "next-auth"
 import { NextResponse } from "next/server"
@@ -23,5 +24,7 @@ export async function GET() {
     },
   })
 
-  return NextResponse.json(nodes)
+  return NextResponse.json(
+    nodes.map((node) => ({ ...node, server: protectServer(node.server) })),
+  )
 }
