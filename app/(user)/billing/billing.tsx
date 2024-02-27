@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/table"
 import { Payment, Node } from "@prisma/client"
 import { Skeleton } from "@/components/ui/skeleton"
+import { formatDate } from "@/lib/utils"
 
 const BillingHistory = () => {
   const { isPending, data } = useQuery<(Payment & { node: any })[]>({
@@ -62,7 +63,7 @@ const BillingHistory = () => {
                     {item.credit}
                   </TableCell>
                   <TableCell className="text-[16px] font-[600] text-white max-md:min-w-[130px]">
-                    {String(item.date)}
+                    {formatDate(item.date)}
                   </TableCell>
                 </TableRow>
               ))

@@ -9,8 +9,19 @@ import "./globals.css"
 import React from "react"
 
 export const metadata: Metadata = {
-  title: "Opsec Nodes",
-  description: "Secure node management for the masses",
+  title: "Opsec Cloudverse",
+  description: "Secure blockchain management for the people",
+  openGraph: {
+    type: "website",
+    locale: "en_IE",
+    url: `${process.env.NEXT_PUBLIC_BASE_URL}/og.jpg`,
+    siteName: "Opsec Cloudverse",
+  },
+  icons: [
+    {
+      url: `${process.env.NEXT_PUBLIC_BASE_URL}/favicon.ico`,
+    },
+  ],
 }
 
 export interface LayoutProps {
@@ -18,7 +29,6 @@ export interface LayoutProps {
 }
 
 const RootLayout: React.FC<LayoutProps> = ({ children }) => (
-  // Wrap the Providers component with SessionProvider
   <html lang="en">
     <body className={`${gilroy.className} bg-black dark`}>
       <Providers>

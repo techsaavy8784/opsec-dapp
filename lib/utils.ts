@@ -1,3 +1,4 @@
+import { Server } from "@prisma/client"
 import { type ClassValue, clsx } from "clsx"
 import { twMerge } from "tailwind-merge"
 
@@ -22,3 +23,10 @@ const intl = new Intl.DateTimeFormat("en-US", {
 
 export const formatDate = (date: string | Date) =>
   intl.format(new Date(date)).toString()
+
+export const protectServer = (server: Server) =>
+  Object.fromEntries(
+    Object.entries(server).filter(
+      ([key]) => !["host", "port", "username", "password"].includes(key),
+    ),
+  )

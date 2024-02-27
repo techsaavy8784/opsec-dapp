@@ -1,6 +1,7 @@
 "use client"
 
 import React, { useCallback, useEffect, useRef, useState } from "react"
+import { ReloadIcon } from "@radix-ui/react-icons"
 import { DialogProps } from "@radix-ui/react-dialog"
 import {
   Dialog,
@@ -22,8 +23,7 @@ export const CreditPaymentModal: React.FC<CreditPaymentModalProps> = ({
   onComplete,
   ...props
 }) => {
-  const [step, setStep] = useState(0)
-  const [payment, setPayment] = useState<"waiting" | "complete">("waiting")
+  const [step, setStep] = useState<"form" | "waiting" | "complete">("form")
   const timer = useRef<NodeJS.Timeout>()
 
   const {
@@ -32,19 +32,18 @@ export const CreditPaymentModal: React.FC<CreditPaymentModalProps> = ({
     formState: { errors },
   } = useForm({
     defaultValues: {
-      amount: 50,
+      amount: process.env.NEXT_PUBLIC_MIN_BUY_CREDIT_AMOUNT,
     },
   })
   useEffect(() => {
-    setStep(0)
-    setPayment("waiting")
+    setStep("form")
 
     if (!props.open) {
       clearInterval(timer.current)
     }
   }, [props.open])
 
-  const { mutateAsync } = useMutation({
+  const { mutateAsync, isPending } = useMutation({
     mutationFn: (amount: number) =>
       fetch("/api/credits", {
         method: "POST",
@@ -64,11 +63,11 @@ export const CreditPaymentModal: React.FC<CreditPaymentModalProps> = ({
 
   const buyCredit = useCallback(
     (data: any) => {
-      setStep(1)
       mutateAsync(data.amount).then((tx) => {
         if (!tx) {
           return
         }
+        setStep("waiting")
         clearInterval(timer.current)
         timer.current = setInterval(
           () =>
@@ -77,7 +76,7 @@ export const CreditPaymentModal: React.FC<CreditPaymentModalProps> = ({
               .then((res) => {
                 if (res.status === "finished") {
                   clearInterval(timer.current)
-                  setPayment("complete")
+                  setStep("complete")
                   onComplete()
                 }
               }),
@@ -99,17 +98,29 @@ export const CreditPaymentModal: React.FC<CreditPaymentModalProps> = ({
       <DialogContent
         className={`bg-[#18181B] border-none rounded-[24px] p-8 w-[350px] md:w-[450px]`}
       >
-        {step === 0 ? (
+        {step === "form" ? (
           <form onSubmit={handleSubmit(buyCredit)} className="space-y-3">
             <label>Credit amount</label>
-            <Input {...register("amount", { required: true, min: 50 })} />
+            <Input
+              {...register("amount", {
+                required: true,
+                min: process.env.NEXT_PUBLIC_MIN_BUY_CREDIT_AMOUNT,
+              })}
+            />
             {errors && errors.amount && (
               <label className="text-red-900 block">
-                Amount should be greater than 50
+                Amount should be greater than{" "}
+                {process.env.NEXT_PUBLIC_MIN_BUY_CREDIT_AMOUNT}
               </label>
             )}
             <div className="text-center">
-              <Button type="submit">
+              <Button
+                type="submit"
+                disabled={!!errors.amount || isPending || step !== "form"}
+              >
+                {(isPending || step !== "form") && (
+                  <ReloadIcon className="mr-2 h-4 w-4 animate-spin" />
+                )}
                 Pay via{" "}
                 <Image
                   src="https://nowpayments.io/images/logo/logo.svg"
@@ -135,10 +146,10 @@ export const CreditPaymentModal: React.FC<CreditPaymentModalProps> = ({
 
             <p
               className={`text-[16px] font-[400] ${
-                payment === "waiting" ? "text-[#FFEB3B]" : "text-[#10B981]"
+                step === "waiting" ? "text-[#FFEB3B]" : "text-[#10B981]"
               }`}
             >
-              {payment === "waiting"
+              {step === "waiting"
                 ? "Waiting for your payment"
                 : "Successfully Paid"}
             </p>

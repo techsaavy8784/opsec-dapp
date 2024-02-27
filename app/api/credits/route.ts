@@ -32,16 +32,19 @@ export async function POST(request: NextRequest) {
 
   const { amount } = await request.json()
 
-  if (amount < Number(process.env.MIN_BUY_CREDIT_AMOUNT)) {
+  if (amount < Number(process.env.NEXT_PUBLIC_MIN_BUY_CREDIT_AMOUNT)) {
     return NextResponse.json(
       {
-        message: `Amount should be greater than ${process.env.MIN_BUY_CREDIT_AMOUNT}`,
+        message: `Amount should be greater than ${process.env.NEXT_PUBLIC_MIN_BUY_CREDIT_AMOUNT}`,
       },
       { status: 400 },
     )
   }
 
   const verifier = generateRandomString()
+  const successUrl = `${request.nextUrl.origin}/api/credits/success?verifier=${verifier}`
+
+  console.log("success url: ", successUrl)
 
   try {
     const data = await fetch("https://api.nowpayments.io/v1/invoice", {
@@ -53,14 +56,14 @@ export async function POST(request: NextRequest) {
       body: JSON.stringify({
         price_amount: amount,
         price_currency: "usd",
-        pay_currency: "USDTERC20",
-        success_url: `${request.nextUrl.origin}/api/credits/success?verifier=${verifier}`,
+        pay_currency: "eth",
+        success_url: successUrl,
       }),
     })
       .then((res) => res.json())
       .catch((e) => console.log("error making coinbase charge:", e))
 
-    const { payment_id } = await fetch(
+    const payment = await fetch(
       "https://api.nowpayments.io/v1/invoice-payment",
       {
         method: "POST",
@@ -70,12 +73,18 @@ export async function POST(request: NextRequest) {
         },
         body: JSON.stringify({
           iid: data.id,
-          pay_currency: "USDTERC20",
+          pay_currency: "eth",
         }),
       },
     )
       .then((res) => res.json())
       .catch((e) => console.log("error making coinbase charge:", e))
+
+    if (payment.statusCode !== undefined && payment.statusCode !== 200) {
+      return NextResponse.json(payment, { status: payment.statusCode })
+    }
+
+    const { payment_id } = payment
 
     tx[verifier] = {
       userId: session.user.id,

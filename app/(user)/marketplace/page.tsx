@@ -52,7 +52,7 @@ const Nodes: React.FC = () => {
             <h1 className="uppercase text-md font-[300]">nodes available</h1>
           </div>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-3 items-center gap-8 pt-2">
+        <div className="grid items-center grid-cols-1 gap-8 pt-2 md:grid-cols-3">
           <Skeleton className="rounded-lg w-[220] h-[320px] mr-2 block"></Skeleton>
           <Skeleton className="rounded-lg w-[220] h-[320px] mr-2 block"></Skeleton>
           <Skeleton className="rounded-lg w-[220] h-[320px] mr-2 block"></Skeleton>
@@ -62,7 +62,7 @@ const Nodes: React.FC = () => {
   }
 
   if (!data) {
-    return "No data"
+    return <>No data</>
   }
 
   return (
@@ -73,7 +73,7 @@ const Nodes: React.FC = () => {
           <h1 className="uppercase text-md font-[300]">nodes available</h1>
         </div>
       </div>
-      <div className="grid grid-cols-1 md:grid-cols-3 items-center gap-8 pt-2">
+      <div className="grid items-center grid-cols-1 gap-8 pt-2 md:grid-cols-3">
         {data.map((chain: any) => (
           <NodeCard
             key={chain.id}

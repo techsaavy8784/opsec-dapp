@@ -4,13 +4,9 @@ import { Sidebar } from "@/components/sidebar"
 import { Navbar } from "@/components/navbar"
 import ProtectRoutes from "../protect-routes"
 import { SidebarMobile } from "@/components/sidebar/sidebar-mobile"
+import { LayoutProps } from "../layout"
 
-interface LayoutProps {
-  children: React.ReactNode
-  session: any
-}
-
-const Layout: React.FC<LayoutProps> = ({ children, session }) => (
+const Layout: React.FC<LayoutProps> = ({ children }) => (
   <main className="md:container">
     <div className="flex h-screen">
       <div className="max-md:hidden">
