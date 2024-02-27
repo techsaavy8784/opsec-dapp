@@ -191,6 +191,31 @@
         "credit"
       ]
     },
+    "TxVerifier": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer"
+        },
+        "verifier": {
+          "type": "string"
+        },
+        "tx": {
+          "type": [
+            "number",
+            "string",
+            "boolean",
+            "object",
+            "array",
+            "null"
+          ]
+        }
+      },
+      "required": [
+        "verifier",
+        "tx"
+      ]
+    },
     "Blockchain": {
       "type": "object",
       "properties": {
@@ -274,6 +299,9 @@
     },
     "payment": {
       "$ref": "#/definitions/Payment"
+    },
+    "txVerifier": {
+      "$ref": "#/definitions/TxVerifier"
     },
     "blockchain": {
       "$ref": "#/definitions/Blockchain"

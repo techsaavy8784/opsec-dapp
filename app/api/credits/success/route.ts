@@ -2,7 +2,7 @@ import prisma from "@/prisma"
 import { authOptions } from "@/lib/auth"
 import { getServerSession } from "next-auth"
 import { NextResponse, NextRequest } from "next/server"
-import { getTx } from "../verify"
+import { JsonObject } from "@prisma/client/runtime/library"
 
 export async function GET(request: NextRequest) {
   const session = await getServerSession(authOptions)
@@ -13,13 +13,18 @@ export async function GET(request: NextRequest) {
 
   const url = request.nextUrl
   const verifier = url.searchParams.get("verifier") as string
-  const txInfo = getTx()
 
-  if (!txInfo[verifier]) {
+  const txInfo = await prisma.txVerifier.findFirst({
+    where: {
+      verifier,
+    },
+  })
+
+  if (!txInfo) {
     return NextResponse.json({ message: "Charge not made" }, { status: 401 })
   }
 
-  const { userId, amount, tx } = txInfo[verifier]
+  const { userId, amount, tx } = txInfo.tx as JsonObject
 
   if (userId !== session.user.id) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 })
@@ -30,8 +35,8 @@ export async function GET(request: NextRequest) {
   await prisma.credit.create({
     data: {
       userId,
-      tx,
       credits,
+      tx: String(tx),
     },
   })
 
@@ -50,7 +55,11 @@ export async function GET(request: NextRequest) {
     },
   })
 
-  delete txInfo[verifier]
+  await prisma.txVerifier.delete({
+    where: {
+      verifier,
+    },
+  })
 
   return NextResponse.json("Payment has been made successfully")
 }
