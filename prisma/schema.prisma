@@ -84,6 +84,14 @@ model Payment {
     @@map("payments")
 }
 
+model TxVerifier {
+    id       Int    @id @default(autoincrement())
+    verifier String @unique
+    tx       Json
+
+    @@map("tx_verifiers")
+}
+
 model Blockchain {
     id          Int      @id @default(autoincrement())
     name        String
