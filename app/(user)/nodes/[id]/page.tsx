@@ -53,8 +53,8 @@ const Node: React.FC<NodeProps> = ({ params: { id } }) => {
           .toLowerCase()
           .replace(/ /g, "-")}.png`}
         alt=""
-        width={180}
-        height={180}
+        width={90}
+        height={90}
         className="object-contain m-auto"
       />
       <h1 className="text-[#52525B]">{data.server.blockchain.description}</h1>
