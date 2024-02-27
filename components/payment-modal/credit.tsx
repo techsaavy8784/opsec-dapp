@@ -114,7 +114,10 @@ export const CreditPaymentModal: React.FC<CreditPaymentModalProps> = ({
               </label>
             )}
             <div className="text-center">
-              <Button type="submit" disabled={isPending || step !== "form"}>
+              <Button
+                type="submit"
+                disabled={!!errors.amount || isPending || step !== "form"}
+              >
                 {(isPending || step !== "form") && (
                   <ReloadIcon className="mr-2 h-4 w-4 animate-spin" />
                 )}
