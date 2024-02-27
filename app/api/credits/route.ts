@@ -56,7 +56,7 @@ export async function POST(request: NextRequest) {
       body: JSON.stringify({
         price_amount: amount,
         price_currency: "usd",
-        pay_currency: "USDTERC20",
+        pay_currency: "eth",
         success_url: successUrl,
       }),
     })
@@ -73,7 +73,7 @@ export async function POST(request: NextRequest) {
         },
         body: JSON.stringify({
           iid: data.id,
-          pay_currency: "USDTERC20",
+          pay_currency: "eth",
         }),
       },
     )
