@@ -23,11 +23,17 @@ const Dashboard = () => {
 
   const chainCount = useMemo(() => {
     const blockchains: number[] = []
+
+    if (!Array.isArray(data)) {
+      return 0
+    }
+
     data?.forEach((node) => {
       if (!blockchains.includes(node.server.blockchain.id)) {
         blockchains.push(node.server.blockchain.id)
       }
     })
+
     return blockchains.length
   }, [data])
 
