@@ -3,9 +3,6 @@ import { authOptions } from "@/lib/auth"
 import { getServerSession } from "next-auth"
 import { NextResponse, NextRequest } from "next/server"
 import { generateRandomString } from "@/lib/utils"
-import { getTx } from "./verify"
-
-const tx = getTx()
 
 export async function GET(request: NextRequest) {
   const session = await getServerSession(authOptions)
@@ -86,11 +83,16 @@ export async function POST(request: NextRequest) {
 
     const { payment_id } = payment
 
-    tx[verifier] = {
-      userId: session.user.id,
-      amount,
-      tx: payment_id,
-    }
+    await prisma.txVerifier.create({
+      data: {
+        verifier,
+        tx: {
+          userId: session.user.id,
+          amount,
+          tx: payment_id,
+        },
+      },
+    })
 
     return NextResponse.json({
       message: "Charge created",
