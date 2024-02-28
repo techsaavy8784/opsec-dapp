@@ -19,11 +19,7 @@ export async function GET(request: NextRequest) {
     include: {
       node: {
         include: {
-          server: {
-            include: {
-              blockchain: true,
-            },
-          },
+          blockchain: true,
         },
       },
     },
@@ -41,18 +37,29 @@ export async function POST(request: NextRequest) {
 
   const { wallet, blockchainId, duration } = await request.json()
 
-  const server = await prisma.server.findFirst({
+  const serverIds = await prisma.server.findMany({
     where: {
-      blockchainId,
-      node: null,
+      NOT: [
+        {
+          nodes: {
+            some: {
+              blockchainId: blockchainId,
+            },
+          },
+        },
+      ],
+      active: true,
     },
-    include: {
-      blockchain: true,
+    select: {
+      id: true,
     },
   })
 
-  if (!server) {
-    return NextResponse.json({ message: "Server not exist" }, { status: 400 })
+  if (serverIds.length === 0) {
+    return NextResponse.json(
+      { message: "No suitable server found" },
+      { status: 404 },
+    )
   }
 
   const user = await prisma.user.findFirst({
@@ -61,7 +68,20 @@ export async function POST(request: NextRequest) {
     },
   })
 
-  const amount = server.blockchain.price * duration
+  const blockchain = await prisma.blockchain.findUnique({
+    where: {
+      id: blockchainId,
+    },
+  })
+
+  if (!blockchain) {
+    return NextResponse.json(
+      { message: "Blockchain not found" },
+      { status: 404 },
+    )
+  }
+
+  const amount = blockchain.price * duration
 
   if (amount > user!.balance) {
     return NextResponse.json(
@@ -73,8 +93,9 @@ export async function POST(request: NextRequest) {
   const node = await prisma.node.create({
     data: {
       wallet,
-      serverId: server.id,
+      serverId: serverIds[Math.floor(Math.random() * serverIds.length)].id,
       userId: session.user.id,
+      blockchainId: blockchainId,
     },
   })
 

@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 import { DialogProps } from "@radix-ui/react-dialog"
 import { Blockchain } from "@prisma/client"
 import {
@@ -12,14 +12,19 @@ import {
 import Image from "next/image"
 import { Input } from "../ui/input"
 import { Button } from "../ui/button"
+import { ReloadIcon } from "@radix-ui/react-icons"
 
 interface PaymentModalProps extends DialogProps {
+  open: boolean
+  isPaying?: boolean
   chain?: Blockchain
   insufficientBalance?: boolean
   onPay: (wallet: string) => void
 }
 
 export const NodePaymentModal: React.FC<PaymentModalProps> = ({
+  open,
+  isPaying,
   onPay,
   chain,
   insufficientBalance,
@@ -28,7 +33,7 @@ export const NodePaymentModal: React.FC<PaymentModalProps> = ({
   const [walletAddr, setWalletAddr] = useState("")
 
   return (
-    <Dialog {...props}>
+    <Dialog {...props} open={open}>
       {chain && (
         <DialogContent
           className={`bg-[#18181B] border-none rounded-[24px] p-8 w-[350px] md:w-[450px]`}
@@ -84,10 +89,12 @@ export const NodePaymentModal: React.FC<PaymentModalProps> = ({
               onClick={() => onPay(walletAddr)}
               variant="custom"
               disabled={
+                isPaying ||
                 insufficientBalance ||
                 (chain.hasWallet && !/^0x[0-9a-fA-F]{40}$/.test(walletAddr))
               }
             >
+              {isPaying && <ReloadIcon className="mr-2 animate-spin" />}
               Purchase
             </Button>
           </form>

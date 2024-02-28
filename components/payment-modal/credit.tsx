@@ -1,19 +1,15 @@
 "use client"
 
 import React, { useCallback, useEffect, useRef, useState } from "react"
-import { ReloadIcon } from "@radix-ui/react-icons"
+import { ReloadIcon, CheckIcon, Cross2Icon } from "@radix-ui/react-icons"
 import { DialogProps } from "@radix-ui/react-dialog"
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogTitle,
-} from "@/components/ui/dialog"
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog"
 import Image from "next/image"
 import { useMutation } from "@tanstack/react-query"
 import { Input } from "../ui/input"
 import { Button } from "../ui/button"
 import { useForm } from "react-hook-form"
+import { useToast } from "../ui/use-toast"
 
 interface CreditPaymentModalProps extends DialogProps {
   onComplete: () => void
@@ -23,8 +19,11 @@ export const CreditPaymentModal: React.FC<CreditPaymentModalProps> = ({
   onComplete,
   ...props
 }) => {
-  const [step, setStep] = useState<"form" | "waiting" | "complete">("form")
+  const [step, setStep] = useState<"form" | "waiting" | "complete" | "failed">(
+    "form",
+  )
   const timer = useRef<NodeJS.Timeout>()
+  const timeout = useRef<NodeJS.Timeout>()
 
   const {
     register,
@@ -35,6 +34,9 @@ export const CreditPaymentModal: React.FC<CreditPaymentModalProps> = ({
       amount: process.env.NEXT_PUBLIC_MIN_BUY_CREDIT_AMOUNT,
     },
   })
+
+  const { toast } = useToast()
+
   useEffect(() => {
     setStep("form")
 
@@ -51,13 +53,22 @@ export const CreditPaymentModal: React.FC<CreditPaymentModalProps> = ({
           amount,
         }),
       })
-        .then((res) => res.json())
-        .then(({ url, tx }) => {
-          const left = (window.innerWidth - 600) / 2
-          const top = (window.innerHeight - 800) / 2
-          const options = `width=${600},height=${800},left=${left},top=${top},resizable=yes,scrollbars=yes`
-          window.open(url, "_blank", options)
-          return tx
+        .then((res) => Promise.all([res.status, res.json()]))
+        .then(([status, { message, code, url, tx }]) => {
+          if (status === 200) {
+            const left = (window.innerWidth - 600) / 2
+            const top = (window.innerHeight - 800) / 2
+            const options = `width=${600},height=${800},left=${left},top=${top},resizable=yes,scrollbars=yes`
+            window.open(url, "_blank", options)
+            return tx
+          }
+
+          toast({
+            title:
+              code === "AMOUNT_MINIMAL_ERROR"
+                ? "Amount too low, please enter a higher value"
+                : message,
+          })
         }),
   })
 
@@ -67,21 +78,31 @@ export const CreditPaymentModal: React.FC<CreditPaymentModalProps> = ({
         if (!tx) {
           return
         }
+
         setStep("waiting")
         clearInterval(timer.current)
+
         timer.current = setInterval(
           () =>
             fetch(`/api/credits/status?tx=${tx}`)
               .then((res) => res.json())
               .then((res) => {
-                if (res.status === "finished") {
+                if (res.status === "confirmed") {
                   clearInterval(timer.current)
                   setStep("complete")
                   onComplete()
+                } else if (res.status === "failed") {
+                  clearInterval(timer.current)
+                  setStep("failed")
                 }
               }),
-          5000,
+          3000,
         )
+
+        timeout.current = setTimeout(() => {
+          setStep("failed")
+          clearInterval(timer.current)
+        }, 12 * 60000)
       })
     },
     [onComplete, mutateAsync],
@@ -90,6 +111,7 @@ export const CreditPaymentModal: React.FC<CreditPaymentModalProps> = ({
   useEffect(() => {
     return () => {
       clearInterval(timer.current)
+      clearTimeout(timeout.current)
     }
   }, [])
 
@@ -137,22 +159,24 @@ export const CreditPaymentModal: React.FC<CreditPaymentModalProps> = ({
             <div className="flex items-center justify-center w-full">
               <Image src="/image/pay.svg" alt="pay" width={138} height={138} />{" "}
             </div>
-            <DialogTitle className="text-white text-center font-[600] text-[28px]">
-              Waiting for payment
-            </DialogTitle>
-            <DialogDescription className="text-[#54597C] w-full text-center font-[500] text-[16px]">
-              You need to complete your payment to receive node
-            </DialogDescription>
-
-            <p
-              className={`text-[16px] font-[400] ${
-                step === "waiting" ? "text-[#FFEB3B]" : "text-[#10B981]"
-              }`}
-            >
-              {step === "waiting"
-                ? "Waiting for your payment"
-                : "Successfully Paid"}
-            </p>
+            {step === "waiting" ? (
+              <DialogTitle className="text-white text-center font-[600] text-[28px] flex items-center justify-center">
+                <ReloadIcon className="mr-3 h-6 w-6 animate-spin" />
+                Waiting for payment
+              </DialogTitle>
+            ) : step === "complete" ? (
+              <DialogTitle className="text-green-500 text-center font-[600] text-[28px] flex items-center justify-center">
+                <CheckIcon className="h-9 w-9" />
+                Successfully paid
+              </DialogTitle>
+            ) : (
+              step === "failed" && (
+                <DialogTitle className="text-red-500 text-center font-[600] text-[28px] flex items-center justify-center">
+                  <Cross2Icon className="h-6 w-6 mr-4" />
+                  Payment failed
+                </DialogTitle>
+              )
+            )}
           </>
         )}
       </DialogContent>

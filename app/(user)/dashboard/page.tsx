@@ -29,8 +29,8 @@ const Dashboard = () => {
     }
 
     data?.forEach((node) => {
-      if (!blockchains.includes(node.server.blockchain.id)) {
-        blockchains.push(node.server.blockchain.id)
+      if (!blockchains.includes(node.blockchain.id)) {
+        blockchains.push(node.blockchain.id)
       }
     })
 
@@ -55,6 +55,7 @@ const Dashboard = () => {
               count={isPending ? undefined : data?.length}
               chainCount={isPending ? undefined : chainCount}
               link="/nodes"
+              className="h-full"
             />
           </div>
           <div className="col-span-3">
@@ -62,6 +63,7 @@ const Dashboard = () => {
               title="All Nodes"
               count={isPendingCount ? undefined : dataCount?.count}
               chainCount={isPendingCount ? undefined : dataCount?.chainCount}
+              className="h-full"
             />
           </div>
           <div className="col-span-1">{/* <CardNodes /> */}</div>

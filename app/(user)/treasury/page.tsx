@@ -14,7 +14,7 @@ const tablehead = ["#", "Vaults", "Blockchain", "Goal", "Funding", "Action"]
 
 const Treasury = () => {
   return (
-    <div className="py-6 flex flex-col gap-6">
+    <div className="py-6 flex flex-col gap-6 blur-md pointer-events-none">
       <div className="grid grid-cols-2 md:grid-cols-6 gap-6">
         <div className="col-span-2 md:col-span-4 rounded-[24px] bg-[#18181B] p-2 h-[330px] md:h-[430px]">
           <TreasuryChart />
