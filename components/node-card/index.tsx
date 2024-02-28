@@ -52,7 +52,7 @@ export const NodeCard: React.FC<NodeCardProps> = ({
       </Button>
     ) : onBuy ? (
       <Button type="button" variant="custom" onClick={onBuy}>
-        Buy
+        Deploy
         <FaArrowRightLong className="ml-2 font-[300]" />
       </Button>
     ) : (
