@@ -61,5 +61,5 @@ export async function GET(request: NextRequest) {
     },
   })
 
-  return NextResponse.json("Payment has been made successfully")
+  return NextResponse.redirect("/billing")
 }

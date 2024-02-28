@@ -12,9 +12,11 @@ import {
 import Image from "next/image"
 import { Input } from "../ui/input"
 import { Button } from "../ui/button"
+import { ReloadIcon } from "@radix-ui/react-icons"
 
 interface PaymentModalProps extends DialogProps {
   open: boolean
+  isPaying?: boolean
   chain?: Blockchain
   insufficientBalance?: boolean
   onPay: (wallet: string) => void
@@ -22,24 +24,13 @@ interface PaymentModalProps extends DialogProps {
 
 export const NodePaymentModal: React.FC<PaymentModalProps> = ({
   open,
+  isPaying,
   onPay,
   chain,
   insufficientBalance,
   ...props
 }) => {
   const [walletAddr, setWalletAddr] = useState("")
-  const [isPaying, setIsPaying] = useState(false)
-
-  const handlePayment = (wallet: string) => {
-    setIsPaying(true)
-    onPay(wallet)
-  }
-
-  useEffect(() => {
-    if (open) {
-      setIsPaying(false)
-    }
-  }, [open])
 
   return (
     <Dialog {...props} open={open}>
@@ -95,7 +86,7 @@ export const NodePaymentModal: React.FC<PaymentModalProps> = ({
 
             <Button
               type="button"
-              onClick={() => handlePayment(walletAddr)}
+              onClick={() => onPay(walletAddr)}
               variant="custom"
               disabled={
                 isPaying ||
@@ -103,7 +94,8 @@ export const NodePaymentModal: React.FC<PaymentModalProps> = ({
                 (chain.hasWallet && !/^0x[0-9a-fA-F]{40}$/.test(walletAddr))
               }
             >
-              {isPaying ? "Processing..." : "Purchase"}
+              {isPaying && <ReloadIcon className="mr-2 animate-spin" />}
+              Purchase
             </Button>
           </form>
         </DialogContent>

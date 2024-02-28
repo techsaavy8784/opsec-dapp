@@ -95,7 +95,7 @@ const Node: React.FC<NodeProps> = ({ params: { id } }) => {
           </div>
 
           <div className="flex">
-            {new Array(daysPassed)
+            {new Array(daysPassed + 1)
               .fill(0)
               ?.map((_, i) => (
                 <div

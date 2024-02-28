@@ -11,11 +11,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 })
   }
 
-  const nodes = await prisma.node.findMany({
-    include: {
-      server: {},
-    },
-  })
+  const nodes = await prisma.node.findMany()
 
   const chains: number[] = []
 

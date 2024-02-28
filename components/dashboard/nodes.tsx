@@ -16,10 +16,17 @@ interface NodesProps {
   count?: number
   chainCount?: number
   link?: string
+  className?: string
 }
 
-const Nodes: React.FC<NodesProps> = ({ title, count, chainCount, link }) => (
-  <Card>
+const Nodes: React.FC<NodesProps> = ({
+  title,
+  count,
+  chainCount,
+  link,
+  className,
+}) => (
+  <Card className={className}>
     <CardHeader>
       <CardTitle>{title}</CardTitle>
       <CardDescription>Currently running nodes</CardDescription>

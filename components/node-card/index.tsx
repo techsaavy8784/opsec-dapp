@@ -11,7 +11,7 @@ type NodeCardProps = {
   created?: string
   name: string
   description: string
-  disabled: boolean
+  disabled?: boolean
   onBuy?: () => void
 }
 
@@ -38,13 +38,12 @@ export const NodeCard: React.FC<NodeCardProps> = ({
       <p className="text-[#BDBDBD] font-[500] text-[12px]">{description}</p>
       <p className="text-[#BDBDBD] font-[500] text-[12px]">{created}</p>
     </div>
-    {onBuy ? (
-      <Button
-        type="button"
-        variant="custom"
-        disabled={disabled}
-        onClick={onBuy}
-      >
+    {disabled ? (
+      <Button type="button" variant="custom" disabled>
+        Sold out
+      </Button>
+    ) : onBuy ? (
+      <Button type="button" variant="custom" onClick={onBuy}>
         Buy
         <FaArrowRightLong className="ml-2 font-[300]" />
       </Button>

@@ -3,14 +3,6 @@ import { authOptions } from "@/lib/auth"
 import { getServerSession } from "next-auth"
 import { NextResponse, NextRequest } from "next/server"
 
-function shuffleArray(array: any[]) {
-  for (let i = array.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1))
-    ;[array[i], array[j]] = [array[j], array[i]]
-  }
-  return array
-}
-
 export async function GET(request: NextRequest) {
   const session = await getServerSession(authOptions)
 
@@ -27,7 +19,7 @@ export async function GET(request: NextRequest) {
     include: {
       node: {
         include: {
-          server: true,
+          blockchain: true,
         },
       },
     },
@@ -63,11 +55,7 @@ export async function POST(request: NextRequest) {
     },
   })
 
-  const shuffledServerIds = shuffleArray(serverIds.map((server) => server.id))
-
-  const serverId = shuffledServerIds.length > 0 ? shuffledServerIds[0] : null
-
-  if (!serverId) {
+  if (serverIds.length === 0) {
     return NextResponse.json(
       { message: "No suitable server found" },
       { status: 404 },
@@ -105,7 +93,7 @@ export async function POST(request: NextRequest) {
   const node = await prisma.node.create({
     data: {
       wallet,
-      serverId: serverId,
+      serverId: serverIds[Math.floor(Math.random() * serverIds.length)].id,
       userId: session.user.id,
       blockchainId: blockchainId,
     },

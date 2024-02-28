@@ -10,7 +10,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { Payment, Node } from "@prisma/client"
+import { Payment } from "@prisma/client"
 import { Skeleton } from "@/components/ui/skeleton"
 import { formatDate } from "@/lib/utils"
 
@@ -54,7 +54,7 @@ const BillingHistory = () => {
                     {key + 1}
                   </TableCell>
                   <TableCell className="text-[16px] font-[600] text-white max-md:min-w-[130px]">
-                    {item.node.server.blockchain.name}
+                    {item.node.blockchain.name}
                   </TableCell>
                   <TableCell className="text-[16px] font-[600] text-white max-md:min-w-[130px]">
                     {item.duration}

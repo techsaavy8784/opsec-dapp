@@ -11,8 +11,6 @@ import { useToast } from "@/components/ui/use-toast"
 const Nodes: React.FC = () => {
   const [chain, setChain] = useState<Blockchain>()
 
-  const timer = useRef<NodeJS.Timeout>()
-
   const { toast } = useToast()
 
   const { isPending, data, refetch } = useQuery<any>({
@@ -25,7 +23,7 @@ const Nodes: React.FC = () => {
     queryFn: () => fetch("api/credits/balance").then((res) => res.json()),
   })
 
-  const { mutate } = useMutation({
+  const { mutate, isPending: isPaying } = useMutation({
     mutationFn: (wallet: string) =>
       fetch("/api/payment", {
         method: "POST",
@@ -92,14 +90,10 @@ const Nodes: React.FC = () => {
         <NodePaymentModal
           open={!!chain}
           chain={chain}
-          onOpenChange={(open) => {
-            setChain(undefined)
-            if (!open) {
-              clearInterval(timer.current)
-            }
-          }}
+          onOpenChange={() => setChain(undefined)}
           insufficientBalance={Number(balance?.balance) < Number(chain?.price)}
           onPay={mutate}
+          isPaying={isPaying}
         />
       </div>
     </>
