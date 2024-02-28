@@ -19,8 +19,9 @@ const projectId = process.env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID!
 
 const config = getDefaultConfig({
   appName: "Opsec",
-  projectId,
+  projectId: projectId,
   chains: [mainnet],
+  ssr: true,
 })
 
 const theme = darkTheme()
