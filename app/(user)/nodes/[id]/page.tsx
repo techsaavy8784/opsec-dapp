@@ -6,12 +6,15 @@ import { Skeleton } from "@/components/ui/skeleton"
 import { NodeType } from "../page"
 import Image from "next/image"
 import { formatDate } from "@/lib/utils"
+import clsx from "clsx"
 
 interface NodeProps {
   params: {
     id: string
   }
 }
+
+const uptimeDayCount = 90
 
 const Node: React.FC<NodeProps> = ({ params: { id } }) => {
   const timer = useRef<NodeJS.Timeout>()
@@ -43,7 +46,7 @@ const Node: React.FC<NodeProps> = ({ params: { id } }) => {
     Math.round(
       (Date.now() - new Date(data.createdAt).getTime()) / (1000 * 3600 * 24),
     ),
-    90,
+    uptimeDayCount,
   )
 
   return (
@@ -93,20 +96,23 @@ const Node: React.FC<NodeProps> = ({ params: { id } }) => {
               {formatDate(data.createdAt)}
             </h1>
           </div>
-
-          <div className="flex">
-            {new Array(daysPassed + 1)
+          <h1 className="text-[14px] font-[500] text-[#52525B]">Uptime</h1>
+          <div className="flex flex-row-reverse">
+            {new Array(uptimeDayCount)
               .fill(0)
               ?.map((_, i) => (
                 <div
                   key={i}
-                  className={`w-[1%] h-[48px] m-[1px] bg-[#10B981] rounded-[3px]`}
+                  className={clsx(
+                    `w-[1%] h-[48px] m-[1px] rounded-[3px]`,
+                    i <= daysPassed ? "bg-[#10B981]" : "bg-zinc-900",
+                  )}
                 />
               ))}
           </div>
           <div className="flex items-center justify-between">
             <h1 className="text-[14px] font-[500] text-[#52525B]">
-              {daysPassed} days ago
+              {uptimeDayCount} days ago
             </h1>
             <h1 className="text-[14px] font-[500] text-[#52525B]">Today</h1>
           </div>

@@ -1,10 +1,16 @@
 "use client"
 
-import { usePathname } from "next/navigation"
 import React from "react"
+import { usePathname } from "next/navigation"
 import { ConnectButton } from "@rainbow-me/rainbowkit"
+import { useQuery } from "@tanstack/react-query"
 
 export const Navbar = () => {
+  const { data: balance } = useQuery({
+    queryKey: ["credits/balance"],
+    queryFn: () => fetch("api/credits/balance").then((res) => res.json()),
+  })
+
   const pathName = usePathname()
   const path = pathName.split("/")[1]
 
@@ -14,7 +20,10 @@ export const Navbar = () => {
         <div className="flex-1">
           <h1 className="text-2xl font-semibold capitalize">{path}</h1>
         </div>
-        <div className="max-md:hidden">
+        <div className="max-md:hidden flex items-center space-x-3">
+          {balance && (
+            <div className="font-bold">Balance {balance.balance}</div>
+          )}
           <ConnectButton showBalance={false} />
         </div>
       </div>

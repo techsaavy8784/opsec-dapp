@@ -18,7 +18,7 @@ const Nodes: React.FC = () => {
     queryFn: () => fetch("/api/server/list").then((res) => res.json()),
   })
 
-  const { data: balance } = useQuery({
+  const { data: balance, refetch: refetchBalance } = useQuery({
     queryKey: ["credits/balance"],
     queryFn: () => fetch("api/credits/balance").then((res) => res.json()),
   })
@@ -44,6 +44,7 @@ const Nodes: React.FC = () => {
           })
         }
         refetch()
+        refetchBalance()
       }),
   })
 
