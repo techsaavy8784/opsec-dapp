@@ -55,6 +55,7 @@ const Dashboard = () => {
               count={isPending ? undefined : data?.length}
               chainCount={isPending ? undefined : chainCount}
               link="/nodes"
+              className="h-full"
             />
           </div>
           <div className="col-span-3">
@@ -62,6 +63,7 @@ const Dashboard = () => {
               title="All Nodes"
               count={isPendingCount ? undefined : dataCount?.count}
               chainCount={isPendingCount ? undefined : dataCount?.chainCount}
+              className="h-full"
             />
           </div>
           <div className="col-span-1">{/* <CardNodes /> */}</div>
