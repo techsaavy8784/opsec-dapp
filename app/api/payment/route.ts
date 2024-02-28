@@ -6,7 +6,7 @@ import { NextResponse, NextRequest } from "next/server"
 function shuffleArray(array: any[]) {
   for (let i = array.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1))
-    ;[array[i], array[j]] = [array[j], array[i]]
+      ;[array[i], array[j]] = [array[j], array[i]]
   }
   return array
 }
@@ -27,7 +27,7 @@ export async function GET(request: NextRequest) {
     include: {
       node: {
         include: {
-          server: true,
+          blockchain: true,
         },
       },
     },
