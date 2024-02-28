@@ -11,7 +11,7 @@ type NodeCardProps = {
   created?: string
   name: string
   description: string
-  disabled: boolean
+  disabled?: boolean
   onBuy?: () => void
 }
 

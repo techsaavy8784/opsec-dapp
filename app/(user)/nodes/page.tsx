@@ -3,11 +3,11 @@
 import React from "react"
 import { useQuery } from "@tanstack/react-query"
 import { Skeleton } from "@/components/ui/skeleton"
-import { Blockchain, Node, Server } from "@prisma/client"
+import { Blockchain, Node } from "@prisma/client"
 import { NodeCard } from "@/components/node-card"
 import { formatDate } from "@/lib/utils"
 
-export type NodeType = Node & { server: Server; blockchain: Blockchain }
+export type NodeType = Node & { blockchain: Blockchain }
 
 const Nodes: React.FC = () => {
   const { isPending, data } = useQuery<NodeType[]>({
