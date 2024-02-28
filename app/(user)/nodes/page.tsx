@@ -25,6 +25,10 @@ const Nodes: React.FC = () => {
     )
   }
 
+  if (!Array.isArray(data)) {
+    return "No data"
+  }
+
   return (
     <div className="grid items-center grid-cols-1 gap-8 md:grid-cols-3">
       {data?.map((node, key) => (
@@ -34,6 +38,7 @@ const Nodes: React.FC = () => {
           name={node.blockchain.name}
           created={formatDate(node.createdAt)}
           description={node.blockchain.description}
+          status={node.status}
         />
       ))}
     </div>
