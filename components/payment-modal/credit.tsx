@@ -1,14 +1,9 @@
 "use client"
 
 import React, { useCallback, useEffect, useRef, useState } from "react"
-import { ReloadIcon } from "@radix-ui/react-icons"
+import { ReloadIcon, CheckIcon, Cross2Icon } from "@radix-ui/react-icons"
 import { DialogProps } from "@radix-ui/react-dialog"
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogTitle,
-} from "@/components/ui/dialog"
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog"
 import Image from "next/image"
 import { useMutation } from "@tanstack/react-query"
 import { Input } from "../ui/input"
@@ -24,9 +19,9 @@ export const CreditPaymentModal: React.FC<CreditPaymentModalProps> = ({
   onComplete,
   ...props
 }) => {
-  const [step, setStep] = useState<
-    "form" | "waiting" | "sending" | "complete" | "failed"
-  >("form")
+  const [step, setStep] = useState<"form" | "waiting" | "complete" | "failed">(
+    "form",
+  )
   const timer = useRef<NodeJS.Timeout>()
   const timeout = useRef<NodeJS.Timeout>()
 
@@ -92,15 +87,13 @@ export const CreditPaymentModal: React.FC<CreditPaymentModalProps> = ({
             fetch(`/api/credits/status?tx=${tx}`)
               .then((res) => res.json())
               .then((res) => {
-                if (res.status === "finished") {
+                if (res.status === "confirmed") {
                   clearInterval(timer.current)
                   setStep("complete")
                   onComplete()
                 } else if (res.status === "failed") {
                   clearInterval(timer.current)
                   setStep("failed")
-                } else if (res.status === "sending") {
-                  setStep("sending")
                 }
               }),
           3000,
@@ -171,18 +164,15 @@ export const CreditPaymentModal: React.FC<CreditPaymentModalProps> = ({
                 <ReloadIcon className="mr-3 h-6 w-6 animate-spin" />
                 Waiting for payment
               </DialogTitle>
-            ) : step === "sending" ? (
-              <DialogTitle className="text-yellow-500 text-center font-[600] text-[28px] flex items-center justify-center">
-                <ReloadIcon className="mr-3 h-6 w-6 animate-spin" />
-                Sending payment
-              </DialogTitle>
             ) : step === "complete" ? (
-              <DialogTitle className="text-green-500 text-center font-[600] text-[28px] ">
+              <DialogTitle className="text-green-500 text-center font-[600] text-[28px] flex items-center justify-center">
+                <CheckIcon className="h-9 w-9" />
                 Successfully paid
               </DialogTitle>
             ) : (
               step === "failed" && (
-                <DialogTitle className="text-red-500 text-center font-[600] text-[28px] ">
+                <DialogTitle className="text-red-500 text-center font-[600] text-[28px] flex items-center justify-center">
+                  <Cross2Icon className="h-6 w-6 mr-4" />
                   Payment failed
                 </DialogTitle>
               )
