@@ -14,6 +14,7 @@ import { useMutation } from "@tanstack/react-query"
 import { Input } from "../ui/input"
 import { Button } from "../ui/button"
 import { useForm } from "react-hook-form"
+import { useToast } from "../ui/use-toast"
 
 interface CreditPaymentModalProps extends DialogProps {
   onComplete: () => void
@@ -38,6 +39,9 @@ export const CreditPaymentModal: React.FC<CreditPaymentModalProps> = ({
       amount: process.env.NEXT_PUBLIC_MIN_BUY_CREDIT_AMOUNT,
     },
   })
+
+  const { toast } = useToast()
+
   useEffect(() => {
     setStep("form")
 
@@ -54,13 +58,22 @@ export const CreditPaymentModal: React.FC<CreditPaymentModalProps> = ({
           amount,
         }),
       })
-        .then((res) => res.json())
-        .then(({ url, tx }) => {
-          const left = (window.innerWidth - 600) / 2
-          const top = (window.innerHeight - 800) / 2
-          const options = `width=${600},height=${800},left=${left},top=${top},resizable=yes,scrollbars=yes`
-          window.open(url, "_blank", options)
-          return tx
+        .then((res) => Promise.all([res.status, res.json()]))
+        .then(([status, { message, code, url, tx }]) => {
+          if (status === 200) {
+            const left = (window.innerWidth - 600) / 2
+            const top = (window.innerHeight - 800) / 2
+            const options = `width=${600},height=${800},left=${left},top=${top},resizable=yes,scrollbars=yes`
+            window.open(url, "_blank", options)
+            return tx
+          }
+
+          toast({
+            title:
+              code === "AMOUNT_MINIMAL_ERROR"
+                ? "Amount too low, please enter a higher value"
+                : message,
+          })
         }),
   })
 
