@@ -5,6 +5,7 @@ import React from "react"
 import { Button } from "@/components/ui/button"
 import { FaArrowRightLong } from "react-icons/fa6"
 import Link from "next/link"
+import { Badge } from "../ui/badge"
 
 type NodeCardProps = {
   id?: number
@@ -12,6 +13,7 @@ type NodeCardProps = {
   name: string
   description: string
   disabled?: boolean
+  status?: string
   onBuy?: () => void
 }
 
@@ -21,6 +23,7 @@ export const NodeCard: React.FC<NodeCardProps> = ({
   created,
   description,
   disabled,
+  status,
   onBuy,
 }) => (
   <div className="col-span-1 p-4 rounded-[16px] backdrop:blur-[100px] overflow-hidden flex flex-col gap-4 border border-zinc-600 h-full">
@@ -34,7 +37,10 @@ export const NodeCard: React.FC<NodeCardProps> = ({
       />
     </div>
     <div className="flex flex-col gap-2 flex-1">
-      <h1 className="text-white font-[600] text-[16px]">{name}</h1>
+      <div className="flex justify-between items-center">
+        <h1 className="text-white font-[600] text-[16px]">{name}</h1>
+        {status && <Badge>{status}</Badge>}
+      </div>
       <p className="text-[#BDBDBD] font-[500] text-[12px] line-clamp-2">
         {description}
       </p>
