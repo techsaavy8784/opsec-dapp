@@ -15,7 +15,7 @@ export const Navbar = () => {
           <h1 className="text-2xl font-semibold capitalize">{path}</h1>
         </div>
         <div className="max-md:hidden">
-          <ConnectButton />
+          <ConnectButton showBalance={false} />
         </div>
       </div>
     </div>

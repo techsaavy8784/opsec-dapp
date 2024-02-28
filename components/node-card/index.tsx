@@ -11,6 +11,7 @@ type NodeCardProps = {
   created?: string
   name: string
   description: string
+  disabled?: boolean
   onBuy?: () => void
 }
 
@@ -19,6 +20,7 @@ export const NodeCard: React.FC<NodeCardProps> = ({
   name,
   created,
   description,
+  disabled,
   onBuy,
 }) => (
   <div className="col-span-1 p-4 rounded-[16px] backdrop:blur-[100px] overflow-hidden flex flex-col gap-4 border border-zinc-600">
@@ -26,9 +28,9 @@ export const NodeCard: React.FC<NodeCardProps> = ({
       <Image
         src={`/icons/blockchain/${name.toLowerCase().replace(/ /g, "-")}.png`}
         alt=""
-        width={180}
-        height={180}
-        className="object-contain m-auto"
+        width={120}
+        height={120}
+        className="object-contain pt-3 m-auto"
       />
     </div>
     <div className="flex flex-col gap-2">
@@ -36,7 +38,11 @@ export const NodeCard: React.FC<NodeCardProps> = ({
       <p className="text-[#BDBDBD] font-[500] text-[12px]">{description}</p>
       <p className="text-[#BDBDBD] font-[500] text-[12px]">{created}</p>
     </div>
-    {onBuy ? (
+    {disabled ? (
+      <Button type="button" variant="custom" disabled>
+        Sold out
+      </Button>
+    ) : onBuy ? (
       <Button type="button" variant="custom" onClick={onBuy}>
         Buy
         <FaArrowRightLong className="ml-2 font-[300]" />

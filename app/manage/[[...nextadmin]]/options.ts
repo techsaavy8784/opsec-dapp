@@ -18,36 +18,10 @@ const options: NextAdminOptions = {
     },
     Server: {
       edit: {
-        display: [
-          "id",
-          "host",
-          "port",
-          "username",
-          "password",
-          "active",
-          "blockchain",
-        ],
-        fields: {
-          blockchain: {
-            optionFormatter: (values) => values.name,
-          },
-        },
+        display: ["id", "host", "port", "username", "password", "active"],
       },
       list: {
-        display: [
-          "id",
-          "host",
-          "port",
-          "username",
-          "password",
-          "active",
-          "blockchain",
-        ],
-        fields: {
-          blockchain: {
-            formatter: (chain) => chain.name,
-          },
-        },
+        display: ["id", "host", "port", "username", "password", "active"],
       },
     },
     User: {},

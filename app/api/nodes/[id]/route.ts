@@ -1,5 +1,4 @@
 import { authOptions } from "@/lib/auth"
-import { protectServer } from "@/lib/utils"
 import prisma from "@/prisma"
 import { getServerSession } from "next-auth"
 import { NextResponse } from "next/server"
@@ -19,17 +18,16 @@ export async function GET(
       id: Number(params.id),
     },
     include: {
-      server: {
-        include: {
-          blockchain: true,
+      blockchain: {
+        select: {
+          id: true,
+          name: true,
+          url: true,
+          description: true,
         },
       },
     },
   })
-
-  if (node?.server) {
-    node.server = protectServer(node.server) as any
-  }
 
   return NextResponse.json(node)
 }

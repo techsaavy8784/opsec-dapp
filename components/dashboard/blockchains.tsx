@@ -12,29 +12,6 @@ import { useQuery } from "@tanstack/react-query"
 import Image from "next/image"
 
 export function CardBlockchains() {
-  const blockchains = [
-    {
-      name: "Base",
-      icon: "/icons/blockchain/base.png",
-    },
-    {
-      name: "Optimism",
-      icon: "/icons/blockchain/optimism.png",
-    },
-    {
-      name: "Polygon",
-      icon: "/icons/blockchain/polygon.png",
-    },
-    {
-      name: "Avalanche",
-      icon: "/icons/blockchain/avalanche.png",
-    },
-    {
-      name: "Fantom",
-      icon: "/icons/blockchain/fantom.png",
-    },
-  ]
-
   const { isPending, data } = useQuery<[]>({
     queryKey: ["blockchain/list"],
     queryFn: () => fetch("/api/blockchains/list").then((res) => res.json()),
