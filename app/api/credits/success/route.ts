@@ -61,5 +61,5 @@ export async function GET(request: NextRequest) {
     },
   })
 
-  return NextResponse.redirect("/billing")
+  return NextResponse.redirect(`${process.env.NEXTAUTH_URL}/billing`)
 }

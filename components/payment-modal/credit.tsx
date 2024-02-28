@@ -24,9 +24,9 @@ export const CreditPaymentModal: React.FC<CreditPaymentModalProps> = ({
   onComplete,
   ...props
 }) => {
-  const [step, setStep] = useState<"form" | "waiting" | "complete" | "failed">(
-    "form",
-  )
+  const [step, setStep] = useState<
+    "form" | "waiting" | "sending" | "complete" | "failed"
+  >("form")
   const timer = useRef<NodeJS.Timeout>()
   const timeout = useRef<NodeJS.Timeout>()
 
@@ -83,8 +83,10 @@ export const CreditPaymentModal: React.FC<CreditPaymentModalProps> = ({
         if (!tx) {
           return
         }
+
         setStep("waiting")
         clearInterval(timer.current)
+
         timer.current = setInterval(
           () =>
             fetch(`/api/credits/status?tx=${tx}`)
@@ -97,10 +99,13 @@ export const CreditPaymentModal: React.FC<CreditPaymentModalProps> = ({
                 } else if (res.status === "failed") {
                   clearInterval(timer.current)
                   setStep("failed")
+                } else if (res.status === "sending") {
+                  setStep("sending")
                 }
               }),
           3000,
         )
+
         timeout.current = setTimeout(() => {
           setStep("failed")
           clearInterval(timer.current)
@@ -161,20 +166,25 @@ export const CreditPaymentModal: React.FC<CreditPaymentModalProps> = ({
             <div className="flex items-center justify-center w-full">
               <Image src="/image/pay.svg" alt="pay" width={138} height={138} />{" "}
             </div>
-            <DialogTitle className="text-white text-center font-[600] text-[28px]">
-              Waiting for payment
-            </DialogTitle>
-            <DialogDescription className="text-[#54597C] w-full text-center font-[500] text-[16px]">
-              You need to complete your payment to receive node
-            </DialogDescription>
-
-            {step === "complete" ? (
-              <p className="text-[16px] font-[400] text-green-500">
-                Successfully Paid
-              </p>
+            {step === "waiting" ? (
+              <DialogTitle className="text-white text-center font-[600] text-[28px] flex items-center justify-center">
+                <ReloadIcon className="mr-3 h-6 w-6 animate-spin" />
+                Waiting for payment
+              </DialogTitle>
+            ) : step === "sending" ? (
+              <DialogTitle className="text-yellow-500 text-center font-[600] text-[28px] flex items-center justify-center">
+                <ReloadIcon className="mr-3 h-6 w-6 animate-spin" />
+                Sending payment
+              </DialogTitle>
+            ) : step === "complete" ? (
+              <DialogTitle className="text-green-500 text-center font-[600] text-[28px] ">
+                Successfully paid
+              </DialogTitle>
             ) : (
               step === "failed" && (
-                <p className="text-[16px] font-[400] text-red-500">Failed</p>
+                <DialogTitle className="text-red-500 text-center font-[600] text-[28px] ">
+                  Payment failed
+                </DialogTitle>
               )
             )}
           </>
