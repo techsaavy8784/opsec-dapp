@@ -168,16 +168,14 @@ export const CreditPaymentModal: React.FC<CreditPaymentModalProps> = ({
               You need to complete your payment to receive node
             </DialogDescription>
 
-            {step === "waiting" ? (
-              <p className="text-[16px] font-[400] text-yellow-500">
-                Waiting for your payment
-              </p>
-            ) : step === "complete" ? (
+            {step === "complete" ? (
               <p className="text-[16px] font-[400] text-green-500">
                 Successfully Paid
               </p>
             ) : (
-              <p className="text-[16px] font-[400] text-red-500">Failed</p>
+              step === "failed" && (
+                <p className="text-[16px] font-[400] text-red-500">Failed</p>
+              )
             )}
           </>
         )}
