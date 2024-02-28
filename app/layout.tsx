@@ -1,12 +1,10 @@
+import React from "react"
 import type { Metadata } from "next"
 import { gilroy } from "@/fonts/gilroy"
 import { Providers } from "./providers"
 import { Toaster } from "@/components/ui/toaster"
-import { SessionProvider } from "next-auth/react"
-import ProtectRoutes from "./protect-routes"
 import "@rainbow-me/rainbowkit/styles.css"
 import "./globals.css"
-import React from "react"
 
 export const metadata: Metadata = {
   title: "Opsec Nodes",
@@ -18,7 +16,6 @@ export interface LayoutProps {
 }
 
 const RootLayout: React.FC<LayoutProps> = ({ children }) => (
-  // Wrap the Providers component with SessionProvider
   <html lang="en">
     <body className={`${gilroy.className} bg-black dark`}>
       <Providers>
