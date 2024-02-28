@@ -7,7 +7,7 @@ import { Blockchain, Node, Server } from "@prisma/client"
 import { NodeCard } from "@/components/node-card"
 import { formatDate } from "@/lib/utils"
 
-export type NodeType = Node & { server: Server & { blockchain: Blockchain } }
+export type NodeType = Node & { server: Server; blockchain: Blockchain }
 
 const Nodes: React.FC = () => {
   const { isPending, data } = useQuery<NodeType[]>({
@@ -17,7 +17,7 @@ const Nodes: React.FC = () => {
 
   if (isPending) {
     return (
-      <div className="grid grid-cols-1 md:grid-cols-3 items-center gap-8 pt-2">
+      <div className="grid items-center grid-cols-1 gap-8 pt-2 md:grid-cols-3">
         <Skeleton className="rounded-lg w-[220] h-[320px] mr-2 block"></Skeleton>
         <Skeleton className="rounded-lg w-[220] h-[320px] mr-2 block"></Skeleton>
         <Skeleton className="rounded-lg w-[220] h-[320px] mr-2 block"></Skeleton>
@@ -26,14 +26,14 @@ const Nodes: React.FC = () => {
   }
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-3 items-center gap-8">
+    <div className="grid items-center grid-cols-1 gap-8 md:grid-cols-3">
       {data?.map((node, key) => (
         <NodeCard
           key={key}
           id={node.id}
-          name={node.server.blockchain.name}
+          name={node.blockchain.name}
           created={formatDate(node.createdAt)}
-          description={node.server.blockchain.description}
+          description={node.blockchain.description}
         />
       ))}
     </div>

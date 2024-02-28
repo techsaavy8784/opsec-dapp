@@ -3,6 +3,14 @@ import { authOptions } from "@/lib/auth"
 import { getServerSession } from "next-auth"
 import { NextResponse, NextRequest } from "next/server"
 
+function shuffleArray(array: any[]) {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1))
+    ;[array[i], array[j]] = [array[j], array[i]]
+  }
+  return array
+}
+
 export async function GET(request: NextRequest) {
   const session = await getServerSession(authOptions)
 
@@ -19,11 +27,7 @@ export async function GET(request: NextRequest) {
     include: {
       node: {
         include: {
-          server: {
-            include: {
-              blockchain: true,
-            },
-          },
+          server: true,
         },
       },
     },
@@ -41,18 +45,33 @@ export async function POST(request: NextRequest) {
 
   const { wallet, blockchainId, duration } = await request.json()
 
-  const server = await prisma.server.findFirst({
+  const serverIds = await prisma.server.findMany({
     where: {
-      blockchainId,
-      node: null,
+      NOT: [
+        {
+          nodes: {
+            some: {
+              blockchainId: blockchainId,
+            },
+          },
+        },
+      ],
+      active: true,
     },
-    include: {
-      blockchain: true,
+    select: {
+      id: true,
     },
   })
 
-  if (!server) {
-    return NextResponse.json({ message: "Server not exist" }, { status: 400 })
+  const shuffledServerIds = shuffleArray(serverIds.map((server) => server.id))
+
+  const serverId = shuffledServerIds.length > 0 ? shuffledServerIds[0] : null
+
+  if (!serverId) {
+    return NextResponse.json(
+      { message: "No suitable server found" },
+      { status: 404 },
+    )
   }
 
   const user = await prisma.user.findFirst({
@@ -61,7 +80,20 @@ export async function POST(request: NextRequest) {
     },
   })
 
-  const amount = server.blockchain.price * duration
+  const blockchain = await prisma.blockchain.findUnique({
+    where: {
+      id: blockchainId,
+    },
+  })
+
+  if (!blockchain) {
+    return NextResponse.json(
+      { message: "Blockchain not found" },
+      { status: 404 },
+    )
+  }
+
+  const amount = blockchain.price * duration
 
   if (amount > user!.balance) {
     return NextResponse.json(
@@ -73,8 +105,9 @@ export async function POST(request: NextRequest) {
   const node = await prisma.node.create({
     data: {
       wallet,
-      serverId: server.id,
+      serverId: serverId,
       userId: session.user.id,
+      blockchainId: blockchainId,
     },
   })
 

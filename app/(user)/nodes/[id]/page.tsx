@@ -47,9 +47,9 @@ const Node: React.FC<NodeProps> = ({ params: { id } }) => {
   )
 
   return (
-    <div className="space-y-2">
+    <div className="w-full space-y-2">
       <Image
-        src={`/icons/blockchain/${data.server.blockchain.name
+        src={`/icons/blockchain/${data.blockchain.name
           .toLowerCase()
           .replace(/ /g, "-")}.png`}
         alt=""
@@ -57,25 +57,29 @@ const Node: React.FC<NodeProps> = ({ params: { id } }) => {
         height={90}
         className="object-contain m-auto"
       />
-      <h1 className="text-[#52525B]">{data.server.blockchain.description}</h1>
-      <div className="flex items-center justify-between pt-5">
-        <h1 className="text-[14px] font-[500] text-[#52525B]">Chain name</h1>
-        <h1 className="text-[14px] font-[500] text-[#fff]">
-          {data.server.blockchain.name}
-        </h1>
-      </div>
-      <div className="flex items-center justify-between">
-        <h1 className="text-[14px] font-[500] text-[#52525B]">Stats</h1>
-        <div className="flex items-center gap-1">
-          <Image
-            src="/icons/tick-circle.svg"
-            alt="tick-circle"
-            width={18}
-            height={18}
-          />
-          <h1 className="font-[600] text-[14px] text-[#10B981]">
-            {data.status.toUpperCase()}
+      <h1 className="text-[#52525B] text-center sm:w-1/2 m-auto pb-4">
+        {data.blockchain.description}
+      </h1>
+      <div className="m-auto sm:w-1/4 ">
+        <div className="flex items-center justify-between pt-5 pb-2">
+          <h1 className="text-[14px] font-[500] text-[#52525B]">Chain</h1>
+          <h1 className="text-[14px] font-[500] text-[#fff]">
+            {data.blockchain.name}
           </h1>
+        </div>
+        <div className="flex items-center justify-between">
+          <h1 className="text-[14px] font-[500] text-[#52525B]">Status</h1>
+          <div className="flex items-center gap-1">
+            <Image
+              src="/icons/tick-circle.svg"
+              alt="tick-circle"
+              width={18}
+              height={18}
+            />
+            <h1 className="font-[600] text-[14px] text-[#10B981]">
+              {data.status.toUpperCase()}
+            </h1>
+          </div>
         </div>
       </div>
 

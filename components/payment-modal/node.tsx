@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 import { DialogProps } from "@radix-ui/react-dialog"
 import { Blockchain } from "@prisma/client"
 import {
@@ -14,21 +14,35 @@ import { Input } from "../ui/input"
 import { Button } from "../ui/button"
 
 interface PaymentModalProps extends DialogProps {
+  open: boolean
   chain?: Blockchain
   insufficientBalance?: boolean
   onPay: (wallet: string) => void
 }
 
 export const NodePaymentModal: React.FC<PaymentModalProps> = ({
+  open,
   onPay,
   chain,
   insufficientBalance,
   ...props
 }) => {
   const [walletAddr, setWalletAddr] = useState("")
+  const [isPaying, setIsPaying] = useState(false)
+
+  const handlePayment = (wallet: string) => {
+    setIsPaying(true)
+    onPay(wallet)
+  }
+
+  useEffect(() => {
+    if (open) {
+      setIsPaying(false)
+    }
+  }, [open])
 
   return (
-    <Dialog {...props}>
+    <Dialog {...props} open={open}>
       {chain && (
         <DialogContent
           className={`bg-[#18181B] border-none rounded-[24px] p-8 w-[350px] md:w-[450px]`}
@@ -81,14 +95,15 @@ export const NodePaymentModal: React.FC<PaymentModalProps> = ({
 
             <Button
               type="button"
-              onClick={() => onPay(walletAddr)}
+              onClick={() => handlePayment(walletAddr)}
               variant="custom"
               disabled={
+                isPaying ||
                 insufficientBalance ||
                 (chain.hasWallet && !/^0x[0-9a-fA-F]{40}$/.test(walletAddr))
               }
             >
-              Purchase
+              {isPaying ? "Processing..." : "Purchase"}
             </Button>
           </form>
         </DialogContent>

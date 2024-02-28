@@ -35,16 +35,18 @@ enum Status {
 }
 
 model Node {
-    id          Int           @id @default(autoincrement())
-    userId      Int           @map("user_id")
-    user        User          @relation(fields: [userId], references: [id])
-    serverId    Int           @unique @map("server_id")
-    server      Server        @relation(fields: [serverId], references: [id])
-    wallet      String?
-    status      Status        @default(CREATED)
-    createdAt   DateTime      @default(now()) @map("created_at")
-    nodeHistory NodeHistory[]
-    payment     Payment?
+    id           Int           @id @default(autoincrement())
+    userId       Int           @map("user_id")
+    user         User          @relation(fields: [userId], references: [id])
+    serverId     Int           @map("server_id")
+    server       Server        @relation(fields: [serverId], references: [id])
+    wallet       String?
+    status       Status        @default(CREATED)
+    createdAt    DateTime      @default(now()) @map("created_at")
+    nodeHistory  NodeHistory[]
+    payment      Payment?
+    blockchainId Int           @map("blockchain_id")
+    blockchain   Blockchain    @relation(fields: [blockchainId], references: [id])
 
     @@map("nodes")
 }
@@ -60,15 +62,13 @@ model NodeHistory {
 }
 
 model Server {
-    id           Int        @id @default(autoincrement())
-    host         String     @default("")
-    port         Int        @default(22)
-    username     String     @default("")
-    password     String     @default("")
-    active       Boolean
-    node         Node?
-    blockchain   Blockchain @relation(fields: [blockchainId], references: [id])
-    blockchainId Int        @map("blockchain_id")
+    id       Int     @id @default(autoincrement())
+    host     String  @default("")
+    port     Int     @default(22)
+    username String  @default("")
+    password String  @default("")
+    active   Boolean
+    nodes    Node[]
 
     @@map("servers")
 }
@@ -100,7 +100,7 @@ model Blockchain {
     price       Float
     hasWallet   Boolean  @default(false) @map("has_wallet")
     launchedAt  DateTime @default(now()) @map("launched_at")
-    servers     Server[]
+    Node        Node[]
 
     @@map("blockchains")
 }

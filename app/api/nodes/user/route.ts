@@ -17,8 +17,16 @@ export async function GET() {
     },
     include: {
       server: {
-        include: {
-          blockchain: true,
+        // include: {
+        //   blockchain: true,
+        // },
+      },
+      blockchain: {
+        select: {
+          id: true,
+          name: true,
+          url: true,
+          description: true,
         },
       },
     },

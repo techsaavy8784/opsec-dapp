@@ -29,8 +29,8 @@ const Dashboard = () => {
     }
 
     data?.forEach((node) => {
-      if (!blockchains.includes(node.server.blockchain.id)) {
-        blockchains.push(node.server.blockchain.id)
+      if (!blockchains.includes(node.blockchain.id)) {
+        blockchains.push(node.blockchain.id)
       }
     })
 

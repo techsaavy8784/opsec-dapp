@@ -15,7 +15,7 @@ const Nodes: React.FC = () => {
 
   const { toast } = useToast()
 
-  const { isPending, data, refetch } = useQuery<[]>({
+  const { isPending, data, refetch } = useQuery<any>({
     queryKey: ["server/list"],
     queryFn: () => fetch("/api/server/list").then((res) => res.json()),
   })
@@ -34,11 +34,17 @@ const Nodes: React.FC = () => {
           blockchainId: chain?.id,
           duration: 1,
         }),
-      }).then(() => {
+      }).then((response) => {
         setChain(undefined)
-        toast({
-          title: "Node purchased",
-        })
+        if (response.ok) {
+          toast({
+            title: "Node purchased",
+          })
+        } else {
+          toast({
+            title: "An error occurred",
+          })
+        }
         refetch()
       }),
   })
@@ -69,17 +75,18 @@ const Nodes: React.FC = () => {
     <>
       <div className="pb-6">
         <div className="w-full flex px-[20px] md:px-[34px] py-6 rounded-[24px] justify-center flex-col bg-[url(/backgrounds/marketplace.jpg)] bg-center bg-cover bg-no-repeat h-[172px]">
-          <h1 className="uppercase text-[32px] font-[900]">{data.length}</h1>
+          <h1 className="uppercase text-[32px] font-[900]">{data.capacity}</h1>
           <h1 className="uppercase text-md font-[300]">nodes available</h1>
         </div>
       </div>
       <div className="grid items-center grid-cols-1 gap-8 pt-2 md:grid-cols-3">
-        {data.map((chain: any) => (
+        {data.chains.map((chain: any) => (
           <NodeCard
             key={chain.id}
             name={chain.name}
             description={chain.description}
             onBuy={() => setChain(chain)}
+            disabled={chain.disabled}
           />
         ))}
         <NodePaymentModal

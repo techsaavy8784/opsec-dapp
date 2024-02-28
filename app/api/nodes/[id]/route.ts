@@ -19,9 +19,13 @@ export async function GET(
       id: Number(params.id),
     },
     include: {
-      server: {
-        include: {
-          blockchain: true,
+      server: {},
+      blockchain: {
+        select: {
+          id: true,
+          name: true,
+          url: true,
+          description: true,
         },
       },
     },

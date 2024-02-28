@@ -13,19 +13,15 @@ export async function GET(request: NextRequest) {
 
   const nodes = await prisma.node.findMany({
     include: {
-      server: {
-        include: {
-          blockchain: true,
-        },
-      },
+      server: {},
     },
   })
 
   const chains: number[] = []
 
   nodes.forEach((node) => {
-    if (!chains.includes(node.server.blockchainId)) {
-      chains.push(node.server.blockchainId)
+    if (!chains.includes(node.blockchainId)) {
+      chains.push(node.blockchainId)
     }
   })
 
