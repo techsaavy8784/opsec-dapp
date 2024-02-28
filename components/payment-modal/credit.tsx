@@ -23,8 +23,11 @@ export const CreditPaymentModal: React.FC<CreditPaymentModalProps> = ({
   onComplete,
   ...props
 }) => {
-  const [step, setStep] = useState<"form" | "waiting" | "complete">("form")
+  const [step, setStep] = useState<"form" | "waiting" | "complete" | "failed">(
+    "form",
+  )
   const timer = useRef<NodeJS.Timeout>()
+  const timeout = useRef<NodeJS.Timeout>()
 
   const {
     register,
@@ -78,10 +81,17 @@ export const CreditPaymentModal: React.FC<CreditPaymentModalProps> = ({
                   clearInterval(timer.current)
                   setStep("complete")
                   onComplete()
+                } else if (res.status === "failed") {
+                  clearInterval(timer.current)
+                  setStep("failed")
                 }
               }),
-          5000,
+          3000,
         )
+        timeout.current = setTimeout(() => {
+          setStep("failed")
+          clearInterval(timer.current)
+        }, 12 * 60000)
       })
     },
     [onComplete, mutateAsync],
@@ -90,6 +100,7 @@ export const CreditPaymentModal: React.FC<CreditPaymentModalProps> = ({
   useEffect(() => {
     return () => {
       clearInterval(timer.current)
+      clearTimeout(timeout.current)
     }
   }, [])
 
@@ -144,15 +155,17 @@ export const CreditPaymentModal: React.FC<CreditPaymentModalProps> = ({
               You need to complete your payment to receive node
             </DialogDescription>
 
-            <p
-              className={`text-[16px] font-[400] ${
-                step === "waiting" ? "text-[#FFEB3B]" : "text-[#10B981]"
-              }`}
-            >
-              {step === "waiting"
-                ? "Waiting for your payment"
-                : "Successfully Paid"}
-            </p>
+            {step === "waiting" ? (
+              <p className="text-[16px] font-[400] text-yellow-500">
+                Waiting for your payment
+              </p>
+            ) : step === "complete" ? (
+              <p className="text-[16px] font-[400] text-green-500">
+                Successfully Paid
+              </p>
+            ) : (
+              <p className="text-[16px] font-[400] text-red-500">Failed</p>
+            )}
           </>
         )}
       </DialogContent>
