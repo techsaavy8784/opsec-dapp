@@ -23,7 +23,7 @@ export const NodeCard: React.FC<NodeCardProps> = ({
   disabled,
   onBuy,
 }) => (
-  <div className="col-span-1 p-4 rounded-[16px] backdrop:blur-[100px] overflow-hidden flex flex-col gap-4 border border-zinc-600">
+  <div className="col-span-1 p-4 rounded-[16px] backdrop:blur-[100px] overflow-hidden flex flex-col gap-4 border border-zinc-600 h-full">
     <div className="flex bg-[url(/image/node.png)] rounded-[16px] bg-center bg-cover bg-no-repeat h-[172px] justify-center items-center ">
       <Image
         src={`/icons/blockchain/${name.toLowerCase().replace(/ /g, "-")}.png`}
@@ -33,9 +33,11 @@ export const NodeCard: React.FC<NodeCardProps> = ({
         className="object-contain pt-3 m-auto"
       />
     </div>
-    <div className="flex flex-col gap-2">
+    <div className="flex flex-col gap-2 flex-1">
       <h1 className="text-white font-[600] text-[16px]">{name}</h1>
-      <p className="text-[#BDBDBD] font-[500] text-[12px]">{description}</p>
+      <p className="text-[#BDBDBD] font-[500] text-[12px] line-clamp-2">
+        {description}
+      </p>
       <p className="text-[#BDBDBD] font-[500] text-[12px]">{created}</p>
     </div>
     {disabled ? (
