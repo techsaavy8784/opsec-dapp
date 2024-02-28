@@ -26,7 +26,7 @@ const Nodes: React.FC = () => {
   }
 
   if (!Array.isArray(data)) {
-    return "No data"
+    return <>No data</>
   }
 
   return (
