@@ -49,6 +49,7 @@ export async function GET() {
   })
 
   return NextResponse.json({
+    total: totalCapacity,
     capacity: remainingCapacity,
     chains: chains,
   })

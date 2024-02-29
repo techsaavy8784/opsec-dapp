@@ -1,9 +1,10 @@
 "use client"
 
 import React, { useMemo } from "react"
-import { DashCards } from "@/components/dash-card"
 import { CardBlockchains } from "@/components/dashboard/blockchains"
 import Nodes from "@/components/dashboard/nodes"
+import { ProgressBar } from "@/components/dashboard/liquid-progress-bar"
+import { TreasuryCard } from "@/components/dashboard/treasury-card"
 import { useQuery } from "@tanstack/react-query"
 import { NodeType } from "../nodes/page"
 
@@ -66,7 +67,11 @@ const Dashboard = () => {
               className="h-full"
             />
           </div>
-          <div className="col-span-1">{/* <CardNodes /> */}</div>
+          <div className="col-span-2 row-span-2 md:col-span-1">
+            <div className="flex items-center justify-center h-full">
+              <ProgressBar />
+            </div>
+          </div>
           <div className="col-span-3">
             <CardBlockchains />
           </div>
@@ -91,22 +96,8 @@ const Dashboard = () => {
             value={465}
             image={"/icons/dash/sound.svg"}
           /> */}
-          <div className="relative grid h-full grid-cols-2 col-span-2">
-            <DashCards
-              title="Coming Soon"
-              value={74}
-              image={"/icons/dash/tick-circle.svg"}
-            />
-            <DashCards
-              title="Coming Soon"
-              value={465}
-              image={"/icons/dash/tick-circle.svg"}
-            />
-            <div className="z-[10] absolute top-0 left-0 w-full flex justify-center items-center h-full backdrop-blur-md">
-              <h1 className="text-center text-[16px] font-[500] tracking-[10px]">
-                Coming Soon
-              </h1>
-            </div>
+          <div className="col-span-2 blur-[5px]">
+            <TreasuryCard className="h-full" value={3454772} />
           </div>
         </div>
       </div>
