@@ -10,7 +10,12 @@ import { NodeType } from "../nodes/page"
 const Dashboard = () => {
   const { isPending, data } = useQuery<NodeType[]>({
     queryKey: ["nodes/user"],
-    queryFn: () => fetch("/api/nodes/user").then((res) => res.json()),
+    queryFn: () =>
+      fetch("/api/nodes/user")
+        .then((res) => res.json())
+        .then((res: NodeType[]) =>
+          res.filter((res) => res.status !== "EXPIRED"),
+        ),
   })
 
   const { isPending: isPendingCount, data: dataCount } = useQuery<{
@@ -28,7 +33,7 @@ const Dashboard = () => {
       return 0
     }
 
-    data?.forEach((node) => {
+    data.forEach((node) => {
       if (!blockchains.includes(node.blockchain.id)) {
         blockchains.push(node.blockchain.id)
       }

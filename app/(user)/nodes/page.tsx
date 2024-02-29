@@ -3,11 +3,11 @@
 import React from "react"
 import { useQuery } from "@tanstack/react-query"
 import { Skeleton } from "@/components/ui/skeleton"
-import { Blockchain, Node } from "@prisma/client"
+import { Blockchain, Node, Payment } from "@prisma/client"
 import { NodeCard } from "@/components/node-card"
-import { formatDate } from "@/lib/utils"
+import { daysPassedSince, formatDate } from "@/lib/utils"
 
-export type NodeType = Node & { blockchain: Blockchain }
+export type NodeType = Node & { blockchain: Blockchain; payments: Payment[] }
 
 const Nodes: React.FC = () => {
   const { isPending, data } = useQuery<NodeType[]>({
@@ -39,6 +39,10 @@ const Nodes: React.FC = () => {
           created={formatDate(node.createdAt)}
           description={node.blockchain.description}
           status={node.status}
+          expireInDays={
+            node.payments.reduce((sum, item) => (sum += item.duration), 0) -
+            daysPassedSince(node.createdAt)
+          }
         />
       ))}
     </div>

@@ -14,6 +14,7 @@ type NodeCardProps = {
   description: string
   disabled?: boolean
   status?: string
+  expireInDays?: number
   onBuy?: () => void
 }
 
@@ -24,6 +25,7 @@ export const NodeCard: React.FC<NodeCardProps> = ({
   description,
   disabled,
   status,
+  expireInDays,
   onBuy,
 }) => (
   <div className="col-span-1 p-4 rounded-[16px] backdrop:blur-[100px] overflow-hidden flex flex-col gap-4 border border-zinc-600 h-full">
@@ -39,7 +41,14 @@ export const NodeCard: React.FC<NodeCardProps> = ({
     <div className="flex flex-col gap-2 flex-1">
       <div className="flex justify-between items-center">
         <h1 className="text-white font-[600] text-[16px]">{name}</h1>
-        {status && <Badge>{status}</Badge>}
+        <div className="flex space-x-2">
+          {expireInDays !== undefined &&
+            expireInDays <
+              Number(process.env.NEXT_PUBLIC_NODE_EXPIRE_WARN_DAYS) && (
+              <Badge>{expireInDays} days left</Badge>
+            )}
+          {status && <Badge>{status}</Badge>}
+        </div>
       </div>
       <p className="text-[#BDBDBD] font-[500] text-[12px] line-clamp-2">
         {description}

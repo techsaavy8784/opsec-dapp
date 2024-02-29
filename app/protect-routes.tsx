@@ -1,25 +1,16 @@
 "use client"
 
 import React from "react"
-import { useAccount } from "wagmi"
-import { useSession } from "next-auth/react"
-import { mainnet, sepolia } from "wagmi/chains"
 import { redirect, usePathname } from "next/navigation"
+import useConnected from "@/hooks/useConnected"
 
 interface ProtectRoutesProps {
   children: React.ReactNode
 }
 
-// const chainId = (process.env.NODE_ENV === "production" ? mainnet : sepolia).id
-const chainId = mainnet.id
-
 const ProtectRoutes: React.FC<ProtectRoutesProps> = ({ children }) => {
   const pathname = usePathname()
-  const { isConnected, chain } = useAccount()
-  const { status } = useSession()
-
-  const connected =
-    isConnected && status === "authenticated" && chain?.id === chainId
+  const { connected, status } = useConnected()
 
   if (pathname.startsWith("/manage")) {
     return <>{children}</>

@@ -18,16 +18,14 @@ export async function GET(
       id: Number(params.id),
     },
     include: {
-      blockchain: {
-        select: {
-          id: true,
-          name: true,
-          url: true,
-          description: true,
-        },
-      },
+      payments: true,
+      blockchain: true,
     },
   })
+
+  if (node?.userId !== session.user.id) {
+    return NextResponse.json({ message: "Unauthorized" }, { status: 401 })
+  }
 
   return NextResponse.json(node)
 }

@@ -13,36 +13,87 @@ import Image from "next/image"
 import { Input } from "../ui/input"
 import { Button } from "../ui/button"
 import { ReloadIcon } from "@radix-ui/react-icons"
+import { useMutation, useQuery } from "@tanstack/react-query"
+import { useToast } from "../ui/use-toast"
+import clsx from "clsx"
+import subscriptions from "@/app/api/payment/subscriptions"
+import { redirect, useRouter } from "next/navigation"
 
 interface PaymentModalProps extends DialogProps {
   open: boolean
-  isPaying?: boolean
+  nodeId?: number
   chain?: Blockchain
-  insufficientBalance?: boolean
-  onPay: (wallet: string) => void
+  onPurchaseComplete: () => void
 }
 
 export const NodePaymentModal: React.FC<PaymentModalProps> = ({
   open,
-  isPaying,
-  onPay,
+  nodeId,
+  onPurchaseComplete,
   chain,
-  insufficientBalance,
+  onOpenChange,
   ...props
 }) => {
   const [walletAddr, setWalletAddr] = useState("")
 
+  const [plan, setPlan] = useState(0)
+
+  const { toast } = useToast()
+
+  const router = useRouter()
+
+  const { data: balance, refetch: refetchBalance } = useQuery({
+    queryKey: ["credits/balance"],
+    queryFn: () => fetch("/api/credits/balance").then((res) => res.json()),
+  })
+
+  useEffect(() => {
+    setPlan(0)
+  }, [open])
+
+  const [, priceMultiplier] = subscriptions[plan]
+
+  const insufficientBalance =
+    Number(balance?.balance) < Number(chain?.price) * priceMultiplier
+
+  const { mutate: purchase, isPending: isPaying } = useMutation({
+    mutationFn: (wallet: string) =>
+      fetch("/api/payment", {
+        method: nodeId === undefined ? "POST" : "PUT",
+        body: JSON.stringify({
+          wallet,
+          id: nodeId ?? chain?.id,
+          plan,
+        }),
+      }).then((response) => {
+        onOpenChange?.(false)
+        if (response.ok) {
+          toast({
+            title:
+              nodeId === undefined ? "Node purchased" : "Subscription extended",
+          })
+          response.json().then((res) => router.push(`/nodes/${res.nodeId}`))
+        } else {
+          toast({
+            title: "An error occurred",
+          })
+        }
+        onPurchaseComplete()
+        refetchBalance()
+      }),
+  })
+
   return (
-    <Dialog {...props} open={open}>
+    <Dialog {...props} open={open} onOpenChange={onOpenChange}>
       {chain && (
         <DialogContent
           className={`bg-[#18181B] border-none rounded-[24px] p-8 w-[350px] md:w-[450px]`}
         >
           <DialogTitle className="text-white text-center font-[600] text-[28px]">
-            Buy a node{" "}
+            {nodeId === undefined ? "Buy a node" : "Extend your subscription"}
           </DialogTitle>
           <DialogDescription className="text-[#54597C] w-full text-center font-[500] text-[16px]">
-            <div className="flex flex-col items-center">
+            <div className="flex flex-col items-center gap-4">
               <Image
                 src={`/icons/blockchain/${chain.name
                   .toLowerCase()
@@ -52,6 +103,29 @@ export const NodePaymentModal: React.FC<PaymentModalProps> = ({
                 height={64}
                 className="mt-10 mb-4"
               />
+              <div className="flex flex-column gap-2 w-full">
+                {subscriptions.map(([month, priceMultiplier], key) => (
+                  <div
+                    key={month}
+                    onClick={() => setPlan(key)}
+                    className={clsx(
+                      "border-[#F44336] w-1/3 border-solid border-2 p-3 cursor-pointer hover:border-red-700",
+                      plan === key ? "border-green-400" : null,
+                    )}
+                  >
+                    <p className="text-6xl">{month}</p>
+                    <p>{key > 0 ? "Months" : "Month"}</p>
+                    <p>{chain.price * priceMultiplier} credits</p>
+                    {key > 0 && (
+                      <small>
+                        Saves&nbsp;
+                        {chain.price * month - chain.price * priceMultiplier}
+                        &nbsp;credits
+                      </small>
+                    )}
+                  </div>
+                ))}
+              </div>
               <p className="text-[#F44336] mb-10">
                 <strong>1x</strong> {chain.name}{" "}
                 <span className="text-zinc-500">node for</span>{" "}
@@ -62,13 +136,13 @@ export const NodePaymentModal: React.FC<PaymentModalProps> = ({
           </DialogDescription>
 
           {insufficientBalance && (
-            <p className="text-center text-gray-600">
+            <p className="text-center text-yellow-600">
               Insufficient credit balance
             </p>
           )}
 
           <form className="flex flex-col items-center justify-center gap-8 px-8">
-            {chain.hasWallet && (
+            {chain.hasWallet && nodeId === undefined && (
               <>
                 <label>Enter your wallet address</label>
                 <label>
@@ -86,7 +160,7 @@ export const NodePaymentModal: React.FC<PaymentModalProps> = ({
 
             <Button
               type="button"
-              onClick={() => onPay(walletAddr)}
+              onClick={() => purchase(walletAddr)}
               variant="custom"
               disabled={
                 isPaying ||
@@ -95,7 +169,7 @@ export const NodePaymentModal: React.FC<PaymentModalProps> = ({
               }
             >
               {isPaying && <ReloadIcon className="mr-2 animate-spin" />}
-              Purchase
+              {nodeId === undefined ? "Purchase" : "Extend Subscription"}
             </Button>
           </form>
         </DialogContent>
