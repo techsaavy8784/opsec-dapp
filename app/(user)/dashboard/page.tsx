@@ -3,10 +3,10 @@
 import React, { useMemo } from "react"
 import { CardBlockchains } from "@/components/dashboard/blockchains"
 import Nodes from "@/components/dashboard/nodes"
+import { ProgressBar } from "@/components/dashboard/liquid-progress-bar"
+import { TreasuryCard } from "@/components/dashboard/treasury-card"
 import { useQuery } from "@tanstack/react-query"
 import { NodeType } from "../nodes/page"
-import { ProgressBar } from "@/components/progressbar"
-import { TreasuryCard } from "@/components/treasury-card"
 
 const Dashboard = () => {
   const { isPending, data } = useQuery<NodeType[]>({
