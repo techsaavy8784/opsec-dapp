@@ -69,7 +69,7 @@ const Dashboard = () => {
           </div>
           <div className="col-span-2 row-span-2 md:col-span-1">
             <div className="flex items-center justify-center h-full">
-              <ProgressBar value={50} />
+              <ProgressBar />
             </div>
           </div>
           <div className="col-span-3">

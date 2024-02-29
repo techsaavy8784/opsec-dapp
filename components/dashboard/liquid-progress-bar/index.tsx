@@ -1,26 +1,35 @@
 "use client"
 
-import { useEffect, useRef } from "react"
+import { useEffect, useRef, useState } from "react"
+import { useQuery } from "@tanstack/react-query"
 
 import "./styles.css"
+import { Skeleton } from "@/components/ui/skeleton"
 
-type Props = {
-  value: number
-}
-
-export const ProgressBar = ({ value }: Props) => {
+export const ProgressBar = () => {
   const progressRef = useRef<HTMLDivElement>(null)
   const progressLabelRef = useRef<HTMLElement>(null)
 
+  const { isPending, data } = useQuery({
+    queryKey: ["server/list"],
+    queryFn: () => fetch("/api/server/list").then((res) => res.json()),
+  })
+
+  const [value, setValue] = useState(0)
+
+  useEffect(() => {
+    if (data)
+      setValue(Math.floor(((data.total - data.capacity) / data.total) * 100))
+  }, [data])
+
   useEffect(() => {
     if (progressLabelRef.current && progressRef.current) {
-      const target = value <= 100 && value >= 0 ? value : 50
-      progressLabelRef.current.textContent = target.toString()
+      progressLabelRef.current.textContent = value.toString()
       progressRef.current.style.setProperty(
         `--progress-value`,
-        target.toString(),
+        value.toString(),
       )
-      progressRef.current.dataset.value = target.toString()
+      progressRef.current.dataset.value = value.toString()
 
       if (value > 50)
         progressRef.current.classList.add(`progress--upper-half-value`)
@@ -40,8 +49,14 @@ export const ProgressBar = ({ value }: Props) => {
         <div className="progress-indicator"></div>
       </div>
       <span className="progress-label text-xs md:text-base">
-        <strong ref={progressLabelRef}>{value}</strong>
-        <span>%</span>
+        {isPending ? (
+          <Skeleton className="rounded-lg w-[32px] h-[32px] m-auto"></Skeleton>
+        ) : (
+          <>
+            <strong ref={progressLabelRef}>{value}</strong>
+            <span>%</span>
+          </>
+        )}
       </span>
     </div>
   )
