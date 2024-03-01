@@ -1,51 +1,18 @@
 "use client"
 
-import React, { useRef, useState } from "react"
-import { useMutation, useQuery } from "@tanstack/react-query"
+import React, { useState } from "react"
+import { useQuery } from "@tanstack/react-query"
 import { NodeCard } from "@/components/node-card"
 import { NodePaymentModal } from "@/components/payment-modal/node"
 import { Blockchain } from "@prisma/client"
 import { Skeleton } from "@/components/ui/skeleton"
-import { useToast } from "@/components/ui/use-toast"
 
 const Nodes: React.FC = () => {
   const [chain, setChain] = useState<Blockchain>()
 
-  const { toast } = useToast()
-
   const { isPending, data, refetch } = useQuery<any>({
     queryKey: ["server/list"],
     queryFn: () => fetch("/api/server/list").then((res) => res.json()),
-  })
-
-  const { data: balance, refetch: refetchBalance } = useQuery({
-    queryKey: ["credits/balance"],
-    queryFn: () => fetch("api/credits/balance").then((res) => res.json()),
-  })
-
-  const { mutate, isPending: isPaying } = useMutation({
-    mutationFn: (wallet: string) =>
-      fetch("/api/payment", {
-        method: "POST",
-        body: JSON.stringify({
-          wallet,
-          blockchainId: chain?.id,
-          duration: 1,
-        }),
-      }).then((response) => {
-        setChain(undefined)
-        if (response.ok) {
-          toast({
-            title: "Node purchased",
-          })
-        } else {
-          toast({
-            title: "An error occurred",
-          })
-        }
-        refetch()
-        refetchBalance()
-      }),
   })
 
   if (isPending) {
@@ -92,9 +59,7 @@ const Nodes: React.FC = () => {
           open={!!chain}
           chain={chain}
           onOpenChange={() => setChain(undefined)}
-          insufficientBalance={Number(balance?.balance) < Number(chain?.price)}
-          onPay={mutate}
-          isPaying={isPaying}
+          onPurchaseComplete={() => refetch()}
         />
       </div>
     </>

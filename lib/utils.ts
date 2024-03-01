@@ -23,3 +23,6 @@ const intl = new Intl.DateTimeFormat("en-US", {
 
 export const formatDate = (date: string | Date) =>
   intl.format(new Date(date)).toString()
+
+export const daysPassedSince = (since: string | Date) =>
+  Math.round((Date.now() - new Date(since).getTime()) / (1000 * 3600 * 24))

@@ -19,6 +19,10 @@ export async function GET() {
     },
   })
 
+  for (const server of servers) {
+    server.nodes = server.nodes.filter((node) => node.status !== "EXPIRED")
+  }
+
   const totalCapacity = servers.length * 8
   const usedCapacity = servers.reduce(
     (acc, server) => acc + server.nodes.length,
