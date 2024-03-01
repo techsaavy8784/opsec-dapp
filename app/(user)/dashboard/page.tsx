@@ -50,7 +50,7 @@ const Dashboard = () => {
       </div>
       <div className="py-6 pt-0">
         <div className="grid grid-cols-2 gap-6 md:grid-cols-6">
-          <div className="col-span-2">
+          <div className="col-span-3 md:col-span-2">
             <Nodes
               title="Your Nodes"
               count={isPending ? undefined : data?.length}
@@ -67,7 +67,7 @@ const Dashboard = () => {
               className="h-full"
             />
           </div>
-          <div className="col-span-2 row-span-2 md:col-span-1">
+          <div className="col-span-3 row-span-2 md:col-span-1">
             <div className="flex items-center justify-center h-full">
               <ProgressBar />
             </div>
@@ -96,7 +96,7 @@ const Dashboard = () => {
             value={465}
             image={"/icons/dash/sound.svg"}
           /> */}
-          <div className="col-span-2 blur-[5px]">
+          <div className="col-span-3 md:col-span-2">
             <TreasuryCard className="h-full" value={3454772} />
           </div>
         </div>

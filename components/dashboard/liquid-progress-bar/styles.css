@@ -63,7 +63,7 @@
   align-items: center;
   justify-content: center;
   align-content: center;
-  width: var(--progress-min-size);
+  width: var(--progress-size);
   height: var(--progress-size);
   min-height: var(--progress-min-size);
   border-radius: 0.75rem;
