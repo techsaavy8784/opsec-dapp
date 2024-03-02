@@ -69,7 +69,7 @@ const Node: React.FC<NodeProps> = ({ params: { id } }) => {
       <h1 className="text-[#52525B] text-center sm:w-1/2 m-auto pb-4">
         {data.blockchain.description}
       </h1>
-      <div className="m-auto sm:w-1/4 space-y-3">
+      <div className="m-auto space-y-3 sm:w-1/4">
         <div className="flex items-center justify-between">
           <h1 className="text-[14px] font-[500] text-[#52525B]">Chain</h1>
           <h1 className="text-[14px] font-[500] text-[#fff]">
@@ -103,18 +103,18 @@ const Node: React.FC<NodeProps> = ({ params: { id } }) => {
             </h1>
           </div>
         </div>
-        {soonExpired && (
-          <div className="text-center">
-            <Button onClick={() => setModal(true)}>Extend subscription</Button>
-            <NodePaymentModal
-              nodeId={data.id}
-              open={modal}
-              chain={data.blockchain}
-              onOpenChange={() => setModal(false)}
-              onPurchaseComplete={() => refetch()}
-            />
-          </div>
-        )}
+        {/* {soonExpired && ( */}
+        <div className="text-center">
+          <Button onClick={() => setModal(true)}>Extend subscription</Button>
+          <NodePaymentModal
+            nodeId={data.id}
+            open={modal}
+            chain={data.blockchain}
+            onOpenChange={() => setModal(false)}
+            onPurchaseComplete={() => refetch()}
+          />
+        </div>
+        {/* )} */}
       </div>
 
       {data.status === "LIVE" && (
