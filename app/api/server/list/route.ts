@@ -28,8 +28,7 @@ export async function GET() {
     (acc, server) => acc + server.nodes.length,
     0,
   )
-  console.log("totalCapacity", totalCapacity)
-  console.log("usedCapacity", usedCapacity)
+
   const remainingCapacity = totalCapacity - usedCapacity
 
   const chainsAll = await prisma.blockchain.findMany()

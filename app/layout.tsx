@@ -9,11 +9,9 @@ import "./globals.css"
 export const metadata: Metadata = {
   title: "Opsec Cloudverse",
   description: "Secure blockchain management for the people",
-  openGraph: {
-    type: "website",
-    locale: "en_IE",
-    url: `${process.env.NEXT_PUBLIC_BASE_URL}/og.jpg`,
-    siteName: "Opsec Cloudverse",
+  ogImage: {
+    url: "/og.jpg",
+    alt: "OpSec Cloudverse",
   },
   icons: [
     {

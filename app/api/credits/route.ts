@@ -41,7 +41,7 @@ export async function POST(request: NextRequest) {
   const verifier = generateRandomString()
   const successUrl = `${request.nextUrl.origin}/api/credits/success?verifier=${verifier}`
 
-  console.log("success url: ", successUrl)
+  //   console.log("success url: ", successUrl)
 
   try {
     const data = await fetch("https://api.nowpayments.io/v1/invoice", {
@@ -58,7 +58,7 @@ export async function POST(request: NextRequest) {
       }),
     })
       .then((res) => res.json())
-      .catch((e) => console.log("error making coinbase charge:", e))
+      .catch((e) => console.log("error making charge:", e))
 
     const payment = await fetch(
       "https://api.nowpayments.io/v1/invoice-payment",
@@ -75,7 +75,7 @@ export async function POST(request: NextRequest) {
       },
     )
       .then((res) => res.json())
-      .catch((e) => console.log("error making coinbase charge:", e))
+      .catch((e) => console.log("error making charge:", e))
 
     if (payment.statusCode !== undefined && payment.statusCode !== 200) {
       return NextResponse.json(payment, { status: payment.statusCode })
