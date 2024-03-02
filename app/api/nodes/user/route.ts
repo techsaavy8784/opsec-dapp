@@ -15,6 +15,7 @@ export async function GET() {
       userId: session.user.id,
     },
     include: {
+      payments: true,
       blockchain: {
         select: {
           id: true,

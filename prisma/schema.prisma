@@ -32,6 +32,7 @@ enum Status {
     INSTALLING
     LIVE
     FAILED
+    EXPIRED
 }
 
 model Node {
@@ -44,7 +45,7 @@ model Node {
     status       Status        @default(CREATED)
     createdAt    DateTime      @default(now()) @map("created_at")
     nodeHistory  NodeHistory[]
-    payment      Payment?
+    payments     Payment[]
     blockchainId Int           @map("blockchain_id")
     blockchain   Blockchain    @relation(fields: [blockchainId], references: [id])
 
@@ -76,7 +77,7 @@ model Server {
 model Payment {
     id       Int      @id @default(autoincrement())
     duration Int      @default(0)
-    nodeId   Int      @unique @map("node_id")
+    nodeId   Int      @map("node_id")
     node     Node     @relation(fields: [nodeId], references: [id])
     credit   Int
     date     DateTime @default(now())

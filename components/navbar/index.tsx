@@ -4,11 +4,15 @@ import React from "react"
 import { usePathname } from "next/navigation"
 import { ConnectButton } from "@rainbow-me/rainbowkit"
 import { useQuery } from "@tanstack/react-query"
+import useConnected from "@/hooks/useConnected"
 
 export const Navbar = () => {
+  const { connected } = useConnected()
+
   const { data: balance } = useQuery({
     queryKey: ["credits/balance"],
-    queryFn: () => fetch("api/credits/balance").then((res) => res.json()),
+    queryFn: () =>
+      connected && fetch("/api/credits/balance").then((res) => res.json()),
   })
 
   const pathName = usePathname()
@@ -21,7 +25,7 @@ export const Navbar = () => {
           <h1 className="text-2xl font-semibold capitalize">{path}</h1>
         </div>
         <div className="max-md:hidden flex items-center space-x-3">
-          {balance && (
+          {connected && balance && (
             <div className="font-bold">Balance {balance.balance}</div>
           )}
           <ConnectButton showBalance={false} />

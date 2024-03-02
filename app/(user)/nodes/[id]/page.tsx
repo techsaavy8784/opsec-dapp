@@ -1,12 +1,14 @@
 "use client"
 
-import React, { useEffect, useRef } from "react"
+import React, { useEffect, useRef, useState } from "react"
 import { useQuery } from "@tanstack/react-query"
 import { Skeleton } from "@/components/ui/skeleton"
 import { NodeType } from "../page"
 import Image from "next/image"
-import { formatDate } from "@/lib/utils"
+import { daysPassedSince, formatDate } from "@/lib/utils"
 import clsx from "clsx"
+import { NodePaymentModal } from "@/components/payment-modal/node"
+import { Button } from "@/components/ui/button"
 
 interface NodeProps {
   params: {
@@ -18,6 +20,8 @@ const uptimeDayCount = 90
 
 const Node: React.FC<NodeProps> = ({ params: { id } }) => {
   const timer = useRef<NodeJS.Timeout>()
+
+  const [modal, setModal] = useState(false)
 
   const { isPending, data, refetch } = useQuery<NodeType>({
     queryKey: [`nodes/${id}`],
@@ -42,12 +46,14 @@ const Node: React.FC<NodeProps> = ({ params: { id } }) => {
     )
   }
 
-  const daysPassed = Math.min(
-    Math.round(
-      (Date.now() - new Date(data.createdAt).getTime()) / (1000 * 3600 * 24),
-    ),
-    uptimeDayCount,
+  const daysTillExpiration = Math.max(
+    0,
+    data.payments.reduce((sum, item) => (sum += item.duration), 0) -
+      daysPassedSince(data.createdAt),
   )
+
+  const soonExpired =
+    daysTillExpiration < Number(process.env.NEXT_PUBLIC_NODE_EXPIRE_WARN_DAYS)
 
   return (
     <div className="w-full space-y-2">
@@ -63,11 +69,24 @@ const Node: React.FC<NodeProps> = ({ params: { id } }) => {
       <h1 className="text-[#52525B] text-center sm:w-1/2 m-auto pb-4">
         {data.blockchain.description}
       </h1>
-      <div className="m-auto sm:w-1/4 ">
-        <div className="flex items-center justify-between pt-5 pb-2">
+      <div className="m-auto space-y-3 sm:w-1/4">
+        <div className="flex items-center justify-between">
           <h1 className="text-[14px] font-[500] text-[#52525B]">Chain</h1>
           <h1 className="text-[14px] font-[500] text-[#fff]">
             {data.blockchain.name}
+          </h1>
+        </div>
+        <div className="flex items-center justify-between">
+          <h1 className="text-[14px] font-[500] text-[#52525B]">
+            Days remaining
+          </h1>
+          <h1
+            className={clsx(
+              "text-[14px] font-[500]",
+              soonExpired ? "text-yellow-500" : "text-white",
+            )}
+          >
+            {daysTillExpiration}
           </h1>
         </div>
         <div className="flex items-center justify-between">
@@ -84,6 +103,18 @@ const Node: React.FC<NodeProps> = ({ params: { id } }) => {
             </h1>
           </div>
         </div>
+        {/* {soonExpired && ( */}
+        <div className="text-center">
+          <Button onClick={() => setModal(true)}>Extend subscription</Button>
+          <NodePaymentModal
+            nodeId={data.id}
+            open={modal}
+            chain={data.blockchain}
+            onOpenChange={() => setModal(false)}
+            onPurchaseComplete={() => refetch()}
+          />
+        </div>
+        {/* )} */}
       </div>
 
       {data.status === "LIVE" && (
@@ -105,7 +136,9 @@ const Node: React.FC<NodeProps> = ({ params: { id } }) => {
                   key={i}
                   className={clsx(
                     `w-[1%] h-[48px] m-[1px] rounded-[3px]`,
-                    i <= daysPassed ? "bg-[#10B981]" : "bg-zinc-900",
+                    i <= daysPassedSince(data.createdAt)
+                      ? "bg-[#10B981]"
+                      : "bg-zinc-900",
                   )}
                 />
               ))}

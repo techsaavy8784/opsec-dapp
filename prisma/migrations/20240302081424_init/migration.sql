@@ -1,5 +1,5 @@
 -- CreateEnum
-CREATE TYPE "Status" AS ENUM ('CREATED', 'INSTALLING', 'LIVE', 'FAILED');
+CREATE TYPE "Status" AS ENUM ('CREATED', 'INSTALLING', 'LIVE', 'FAILED', 'EXPIRED');
 
 -- CreateTable
 CREATE TABLE "users" (
@@ -95,9 +95,6 @@ CREATE UNIQUE INDEX "users_address_key" ON "users"("address");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "node_histories_node_id_key" ON "node_histories"("node_id");
-
--- CreateIndex
-CREATE UNIQUE INDEX "payments_node_id_key" ON "payments"("node_id");
 
 -- CreateIndex
 CREATE UNIQUE INDEX "tx_verifiers_verifier_key" ON "tx_verifiers"("verifier");

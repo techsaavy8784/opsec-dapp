@@ -17,8 +17,6 @@ export function CardBlockchains() {
     queryFn: () => fetch("/api/blockchains/list").then((res) => res.json()),
   })
 
-  console.log(data)
-
   return (
     <Card>
       <CardHeader>

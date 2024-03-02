@@ -19,13 +19,16 @@ export async function GET() {
     },
   })
 
+  for (const server of servers) {
+    server.nodes = server.nodes.filter((node) => node.status !== "EXPIRED")
+  }
+
   const totalCapacity = servers.length * 8
   const usedCapacity = servers.reduce(
     (acc, server) => acc + server.nodes.length,
     0,
   )
-  console.log("totalCapacity", totalCapacity)
-  console.log("usedCapacity", usedCapacity)
+
   const remainingCapacity = totalCapacity - usedCapacity
 
   const chainsAll = await prisma.blockchain.findMany()
@@ -49,6 +52,7 @@ export async function GET() {
   })
 
   return NextResponse.json({
+    total: totalCapacity,
     capacity: remainingCapacity,
     chains: chains,
   })

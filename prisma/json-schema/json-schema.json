@@ -62,7 +62,8 @@
             "CREATED",
             "INSTALLING",
             "LIVE",
-            "FAILED"
+            "FAILED",
+            "EXPIRED"
           ]
         },
         "createdAt": {
@@ -75,15 +76,11 @@
             "$ref": "#/definitions/NodeHistory"
           }
         },
-        "payment": {
-          "anyOf": [
-            {
-              "$ref": "#/definitions/Payment"
-            },
-            {
-              "type": "null"
-            }
-          ]
+        "payments": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Payment"
+          }
         },
         "blockchain": {
           "$ref": "#/definitions/Blockchain"
@@ -117,7 +114,8 @@
             "CREATED",
             "INSTALLING",
             "LIVE",
-            "FAILED"
+            "FAILED",
+            "EXPIRED"
           ]
         }
       },
