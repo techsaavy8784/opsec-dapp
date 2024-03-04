@@ -14,6 +14,8 @@ import {
   TreasuryIcon,
   BillingIcon,
 } from "@/components/icons"
+import useConnected from "@/hooks/useConnected"
+import { useQuery } from "@tanstack/react-query"
 
 type Props = {
   setOpen?: (value: boolean) => void
@@ -60,6 +62,14 @@ const Sidebar = ({ setOpen }: Props) => {
       icon: BillingIcon,
     },
   ]
+
+  const { connected } = useConnected()
+
+  const { data: balance } = useQuery({
+    queryKey: ["credits/balance"],
+    queryFn: () =>
+      connected && fetch("/api/credits/balance").then((res) => res.json()),
+  })
 
   return (
     <aside
@@ -112,7 +122,10 @@ const Sidebar = ({ setOpen }: Props) => {
               className="max-md:hidden"
             />
           </Link>
-          <div className="md:hidden">
+          <div className="md:hidden flex items-center space-x-3">
+            {connected && balance && (
+              <div className="font-bold">Balance {balance.balance}</div>
+            )}
             <ConnectButton />
           </div>
         </div>
