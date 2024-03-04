@@ -19,9 +19,9 @@ export const CreditPaymentModal: React.FC<CreditPaymentModalProps> = ({
   onComplete,
   ...props
 }) => {
-  const [step, setStep] = useState<"form" | "waiting" | "complete" | "failed">(
-    "form",
-  )
+  const [step, setStep] = useState<
+    "form" | "initiating" | "waiting" | "complete" | "failed"
+  >("form")
   const timer = useRef<NodeJS.Timeout>()
   const timeout = useRef<NodeJS.Timeout>()
 
