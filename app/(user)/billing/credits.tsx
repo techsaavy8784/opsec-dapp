@@ -25,7 +25,7 @@ const CreditHistory = () => {
 
   return (
     <div>
-      <Button onClick={() => setModal(true)}>Charge Credits</Button>
+      <Button onClick={() => setModal(true)}>Add Credits</Button>
       <CreditPaymentModal
         open={modal}
         onOpenChange={setModal}
