@@ -78,7 +78,7 @@ const Sidebar = ({ setOpen }: Props) => {
           </h1>
         </div>
       </div>
-      <div className="flex flex-col flex-1 justify-between">
+      <div className="flex flex-col justify-between flex-1">
         <div className={`flex flex-col gap-14 md:gap-6`}>
           {navItems?.map((item, index) => (
             <Link
@@ -103,7 +103,7 @@ const Sidebar = ({ setOpen }: Props) => {
           ))}
         </div>
         <div className={`flex items-center justify-center py-8 md:py-4`}>
-          <Link href="https://x.com/">
+          <Link href="https://x.com/OpSecCloud">
             <Image
               src="/backgrounds/twitter-banner.png"
               alt="twitter-banner"
