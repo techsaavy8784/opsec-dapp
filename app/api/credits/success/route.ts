@@ -1,16 +1,8 @@
 import prisma from "@/prisma"
-import { authOptions } from "@/lib/auth"
-import { getServerSession } from "next-auth"
 import { NextResponse, NextRequest } from "next/server"
 import { JsonObject } from "@prisma/client/runtime/library"
 
 export async function GET(request: NextRequest) {
-  const session = await getServerSession(authOptions)
-
-  if (!session) {
-    return NextResponse.json({ message: "Unauthorized" }, { status: 401 })
-  }
-
   const url = request.nextUrl
   const verifier = url.searchParams.get("verifier") as string
 
@@ -26,15 +18,11 @@ export async function GET(request: NextRequest) {
 
   const { userId, amount, tx } = txInfo.tx as JsonObject
 
-  if (userId !== session.user.id) {
-    return NextResponse.json({ message: "Unauthorized" }, { status: 401 })
-  }
-
   const credits = Number(amount)
 
   await prisma.credit.create({
     data: {
-      userId,
+      userId: Number(userId),
       credits,
       tx: String(tx),
     },
@@ -42,7 +30,7 @@ export async function GET(request: NextRequest) {
 
   const user = await prisma.user.findFirst({
     where: {
-      id: session.user.id,
+      id: Number(userId),
     },
   })
 
@@ -51,7 +39,7 @@ export async function GET(request: NextRequest) {
       balance: user!.balance + credits,
     },
     where: {
-      id: session.user.id,
+      id: Number(userId),
     },
   })
 
