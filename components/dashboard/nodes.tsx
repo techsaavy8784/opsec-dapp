@@ -13,7 +13,8 @@ import Link from "next/link"
 
 interface NodesProps {
   title: string
-  count?: number
+  activeCount?: number
+  totalCount?: number
   chainCount?: number
   link?: string
   className?: string
@@ -21,7 +22,8 @@ interface NodesProps {
 
 const Nodes: React.FC<NodesProps> = ({
   title,
-  count,
+  activeCount,
+  totalCount,
   chainCount,
   link,
   className,
@@ -32,7 +34,7 @@ const Nodes: React.FC<NodesProps> = ({
       <CardDescription>Currently running nodes</CardDescription>
     </CardHeader>
     <CardContent>
-      {count === undefined ? (
+      {totalCount === undefined ? (
         <div className="flex flex-row w-full">
           <Skeleton className="rounded-lg w-[32px] h-[32px] mr-2"></Skeleton>
           <Skeleton className="rounded-lg w-[32px] h-[32px] mr-2"></Skeleton>
@@ -41,7 +43,17 @@ const Nodes: React.FC<NodesProps> = ({
         </div>
       ) : (
         <>
-          <div className="text-4xl font-bold">{count}</div>
+          <div className="text-4xl font-bold">
+            {activeCount === totalCount ? (
+              totalCount
+            ) : (
+              <>
+                {activeCount}
+                <span className="text-xl mx-4">/</span>
+                {totalCount}
+              </>
+            )}
+          </div>
           <p className="text-xs text-muted-foreground">
             on {chainCount} blockchains
           </p>

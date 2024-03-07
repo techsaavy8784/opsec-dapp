@@ -17,6 +17,9 @@ export async function GET(request: NextRequest) {
       status: {
         not: Status.EXPIRED,
       },
+      server: {
+        active: true,
+      },
     },
   })
 
@@ -29,7 +32,8 @@ export async function GET(request: NextRequest) {
   })
 
   return NextResponse.json({
-    count: nodes.length,
+    activeCount: nodes.filter((node) => node.status !== "FAILED").length,
+    totalCount: nodes.length,
     chainCount: chains.length,
   })
 }
