@@ -32,8 +32,7 @@ export async function GET(request: NextRequest) {
   })
 
   return NextResponse.json({
-    activeCount: nodes.filter((node) => node.status !== "FAILED").length,
-    totalCount: nodes.length,
+    count: nodes.length,
     chainCount: chains.length,
   })
 }

@@ -20,8 +20,7 @@ const Dashboard = () => {
   })
 
   const { isPending: isPendingCount, data: dataCount } = useQuery<{
-    activeCount: number
-    totalCount: number
+    count: number
     chainCount: number
   }>({
     queryKey: ["nodes/count"],
@@ -73,8 +72,8 @@ const Dashboard = () => {
           <div className="col-span-3">
             <Nodes
               title="All Nodes"
-              activeCount={isPendingCount ? undefined : dataCount?.activeCount}
-              totalCount={isPendingCount ? undefined : dataCount?.totalCount}
+              activeCount={isPendingCount ? undefined : dataCount?.count}
+              totalCount={isPendingCount ? undefined : dataCount?.count}
               chainCount={isPendingCount ? undefined : dataCount?.chainCount}
               className="h-full"
             />
