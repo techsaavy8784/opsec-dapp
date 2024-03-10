@@ -148,7 +148,9 @@ export const CreditPaymentModal: React.FC<CreditPaymentModalProps> = ({
                 {process.env.NEXT_PUBLIC_MIN_BUY_CREDIT_AMOUNT}
               </label>
             )}
-            <p className="text-sm text-zinc-400">1 Credit = 1 USD</p>
+            <p className="text-xs text-zinc-400">
+              1 Credit = 1 USD (all credits are non-refundable)
+            </p>
             <div className="text-center">
               <Button
                 type="submit"

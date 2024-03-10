@@ -41,6 +41,7 @@ export function CardBlockchains() {
                     rel="noopener noreferrer"
                     href={blockchain?.url}
                     key={index}
+                    className={`${index !== 0 ? "ml-[-8px]" : ""} `}
                   >
                     <Image
                       src={`/icons/blockchain/${blockchain?.name
@@ -49,9 +50,7 @@ export function CardBlockchains() {
                       alt={blockchain?.name}
                       width={32}
                       height={32}
-                      className={`${
-                        index !== 0 ? "ml-[-8px]" : ""
-                      } rounded-[5px]`}
+                      className={`rounded-[5px]`}
                     />
                   </a>
                 ))}
