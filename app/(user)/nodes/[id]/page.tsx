@@ -112,7 +112,7 @@ const Node: React.FC<NodeProps> = ({ params: { id } }) => {
               <a
                 target="_blank"
                 href={
-                  data.blockchain.name === "avail"
+                  data.blockchain.name === "Avail"
                     ? `https://telemetry.avail.tools/#/${data.wallet}`
                     : `https://telemetry-testnet.bevm.io/#/${data.wallet}`
                 }
