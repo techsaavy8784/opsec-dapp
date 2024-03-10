@@ -32,7 +32,7 @@ const Sidebar = ({ setOpen }: Props) => {
   const pathName = path.split("/")[1]
   const navItems: NavItem[] = [
     {
-      title: "Dashbaord",
+      title: "Dashboard",
       link: "dashboard",
       icon: DashboardIcon,
     },
@@ -122,7 +122,7 @@ const Sidebar = ({ setOpen }: Props) => {
               className="max-md:hidden"
             />
           </Link>
-          <div className="md:hidden flex items-center space-x-3">
+          <div className="flex items-center space-x-3 md:hidden">
             {connected && balance && (
               <div className="font-bold">Balance {balance.balance}</div>
             )}
