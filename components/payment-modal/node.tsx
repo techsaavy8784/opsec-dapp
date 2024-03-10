@@ -49,6 +49,7 @@ export const NodePaymentModal: React.FC<PaymentModalProps> = ({
 
   useEffect(() => {
     setPlan(0)
+    setWalletAddr("")
   }, [open])
 
   const [, priceMultiplier] = subscriptions[plan]
@@ -103,7 +104,7 @@ export const NodePaymentModal: React.FC<PaymentModalProps> = ({
                 height={64}
                 className="mt-10 mb-4"
               />
-              <div className="flex flex-column gap-2 w-full">
+              <div className="flex w-full gap-2 flex-column">
                 {subscriptions.map(([month, priceMultiplier], key) => (
                   <div
                     key={month}
@@ -142,21 +143,35 @@ export const NodePaymentModal: React.FC<PaymentModalProps> = ({
           )}
 
           <form className="flex flex-col items-center justify-center gap-8 px-8">
-            {chain.hasWallet && nodeId === undefined && (
-              <>
-                <label>Enter your wallet address</label>
-                <label>
-                  This wallet will be the one where you receive rewards
-                </label>
-                <Input
-                  placeholder="Example: 0x56464...541584"
-                  type="text"
-                  value={walletAddr}
-                  onChange={(e) => setWalletAddr(e.target.value)}
-                  className="border border-[#54597C] rounded-[12px] w-full bg-[#1D202D] placeholder:text-[#54597C]"
-                />
-              </>
-            )}
+            {chain.hasWallet &&
+              nodeId === undefined &&
+              insufficientBalance == false && (
+                <>
+                  <label>
+                    {chain.name === "Avail"
+                      ? "Enter your node name"
+                      : "Enter your wallet address"}
+                  </label>
+                  <Input
+                    placeholder={
+                      chain.name === "Avail"
+                        ? "my-node"
+                        : "0x56464... (address to receive funds)"
+                    }
+                    type="text"
+                    value={walletAddr}
+                    onChange={(e) => {
+                      const value = e.target.value
+                      const formattedValue =
+                        chain.name === "Avail"
+                          ? value.replace(/\s+/g, "-")
+                          : value
+                      setWalletAddr(formattedValue)
+                    }}
+                    className="border border-[#54597C] rounded-[12px] w-full bg-[#1D202D] placeholder:text-[#54597C]"
+                  />
+                </>
+              )}
 
             <Button
               type="button"
@@ -165,7 +180,9 @@ export const NodePaymentModal: React.FC<PaymentModalProps> = ({
               disabled={
                 isPaying ||
                 insufficientBalance ||
-                (chain.hasWallet && !/^0x[0-9a-fA-F]{40}$/.test(walletAddr))
+                (chain.hasWallet && !walletAddr)
+
+                // (chain.hasWallet && !/^0x[0-9a-fA-F]{40}$/.test(walletAddr))
               }
             >
               {isPaying && <ReloadIcon className="mr-2 animate-spin" />}

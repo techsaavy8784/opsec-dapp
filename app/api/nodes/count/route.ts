@@ -17,6 +17,9 @@ export async function GET(request: NextRequest) {
       status: {
         not: Status.EXPIRED,
       },
+      server: {
+        active: true,
+      },
     },
   })
 

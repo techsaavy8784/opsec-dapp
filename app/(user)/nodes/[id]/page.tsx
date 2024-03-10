@@ -5,6 +5,7 @@ import { useQuery } from "@tanstack/react-query"
 import { Skeleton } from "@/components/ui/skeleton"
 import { NodeType } from "../page"
 import Image from "next/image"
+import Link from "next/link"
 import { daysPassedSince, formatDate } from "@/lib/utils"
 import clsx from "clsx"
 import { NodePaymentModal } from "@/components/payment-modal/node"
@@ -103,6 +104,27 @@ const Node: React.FC<NodeProps> = ({ params: { id } }) => {
             </h1>
           </div>
         </div>
+
+        {["Avail", "BEVM"].includes(data.blockchain.name) && (
+          <div className="flex items-center justify-between">
+            <h1 className="text-[14px] font-[500] text-[#52525B]">Telemetry</h1>
+            <div className="flex items-center gap-1">
+              <a
+                target="_blank"
+                href={
+                  data.blockchain.name === "avail"
+                    ? `https://telemetry.avail.tools/#/${data.wallet}`
+                    : `https://telemetry-testnet.bevm.io/#/${data.wallet}`
+                }
+                rel="noopener noreferrer"
+                className="font-[600] text-[14px] text-zinc-500 underline"
+              >
+                View
+              </a>
+            </div>
+          </div>
+        )}
+
         {/* {soonExpired && ( */}
         <div className="text-center">
           <Button onClick={() => setModal(true)}>Extend subscription</Button>

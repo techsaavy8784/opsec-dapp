@@ -13,6 +13,9 @@ export async function GET() {
   const nodes = await prisma.node.findMany({
     where: {
       userId: session.user.id,
+      server: {
+        active: true,
+      },
     },
     include: {
       payments: true,

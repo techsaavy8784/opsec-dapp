@@ -58,7 +58,12 @@ const Dashboard = () => {
           <div className="col-span-3 md:col-span-2">
             <Nodes
               title="Your Nodes"
-              count={isPending ? undefined : data?.length}
+              activeCount={
+                isPending
+                  ? undefined
+                  : data?.filter((item) => item.status !== "FAILED")?.length
+              }
+              totalCount={isPending ? undefined : data?.length}
               chainCount={isPending ? undefined : chainCount}
               link="/nodes"
               className="h-full"
@@ -67,7 +72,8 @@ const Dashboard = () => {
           <div className="col-span-3">
             <Nodes
               title="All Nodes"
-              count={isPendingCount ? undefined : dataCount?.count}
+              activeCount={isPendingCount ? undefined : dataCount?.count}
+              totalCount={isPendingCount ? undefined : dataCount?.count}
               chainCount={isPendingCount ? undefined : dataCount?.chainCount}
               className="h-full"
             />
