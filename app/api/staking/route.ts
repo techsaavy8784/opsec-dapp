@@ -3,7 +3,8 @@ import { authOptions } from "@/lib/auth"
 import { getServerSession } from "next-auth"
 import { NextResponse, NextRequest } from "next/server"
 import { Status } from "@prisma/client"
-import subscriptions from "./subscriptions"
+import { publicClient } from "@/contract/client"
+import abi from "@/contract/abi.json"
 
 export async function GET(request: NextRequest) {
   const session = await getServerSession(authOptions)
@@ -17,7 +18,9 @@ export async function GET(request: NextRequest) {
       node: {
         userId: session.user.id,
       },
-      stakeId: null,
+      stakeId: {
+        not: null,
+      },
     },
     include: {
       node: {
@@ -39,7 +42,7 @@ export async function PUT(request: NextRequest) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 })
   }
 
-  const { id, plan } = await request.json()
+  const { id, stakeId } = await request.json()
 
   const node = await prisma.node.findUnique({
     where: {
@@ -54,37 +57,18 @@ export async function PUT(request: NextRequest) {
     return NextResponse.json("Node doesn't exist", { status: 404 })
   }
 
-  const user = await prisma.user.findFirst({
-    where: {
-      id: session.user.id,
-    },
-  })
-
-  const [months, priceMultiplier] = subscriptions[plan]
-
-  const amount = node.blockchain.price * priceMultiplier
-
-  if (amount > user!.balance) {
-    return NextResponse.json(
-      { message: "Insufficient credit balance" },
-      { status: 400 },
-    )
-  }
+  const [, amount, duration] = (await publicClient.readContract({
+    abi,
+    address: process.env.NEXT_PUBLIC_STAKING_CONTRACT as `0x${string}`,
+    functionName: "stakes",
+    args: [stakeId],
+  })) as [string, number, number]
 
   const payment = await prisma.payment.create({
     data: {
-      duration: months * 31,
+      duration: Math.round(duration / 3600 / 24),
       credit: amount,
       nodeId: node.id,
-    },
-  })
-
-  await prisma.user.update({
-    data: {
-      balance: user!.balance - amount,
-    },
-    where: {
-      id: session.user.id,
     },
   })
 
@@ -99,7 +83,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 })
   }
 
-  const { wallet, id, plan } = await request.json()
+  const { wallet, id, plan, stakeId } = await request.json()
 
   const blockchainId = id
 
@@ -150,16 +134,12 @@ export async function POST(request: NextRequest) {
     )
   }
 
-  const [months, priceMultiplier] = subscriptions[plan]
-
-  const amount = blockchain.price * priceMultiplier
-
-  if (amount > user!.balance) {
-    return NextResponse.json(
-      { message: "Insufficient credit balance" },
-      { status: 400 },
-    )
-  }
+  const [, amount, duration] = (await publicClient.readContract({
+    abi,
+    address: process.env.NEXT_PUBLIC_STAKING_CONTRACT as `0x${string}`,
+    functionName: "stakes",
+    args: [stakeId],
+  })) as [string, number, number]
 
   const node = await prisma.node.create({
     data: {
@@ -172,18 +152,10 @@ export async function POST(request: NextRequest) {
 
   const payment = await prisma.payment.create({
     data: {
-      duration: months * 31,
+      duration: Math.round(duration / 3600 / 24),
       credit: amount,
+      stakeId,
       nodeId: node.id,
-    },
-  })
-
-  await prisma.user.update({
-    data: {
-      balance: user!.balance - amount,
-    },
-    where: {
-      id: session.user.id,
     },
   })
 

@@ -175,6 +175,12 @@
         "credit": {
           "type": "integer"
         },
+        "stakeId": {
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
         "date": {
           "type": "string",
           "format": "date-time"

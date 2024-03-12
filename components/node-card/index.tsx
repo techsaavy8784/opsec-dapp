@@ -11,6 +11,7 @@ type NodeCardProps = {
   id?: number
   created?: string
   name: string
+  deployButtonTitle?: string
   description: string
   disabled?: boolean
   status?: string
@@ -23,6 +24,7 @@ export const NodeCard: React.FC<NodeCardProps> = ({
   name,
   created,
   description,
+  deployButtonTitle,
   disabled,
   status,
   expireInDays,
@@ -61,7 +63,7 @@ export const NodeCard: React.FC<NodeCardProps> = ({
       </Button>
     ) : onBuy ? (
       <Button type="button" variant="custom" onClick={onBuy}>
-        Deploy
+        {deployButtonTitle ?? "Deploy"}
         <FaArrowRightLong className="ml-2 font-[300]" />
       </Button>
     ) : (

@@ -5,11 +5,11 @@ import { useQuery } from "@tanstack/react-query"
 import { Skeleton } from "@/components/ui/skeleton"
 import { NodeType } from "../page"
 import Image from "next/image"
-import Link from "next/link"
 import { daysPassedSince, formatDate } from "@/lib/utils"
 import clsx from "clsx"
 import { NodePaymentModal } from "@/components/payment-modal/node"
 import { Button } from "@/components/ui/button"
+import { StakingModal } from "@/components/staking-modal"
 
 interface NodeProps {
   params: {
@@ -22,7 +22,7 @@ const uptimeDayCount = 90
 const Node: React.FC<NodeProps> = ({ params: { id } }) => {
   const timer = useRef<NodeJS.Timeout>()
 
-  const [modal, setModal] = useState(false)
+  const [modal, setModal] = useState<"credit" | "staking">()
 
   const { isPending, data, refetch } = useQuery<NodeType>({
     queryKey: [`nodes/${id}`],
@@ -125,18 +125,25 @@ const Node: React.FC<NodeProps> = ({ params: { id } }) => {
           </div>
         )}
 
-        {/* {soonExpired && ( */}
-        <div className="text-center">
-          <Button onClick={() => setModal(true)}>Extend subscription</Button>
+        <div className="text-center flex flex-col gap-3">
+          <label>Extend subscription with</label>
+          <Button onClick={() => setModal("credit")}>Credit</Button>
+          <Button onClick={() => setModal("staking")}>Staking</Button>
           <NodePaymentModal
             nodeId={data.id}
-            open={modal}
+            open={modal === "credit"}
             chain={data.blockchain}
-            onOpenChange={() => setModal(false)}
+            onOpenChange={() => setModal(undefined)}
             onPurchaseComplete={() => refetch()}
           />
+          <StakingModal
+            open={modal === "staking"}
+            nodeId={data.id}
+            chain={data.blockchain}
+            onOpenChange={() => setModal(undefined)}
+            onStakingComplete={() => refetch()}
+          />
         </div>
-        {/* )} */}
       </div>
 
       {data.status === "LIVE" && (

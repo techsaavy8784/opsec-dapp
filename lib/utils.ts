@@ -1,4 +1,3 @@
-import { Server } from "@prisma/client"
 import { type ClassValue, clsx } from "clsx"
 import { twMerge } from "tailwind-merge"
 
@@ -26,3 +25,11 @@ export const formatDate = (date: string | Date) =>
 
 export const daysPassedSince = (since: string | Date) =>
   Math.round((Date.now() - new Date(since).getTime()) / (1000 * 3600 * 24))
+
+export const formatBalance = (value: number) => {
+  if (value < 0.0001) {
+    return String(value)
+  }
+
+  return String(Math.round(value * 1000) / 1000)
+}
