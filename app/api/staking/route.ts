@@ -115,12 +115,6 @@ export async function POST(request: NextRequest) {
     )
   }
 
-  const user = await prisma.user.findFirst({
-    where: {
-      id: session.user.id,
-    },
-  })
-
   const blockchain = await prisma.blockchain.findUnique({
     where: {
       id: blockchainId,
