@@ -63,12 +63,12 @@ export const StakingModal: React.FC<StakingModalProps> = ({
     opsecBalance.value < stakingPerMonth * 10 ** opsecBalance.decimals * month
 
   const { mutate: purchase, isPending: isRewarding } = useMutation({
-    mutationFn: (stakeId: number) =>
+    mutationFn: (verifier: string) =>
       fetch("/api/staking", {
         method: nodeId === undefined ? "POST" : "PUT",
         body: JSON.stringify({
           id: nodeId ?? chain?.id,
-          stakeId,
+          verifier,
         }),
       }).then((response) => {
         onOpenChange?.(false)
@@ -95,6 +95,9 @@ export const StakingModal: React.FC<StakingModalProps> = ({
       return
     }
 
+    // todo: generate random hex string and pass it to verifier in the following contract call
+    const stakeVerifier = ""
+
     writeContract({
       address: process.env.NEXT_PUBLIC_STAKING_CONTRACT as `0x${string}`,
       abi,
@@ -102,11 +105,12 @@ export const StakingModal: React.FC<StakingModalProps> = ({
       args: [
         stakingPerMonth * month * 10 ** opsecBalance.decimals,
         month * 31 * 3600 * 24,
+        stakeVerifier,
       ],
     })
 
-    // todo: call purchase
-  }, [month, opsecBalance, stakingPerMonth, writeContract])
+    purchase(stakeVerifier)
+  }, [month, opsecBalance, purchase, stakingPerMonth, writeContract])
 
   return (
     <Dialog {...props} onOpenChange={onOpenChange}>

@@ -42,7 +42,12 @@ export async function PUT(request: NextRequest) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 })
   }
 
-  const { id, stakeId } = await request.json()
+  const { id, verifier } = await request.json()
+
+  // todo: listen to Staked event and check verifier arg with the value provided from body above
+  // and get stakeId value from the event arg
+
+  const stakeId = "" // value from event arg when verifier matches
 
   const node = await prisma.node.findUnique({
     where: {
@@ -83,7 +88,12 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 })
   }
 
-  const { wallet, id, plan, stakeId } = await request.json()
+  const { id, verifier } = await request.json()
+
+  // todo: listen to Staked event and check verifier arg with the value provided from body above
+  // and get stakeId value from the event arg
+
+  const stakeId = "" // value from event arg when verifier matches
 
   const blockchainId = id
 
@@ -137,7 +147,6 @@ export async function POST(request: NextRequest) {
 
   const node = await prisma.node.create({
     data: {
-      wallet,
       serverId: serverIds[Math.floor(Math.random() * serverIds.length)].id,
       userId: session.user.id,
       blockchainId,
