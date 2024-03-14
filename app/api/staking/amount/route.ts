@@ -9,13 +9,20 @@ const cache = {
 
 export async function GET(request: NextRequest) {
   const url = request.nextUrl
-  const chain = Number(url.searchParams.get("chain"))
+  const chainsParam = url.searchParams.get("chains")
+  const amountsParam = url.searchParams.get("amounts")
 
-  const blockchain = await prisma.blockchain.findUniqueOrThrow({
-    where: {
-      id: chain,
-    },
-  })
+  const chains = chainsParam
+    ? decodeURI(String(chainsParam)).split(",").map(Number)
+    : []
+
+  const amounts = amountsParam
+    ? decodeURI(String(amountsParam)).split(",").map(Number)
+    : []
+
+  if (chains.length !== amounts.length) {
+    return NextResponse.json({ message: "data invalid" }, { status: 400 })
+  }
 
   if (cache.time + cache.ttl < Date.now()) {
     cache.price = await fetch(
@@ -31,8 +38,18 @@ export async function GET(request: NextRequest) {
     cache.time = Date.now()
   }
 
-  const stakingAmount =
-    (Number(process.env.STAKING_PROFIT_MARGIN) * blockchain.price) / cache.price
+  const blockchains = await prisma.blockchain.findMany()
 
-  return NextResponse.json(stakingAmount)
+  const chainMap = Object.fromEntries(
+    blockchains.map((chain) => [chain.id, chain]),
+  )
+
+  const sum = chains.reduce(
+    (sum, chain, i) => sum + chainMap[chain].price * amounts[i],
+    0,
+  )
+
+  return NextResponse.json(
+    (Number(process.env.STAKING_PROFIT_MARGIN) * sum) / cache.price,
+  )
 }

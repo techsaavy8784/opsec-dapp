@@ -80,7 +80,7 @@ model Payment {
     nodeId   Int      @map("node_id")
     node     Node     @relation(fields: [nodeId], references: [id])
     credit   Int
-    stakeId  Int?     @map("stake_id")
+    stakeId  String?  @map("stake_id")
     date     DateTime @default(now())
 
     @@map("payments")

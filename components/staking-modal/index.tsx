@@ -47,8 +47,8 @@ export const StakingModal: React.FC<StakingModalProps> = ({
     queryKey: ["staking", chain?.id],
     queryFn: () =>
       chain
-        ? fetch(`/api/staking/amount?chain=${chain.id}`).then((res) =>
-            res.json(),
+        ? fetch(`/api/staking/amount?chains=${chain.id}&amounts=1`).then(
+            (res) => res.json(),
           )
         : undefined,
   })

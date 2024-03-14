@@ -177,7 +177,7 @@
         },
         "stakeId": {
           "type": [
-            "integer",
+            "string",
             "null"
           ]
         },

@@ -38,16 +38,13 @@ export async function GET() {
       server.nodes.some((node) => node.blockchainId === chain.id),
     )
 
-    // disabled if all possible servers have a node of this type
-    const disabled = chainServers.length === servers.length
-
     return {
       id: chain.id,
       name: chain.name,
       description: chain.description,
       price: chain.price,
       hasWallet: chain.hasWallet,
-      disabled,
+      available: servers.length - chainServers.length,
     }
   })
 
