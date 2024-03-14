@@ -34,133 +34,111 @@ export async function GET(request: NextRequest) {
   return NextResponse.json(payments)
 }
 
-// extend subscription
-export async function PUT(request: NextRequest) {
-  const session = await getServerSession(authOptions)
-
-  if (!session) {
-    return NextResponse.json({ message: "Unauthorized" }, { status: 401 })
-  }
-
-  const { id, verifier } = await request.json()
-
-  // todo: listen to Staked event and check verifier arg with the value provided from body above
-  // and get stakeId value from the event arg
-
-  const stakeId = "" // value from event arg when verifier matches
-
-  const node = await prisma.node.findUnique({
-    where: {
-      id,
-    },
-    include: {
-      blockchain: true,
-    },
-  })
-
-  if (!node) {
-    return NextResponse.json("Node doesn't exist", { status: 404 })
-  }
-
-  const [, amount, duration] = (await publicClient.readContract({
-    abi,
-    address: process.env.NEXT_PUBLIC_STAKING_CONTRACT as `0x${string}`,
-    functionName: "stakes",
-    args: [stakeId],
-  })) as [string, number, number]
-
-  const payment = await prisma.payment.create({
-    data: {
-      duration: Math.round(duration / 3600 / 24),
-      credit: amount,
-      nodeId: node.id,
-    },
-  })
-
-  return NextResponse.json(payment, { status: 201 })
-}
-
-// buy node
 export async function POST(request: NextRequest) {
-  const session = await getServerSession(authOptions)
-
-  if (!session) {
+  if (request.headers.get("X-API-KEY") !== process.env.STAKE_WEBHOOK_KEY) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 })
   }
 
-  const { id, verifier } = await request.json()
+  const { stakeId } = await request.json()
 
-  // todo: listen to Staked event and check verifier arg with the value provided from body above
-  // and get stakeId value from the event arg
-
-  const stakeId = "" // value from event arg when verifier matches
-
-  const blockchainId = id
-
-  const serverIds = await prisma.server.findMany({
+  const staking = await prisma.staking.findUniqueOrThrow({
     where: {
-      NOT: [
-        {
-          nodes: {
-            some: {
-              blockchainId,
-              status: {
-                not: Status.EXPIRED,
+      id: stakeId,
+    },
+  })
+
+  if (staking.userId === null) {
+    const [, stakingAmount, duration] = (await publicClient.readContract({
+      abi,
+      address: process.env.NEXT_PUBLIC_STAKING_CONTRACT as `0x${string}`,
+      functionName: "stakes",
+      args: [stakeId],
+    })) as [string, number, number]
+
+    await prisma.payment.create({
+      data: {
+        duration: Math.round(duration / 3600 / 24),
+        credit: stakingAmount,
+        nodeId: Number(staking.data),
+        stakeId,
+      },
+    })
+  } else {
+    const data = staking.data as Record<string, number>
+
+    for (const chainId in data) {
+      const blockchainId = Number(chainId)
+
+      const serverIds = await prisma.server.findMany({
+        where: {
+          NOT: [
+            {
+              nodes: {
+                some: {
+                  blockchainId,
+                  status: {
+                    not: Status.EXPIRED,
+                  },
+                },
               },
             },
-          },
+          ],
+          active: true,
         },
-      ],
-      active: true,
-    },
-    select: {
-      id: true,
-    },
-  })
+        select: {
+          id: true,
+        },
+      })
 
-  if (serverIds.length === 0) {
-    return NextResponse.json(
-      { message: "No suitable server found" },
-      { status: 404 },
-    )
+      const amount = data[chainId]
+
+      if (serverIds.length < amount) {
+        return NextResponse.json(
+          { message: "No suitable server found" },
+          { status: 404 },
+        )
+      }
+
+      const blockchain = await prisma.blockchain.findUnique({
+        where: {
+          id: blockchainId,
+        },
+      })
+
+      if (!blockchain) {
+        return NextResponse.json(
+          { message: "Blockchain not found" },
+          { status: 404 },
+        )
+      }
+
+      const [, stakeAmount, duration] = (await publicClient.readContract({
+        abi,
+        address: process.env.NEXT_PUBLIC_STAKING_CONTRACT as `0x${string}`,
+        functionName: "stakes",
+        args: [stakeId],
+      })) as [string, number, number]
+
+      await prisma.node.createMany({
+        data: Array(amount)
+          .fill(0)
+          .map((_, i) => ({
+            serverId: serverIds[i].id,
+            userId: staking.userId!,
+            blockchainId,
+            payments: {
+              create: [
+                {
+                  duration: Math.round(duration / 3600 / 24),
+                  credit: stakeAmount,
+                  stakeId,
+                },
+              ],
+            },
+          })),
+      })
+    }
   }
 
-  const blockchain = await prisma.blockchain.findUnique({
-    where: {
-      id: blockchainId,
-    },
-  })
-
-  if (!blockchain) {
-    return NextResponse.json(
-      { message: "Blockchain not found" },
-      { status: 404 },
-    )
-  }
-
-  const [, amount, duration] = (await publicClient.readContract({
-    abi,
-    address: process.env.NEXT_PUBLIC_STAKING_CONTRACT as `0x${string}`,
-    functionName: "stakes",
-    args: [stakeId],
-  })) as [string, number, number]
-
-  const node = await prisma.node.create({
-    data: {
-      serverId: serverIds[Math.floor(Math.random() * serverIds.length)].id,
-      userId: session.user.id,
-      blockchainId,
-    },
-  })
-
-  const payment = await prisma.payment.create({
-    data: {
-      duration: Math.round(duration / 3600 / 24),
-      credit: amount,
-      stakeId,
-      nodeId: node.id,
-    },
-  })
-
-  return NextResponse.json(payment, { status: 201 })
+  return NextResponse.json("success", { status: 201 })
 }

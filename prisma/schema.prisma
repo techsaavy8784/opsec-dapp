@@ -17,12 +17,13 @@ datasource db {
 }
 
 model User {
-    id       Int      @id @default(autoincrement())
-    address  String   @unique // address is used as email for admins
+    id       Int       @id @default(autoincrement())
+    address  String    @unique // address is used as email for admins
     password String? // if password is not null, he is admin, otherwise user
-    balance  Int      @default(0)
+    balance  Int       @default(0)
     nodes    Node[]
     credits  Credit[]
+    Staking  Staking[]
 
     @@map("users")
 }
@@ -84,6 +85,13 @@ model Payment {
     date     DateTime @default(now())
 
     @@map("payments")
+}
+
+model Staking {
+    id     String @id
+    data   Json
+    userId Int?   @map("user_id")
+    user   User?  @relation(fields: [userId], references: [id])
 }
 
 model TxVerifier {
