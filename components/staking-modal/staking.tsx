@@ -14,18 +14,23 @@ import { formatBalance, generateRandomString } from "@/lib/utils"
 import abi from "@/contract/abi.json"
 
 interface StakingProps {
-  chainAmounts: Record<string, number>
+  rewards: Record<string, number>
   nodeId?: number
+  onStakingComplete: () => void
 }
 
-const Staking: React.FC<StakingProps> = ({ chainAmounts, nodeId }) => {
+const Staking: React.FC<StakingProps> = ({
+  rewards,
+  nodeId,
+  onStakingComplete,
+}) => {
   const [month, setMonth] = useState<number>(1)
 
   const { data: opsecBalance, refetch: refetchBalance } = useBalance({
     address: process.env.NEXT_PUBLIC_OPSEC_TOKEN_ADDRESS as `0x${string}`,
   })
 
-  const entries = Object.entries(chainAmounts)
+  const entries = Object.entries(rewards)
     .filter(([chainId, amount]) => amount > 0)
     .sort((a, b) => Number(a[0]) - Number(b[0]))
 
@@ -44,14 +49,21 @@ const Staking: React.FC<StakingProps> = ({ chainAmounts, nodeId }) => {
   const { mutateAsync: registerStaking, isPending: isRegistering } =
     useMutation({
       mutationFn: (stakeId: string) =>
-        fetch("/api/staking/register", {
-          method: "POST",
-          body: JSON.stringify({
-            stakeId,
-            chainAmounts,
-            nodeId,
-          }),
-        }),
+        nodeId === undefined
+          ? fetch("/api/staking/register", {
+              method: "POST",
+              body: JSON.stringify({
+                stakeId,
+                rewards,
+              }),
+            })
+          : fetch("/api/staking/register", {
+              method: "PUT",
+              body: JSON.stringify({
+                stakeId,
+                nodeId,
+              }),
+            }),
     })
 
   const { data: hash, writeContract, isPending: isStaking } = useWriteContract()

@@ -9,14 +9,14 @@ import { Button } from "@/components/ui/button"
 import Staking from "@/components/staking-modal/staking"
 
 const StakingPage: React.FC = () => {
-  const [count, setCount] = useState<Record<string, number>>({})
+  const [rewards, setRewards] = useState<Record<string, number>>({})
 
   const { isPending, data, refetch } = useQuery<any>({
     queryKey: ["server/list"],
     queryFn: () => fetch("/api/server/list").then((res) => res.json()),
   })
 
-  const entries = Object.entries(count)
+  const entries = Object.entries(rewards)
     .filter(([chainId, amount]) => amount > 0)
     .sort((a, b) => Number(a[0]) - Number(b[0]))
 
@@ -52,24 +52,24 @@ const StakingPage: React.FC = () => {
                 variant="outline"
                 size="icon"
                 onClick={() =>
-                  setCount((prev) => ({
+                  setRewards((prev) => ({
                     ...prev,
                     [chain.id]: (prev[chain.id] ?? 0) - 1,
                   }))
                 }
                 disabled={
-                  count[chain.id] === 0 || count[chain.id] === undefined
+                  rewards[chain.id] === 0 || rewards[chain.id] === undefined
                 }
               >
                 <MinusIcon className="h-4 w-4" />
               </Button>
-              <span>{count[chain.id] ?? 0}</span>
+              <span>{rewards[chain.id] ?? 0}</span>
               <Button
                 variant="outline"
                 size="icon"
-                disabled={count[chain.id] === chain.available}
+                disabled={rewards[chain.id] === chain.available}
                 onClick={() =>
-                  setCount((prev) => ({
+                  setRewards((prev) => ({
                     ...prev,
                     [chain.id]: (prev[chain.id] ?? 0) + 1,
                   }))
@@ -86,7 +86,7 @@ const StakingPage: React.FC = () => {
       ) : (
         <>
           <p>How long do you want to use these nodes?</p>
-          <Staking chainAmounts={count} />
+          <Staking rewards={rewards} onStakingComplete={refetch} />
         </>
       )}
     </div>

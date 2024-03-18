@@ -39,7 +39,11 @@ export const StakingModal: React.FC<StakingModalProps> = ({
             className="m-auto"
           />
           <p>How long do you want to extend the subscription by?</p>
-          <Staking chainAmounts={{ [chain.id]: 1 }} nodeId={nodeId} />
+          <Staking
+            rewards={{ [chain.id]: 1 }}
+            nodeId={nodeId}
+            onStakingComplete={onStakingComplete}
+          />
         </div>
       </DialogContent>
     )}

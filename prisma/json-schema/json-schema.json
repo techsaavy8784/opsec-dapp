@@ -31,12 +31,6 @@
           "items": {
             "$ref": "#/definitions/Credit"
           }
-        },
-        "Staking": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/Staking"
-          }
         }
       },
       "required": [
@@ -69,7 +63,8 @@
             "INSTALLING",
             "LIVE",
             "FAILED",
-            "EXPIRED"
+            "EXPIRED",
+            "REWARD_RESERVED"
           ]
         },
         "createdAt": {
@@ -90,12 +85,44 @@
         },
         "blockchain": {
           "$ref": "#/definitions/Blockchain"
+        },
+        "rewardReserved": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/RewardReserved"
+            },
+            {
+              "type": "null"
+            }
+          ]
         }
       },
       "required": [
         "userId",
         "serverId",
         "blockchainId"
+      ]
+    },
+    "RewardReserved": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer"
+        },
+        "node": {
+          "$ref": "#/definitions/Node"
+        },
+        "stakeId": {
+          "type": "string"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "nodeId",
+        "stakeId"
       ]
     },
     "NodeHistory": {
@@ -121,7 +148,8 @@
             "INSTALLING",
             "LIVE",
             "FAILED",
-            "EXPIRED"
+            "EXPIRED",
+            "REWARD_RESERVED"
           ]
         }
       },
@@ -195,38 +223,6 @@
       "required": [
         "nodeId",
         "credit"
-      ]
-    },
-    "Staking": {
-      "type": "object",
-      "properties": {
-        "id": {
-          "type": "string"
-        },
-        "data": {
-          "type": [
-            "number",
-            "string",
-            "boolean",
-            "object",
-            "array",
-            "null"
-          ]
-        },
-        "user": {
-          "anyOf": [
-            {
-              "$ref": "#/definitions/User"
-            },
-            {
-              "type": "null"
-            }
-          ]
-        }
-      },
-      "required": [
-        "id",
-        "data"
       ]
     },
     "TxVerifier": {
@@ -329,6 +325,9 @@
     "node": {
       "$ref": "#/definitions/Node"
     },
+    "rewardReserved": {
+      "$ref": "#/definitions/RewardReserved"
+    },
     "nodeHistory": {
       "$ref": "#/definitions/NodeHistory"
     },
@@ -337,9 +336,6 @@
     },
     "payment": {
       "$ref": "#/definitions/Payment"
-    },
-    "staking": {
-      "$ref": "#/definitions/Staking"
     },
     "txVerifier": {
       "$ref": "#/definitions/TxVerifier"
