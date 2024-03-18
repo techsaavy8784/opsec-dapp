@@ -22,24 +22,7 @@ const StakingHistory = () => {
     (Payment & { node: any; onchain: [number, number, number, number] })[]
   >({
     queryKey: ["staking-history"],
-    queryFn: () =>
-      fetch("/api/staking")
-        .then((res) => res.json())
-        .then((res: Payment[]) =>
-          Promise.all(
-            res.map((item) =>
-              publicClient
-                .readContract({
-                  abi,
-                  address: process.env
-                    .NEXT_PUBLIC_STAKING_CONTRACT as `0x${string}`,
-                  functionName: "stakes",
-                  args: [item.stakeId],
-                })
-                .then((res) => ({ ...item, onchain: res })),
-            ),
-          ),
-        ),
+    queryFn: () => fetch("/api/staking").then((res) => res.json()),
   })
 
   return (
