@@ -61,21 +61,25 @@ export async function POST(request: NextRequest) {
       )
     }
 
-    await prisma.node.createMany({
-      data: Array(amount)
+    await Promise.all(
+      Array(amount)
         .fill(0)
-        .map((_, i) => ({
-          serverId: serverIds[i].id,
-          userId: session.user.id,
-          status: Status.REWARD_RESERVED,
-          blockchainId,
-          rewardReserved: {
-            create: {
-              stakeId,
+        .map((_, i) =>
+          prisma.node.create({
+            data: {
+              serverId: serverIds[i].id,
+              userId: session.user.id,
+              status: Status.REWARD_RESERVED,
+              blockchainId,
+              rewardReserved: {
+                create: {
+                  stakeId,
+                },
+              },
             },
-          },
-        })),
-    })
+          }),
+        ),
+    )
   }
 
   return NextResponse.json("success", { status: 201 })

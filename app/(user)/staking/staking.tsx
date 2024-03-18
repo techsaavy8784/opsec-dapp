@@ -40,7 +40,7 @@ const StakingPage: React.FC = () => {
     <div className="space-y-6 text-center">
       <div className="grid items-center grid-cols-1 gap-8 pt-2 md:grid-cols-3">
         {data.chains.map((chain: any) => (
-          <div key={chain.id}>
+          <div key={chain.id} className="h-full flex flex-col">
             <NodeCard
               key={chain.id}
               name={chain.name}
@@ -67,7 +67,7 @@ const StakingPage: React.FC = () => {
               <Button
                 variant="outline"
                 size="icon"
-                disabled={rewards[chain.id] === chain.available}
+                disabled={(rewards[chain.id] ?? 0) === chain.available}
                 onClick={() =>
                   setRewards((prev) => ({
                     ...prev,

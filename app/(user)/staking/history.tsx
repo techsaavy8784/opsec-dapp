@@ -49,7 +49,7 @@ const StakingHistory = () => {
               </TableRow>
             ) : !data || data.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={5} className="text-center">
+                <TableCell colSpan={6} className="text-center">
                   No Data
                 </TableCell>
               </TableRow>
