@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useCallback, useState } from "react"
+import React, { useCallback, useEffect, useRef, useState } from "react"
 import { ReloadIcon } from "@radix-ui/react-icons"
 import { useMutation, useQuery } from "@tanstack/react-query"
 import { Button } from "@/components/ui/button"
@@ -12,6 +12,7 @@ import {
 } from "wagmi"
 import { formatBalance, generateRandomString } from "@/lib/utils"
 import abi from "@/contract/abi.json"
+import { useToast } from "../ui/use-toast"
 
 interface StakingProps {
   rewards: Record<string, number>
@@ -25,6 +26,10 @@ const Staking: React.FC<StakingProps> = ({
   onStakingComplete,
 }) => {
   const [month, setMonth] = useState<number>(1)
+
+  const { toast } = useToast()
+
+  const timer = useRef<NodeJS.Timeout>()
 
   const { data: opsecBalance, refetch: refetchBalance } = useBalance({
     address: process.env.NEXT_PUBLIC_OPSEC_TOKEN_ADDRESS as `0x${string}`,
@@ -82,7 +87,7 @@ const Staking: React.FC<StakingProps> = ({
       byte.toString(16).padStart(2, "0"),
     ).join("")
 
-    registerStaking(stakeId).then(() =>
+    registerStaking(stakeId).then(() => {
       writeContract({
         address: process.env.NEXT_PUBLIC_STAKING_CONTRACT as `0x${string}`,
         abi,
@@ -92,9 +97,38 @@ const Staking: React.FC<StakingProps> = ({
           stakingPerMonth * month * 10 ** opsecBalance.decimals,
           month * 31 * 3600 * 24,
         ],
-      }),
-    )
-  }, [month, opsecBalance, registerStaking, stakingPerMonth, writeContract])
+      })
+
+      clearInterval(timer.current)
+
+      timer.current = setInterval(() => {
+        fetch(`/api/staking/${stakeId}`)
+          .then((res) => res.json())
+          .then((res) => {
+            if (res.completed) {
+              toast({
+                title: "Staking completed",
+              })
+              refetchBalance()
+              onStakingComplete()
+            }
+          })
+      }, 3000)
+    })
+  }, [
+    month,
+    onStakingComplete,
+    opsecBalance,
+    refetchBalance,
+    registerStaking,
+    stakingPerMonth,
+    toast,
+    writeContract,
+  ])
+
+  useEffect(() => {
+    return () => clearInterval(timer.current)
+  }, [])
 
   const lowBalance =
     stakingPerMonth !== undefined &&
