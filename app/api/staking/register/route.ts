@@ -103,3 +103,16 @@ export async function PUT(request: NextRequest) {
 
   return NextResponse.json("success", { status: 201 })
 }
+
+export async function DELETE(request: NextRequest) {
+  const { stakeId } = await request.json()
+
+  await prisma.node.deleteMany({
+    where: {
+      status: Status.REWARD_RESERVED,
+      rewardReserved: {
+        stakeId,
+      },
+    },
+  })
+}

@@ -5,15 +5,11 @@ import { ReloadIcon } from "@radix-ui/react-icons"
 import { useMutation, useQuery } from "@tanstack/react-query"
 import { Button } from "@/components/ui/button"
 import { Slider } from "@/components/ui/slider"
-import {
-  useAccount,
-  useReadContract,
-  useWaitForTransactionReceipt,
-  useWriteContract,
-} from "wagmi"
+import { useAccount, useReadContract, useWalletClient } from "wagmi"
 import { formatBalance, generateRandomString } from "@/lib/utils"
 import abi from "@/contract/abi.json"
 import { useToast } from "../ui/use-toast"
+import { erc20Abi } from "viem"
 
 interface StakingProps {
   rewards: Record<string, number>
@@ -37,18 +33,20 @@ const Staking: React.FC<StakingProps> = ({
   const { address } = useAccount()
 
   const { data: opsecBalance, refetch: refetchBalance } = useReadContract({
-    abi: [
-      {
-        type: "function",
-        name: "balanceOf",
-        stateMutability: "view",
-        inputs: [{ name: "account", type: "address" }],
-        outputs: [{ type: "uint256" }],
-      },
-    ],
+    abi: erc20Abi,
     address: process.env.NEXT_PUBLIC_OPSEC_TOKEN_ADDRESS as `0x${string}`,
     functionName: "balanceOf",
     args: [address as `0x${string}`],
+  })
+
+  const { data: allowance, refetch: refetchAllowance } = useReadContract({
+    abi: erc20Abi,
+    address: process.env.NEXT_PUBLIC_OPSEC_TOKEN_ADDRESS as `0x${string}`,
+    functionName: "allowance",
+    args: [
+      address as `0x${string}`,
+      process.env.NEXT_PUBLIC_STAKING_CONTRACT as `0x${string}`,
+    ],
   })
 
   const entries = Object.entries(rewards)
@@ -87,12 +85,28 @@ const Staking: React.FC<StakingProps> = ({
             }).then((res) => res.json()),
     })
 
-  const { data: hash, writeContract, isPending: isStaking } = useWriteContract()
+  const { mutateAsync: unregisterStaking, isPending: isUnregistering } =
+    useMutation({
+      mutationFn: (stakeId: string) =>
+        fetch("/api/staking/register", {
+          method: "DELETE",
+          body: JSON.stringify({
+            stakeId,
+          }),
+        }),
+    })
 
-  const { isLoading: isConfirming } = useWaitForTransactionReceipt({ hash })
+  const { data: walletClient } = useWalletClient()
+
+  const [stakingStatus, setStakingStatus] = useState<"allowing" | "staking">()
 
   const handleStake = useCallback(() => {
-    if (stakingPerMonth === undefined || opsecBalance === undefined) {
+    if (
+      stakingPerMonth === undefined ||
+      opsecBalance === undefined ||
+      walletClient === undefined ||
+      allowance === undefined
+    ) {
       return
     }
 
@@ -103,7 +117,7 @@ const Staking: React.FC<StakingProps> = ({
       byte.toString(16).padStart(2, "0"),
     ).join("")
 
-    registerStaking(stakeId).then((res) => {
+    registerStaking(stakeId).then(async (res) => {
       if (res !== "success") {
         toast({
           title: "Failed to register staking",
@@ -111,16 +125,41 @@ const Staking: React.FC<StakingProps> = ({
         return
       }
 
-      writeContract({
-        address: process.env.NEXT_PUBLIC_STAKING_CONTRACT as `0x${string}`,
-        abi,
-        functionName: "stake",
-        args: [
-          bytesString,
-          stakingPerMonth * month * 10 ** OPSEC_DECIMALS,
-          month * 31 * 3600 * 24,
-        ],
-      })
+      try {
+        if (
+          allowance < BigInt(stakingPerMonth * month * 10 ** OPSEC_DECIMALS)
+        ) {
+          setStakingStatus("allowing")
+          await walletClient.writeContract({
+            address: process.env
+              .NEXT_PUBLIC_OPSEC_TOKEN_ADDRESS as `0x${string}`,
+            abi,
+            functionName: "approve",
+            args: [
+              process.env.NEXT_PUBLIC_STAKING_CONTRACT as `0x${string}`,
+              BigInt(stakingPerMonth * month * 10 ** OPSEC_DECIMALS),
+            ],
+          })
+        }
+
+        setStakingStatus("staking")
+        await walletClient.writeContract({
+          address: process.env.NEXT_PUBLIC_STAKING_CONTRACT as `0x${string}`,
+          abi,
+          functionName: "stake",
+          args: [
+            `0x${bytesString}`,
+            stakingPerMonth * month * 10 ** OPSEC_DECIMALS,
+            month * 31 * 3600 * 24,
+          ],
+        })
+      } catch {
+        unregisterStaking(stakeId)
+        setStakingStatus(undefined)
+        toast({
+          title: "Transaction failed",
+        })
+      }
 
       clearInterval(timer.current)
 
@@ -132,6 +171,7 @@ const Staking: React.FC<StakingProps> = ({
               toast({
                 title: "Staking completed",
               })
+              setStakingStatus(undefined)
               refetchBalance()
               onStakingComplete()
             }
@@ -139,6 +179,7 @@ const Staking: React.FC<StakingProps> = ({
       }, 3000)
     })
   }, [
+    allowance,
     month,
     onStakingComplete,
     opsecBalance,
@@ -146,7 +187,8 @@ const Staking: React.FC<StakingProps> = ({
     registerStaking,
     stakingPerMonth,
     toast,
-    writeContract,
+    unregisterStaking,
+    walletClient,
   ])
 
   useEffect(() => {
@@ -158,7 +200,8 @@ const Staking: React.FC<StakingProps> = ({
     opsecBalance !== undefined &&
     opsecBalance < BigInt(stakingPerMonth * 10 ** OPSEC_DECIMALS * month)
 
-  const isPending = isRegistering || isStaking || isConfirming
+  const isPending =
+    isRegistering || isUnregistering || stakingStatus !== undefined
 
   return (
     <div className="space-y-4">
@@ -194,6 +237,14 @@ const Staking: React.FC<StakingProps> = ({
         <p className="text-yellow-500">
           You don&lsquo;t have enough $OPSEC balance
         </p>
+      )}
+      {stakingStatus === "allowing" && (
+        <p className="text-gray-400">
+          Allowing your $OPSEC balance to be handled by staking contract
+        </p>
+      )}
+      {stakingStatus === "staking" && (
+        <p className="text-gray-400">Staking your $OPSEC balance</p>
       )}
     </div>
   )

@@ -57,7 +57,7 @@ model Node {
 model RewardReserved {
     id        Int      @id @default(autoincrement())
     nodeId    Int      @unique @map("node_id")
-    node      Node     @relation(fields: [nodeId], references: [id])
+    node      Node     @relation(fields: [nodeId], references: [id], onDelete: Cascade)
     stakeId   String   @map("stake_id")
     createdAt DateTime @default(now()) @map("created_at")
 
