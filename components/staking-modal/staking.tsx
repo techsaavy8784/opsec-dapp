@@ -171,6 +171,7 @@ const Staking: React.FC<StakingProps> = ({
         toast({
           title: "Transaction failed",
         })
+        return
       }
 
       clearInterval(timer.current)
