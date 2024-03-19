@@ -10,6 +10,7 @@ import { formatBalance, generateRandomString } from "@/lib/utils"
 import abi from "@/contract/abi.json"
 import { useToast } from "../ui/use-toast"
 import { erc20Abi } from "viem"
+import { publicClient } from "@/contract/client"
 
 interface StakingProps {
   rewards: Record<string, number>
@@ -130,19 +131,29 @@ const Staking: React.FC<StakingProps> = ({
           allowance < BigInt(stakingPerMonth * month * 10 ** OPSEC_DECIMALS)
         ) {
           setStakingStatus("allowing")
-          await walletClient.writeContract({
+
+          const hash = await walletClient.writeContract({
             address: process.env
               .NEXT_PUBLIC_OPSEC_TOKEN_ADDRESS as `0x${string}`,
-            abi,
+            abi: erc20Abi,
             functionName: "approve",
             args: [
               process.env.NEXT_PUBLIC_STAKING_CONTRACT as `0x${string}`,
               BigInt(stakingPerMonth * month * 10 ** OPSEC_DECIMALS),
             ],
           })
+
+          const tx = await publicClient.waitForTransactionReceipt({
+            hash,
+          })
+
+          if (tx.status !== "success") {
+            throw new Error("TX reverted")
+          }
         }
 
         setStakingStatus("staking")
+
         await walletClient.writeContract({
           address: process.env.NEXT_PUBLIC_STAKING_CONTRACT as `0x${string}`,
           abi,
@@ -153,7 +164,7 @@ const Staking: React.FC<StakingProps> = ({
             month * 31 * 3600 * 24,
           ],
         })
-      } catch {
+      } catch (e) {
         unregisterStaking(stakeId)
         setStakingStatus(undefined)
         toast({
