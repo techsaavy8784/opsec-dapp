@@ -24,9 +24,7 @@ export const StakingModal: React.FC<StakingModalProps> = ({
         className={`bg-[#18181B] border-none rounded-[24px] p-8 w-[350px] md:w-[450px]`}
       >
         <DialogTitle className="text-white text-center font-[600] text-[28px]">
-          Extend your subscription by
-          <br />
-          staking
+          Extend your subscription
         </DialogTitle>
         <div className="text-[#54597C] w-full text-center font-[500] text-[16px] space-y-4">
           <Image

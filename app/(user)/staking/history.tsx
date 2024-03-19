@@ -1,6 +1,6 @@
 "use client"
 
-import React from "react"
+import React, { useEffect } from "react"
 import { useQuery } from "@tanstack/react-query"
 import {
   Table,
@@ -16,6 +16,7 @@ import { formatDate } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { publicClient } from "@/contract/client"
 import abi from "@/contract/abi.json"
+import { formatUnits } from "viem"
 
 const StakingHistory = () => {
   const { isPending, data } = useQuery<
@@ -24,6 +25,30 @@ const StakingHistory = () => {
     queryKey: ["staking-history"],
     queryFn: () => fetch("/api/staking").then((res) => res.json()),
   })
+
+  const { data: staking, refetch } = useQuery({
+    queryKey: ["staking-history"],
+    queryFn: () =>
+      Promise.all(
+        data
+          ? data.map((item) =>
+              publicClient
+                .readContract({
+                  abi,
+                  address: process.env
+                    .NEXT_PUBLIC_STAKING_CONTRACT as `0x${string}`,
+                  functionName: "stakes",
+                  args: [item.stakeId],
+                })
+                .then((res) => (res as [string, bigint])[1]),
+            )
+          : [],
+      ),
+  })
+
+  useEffect(() => {
+    refetch()
+  }, [data, refetch])
 
   return (
     <div>
@@ -43,7 +68,7 @@ const StakingHistory = () => {
           <TableBody>
             {isPending ? (
               <TableRow>
-                <TableCell colSpan={5}>
+                <TableCell colSpan={6}>
                   <Skeleton className="rounded-lg w-full h-[64px] mr-2 block"></Skeleton>
                 </TableCell>
               </TableRow>
@@ -55,11 +80,13 @@ const StakingHistory = () => {
               </TableRow>
             ) : (
               data.map((item, key) => {
-                const remaining =
-                  (item.duration -
-                    (Date.now() - new Date(item.date).getTime()) / 1000) /
-                  3600 /
-                  24
+                const remaining = Math.round(
+                  item.duration -
+                    (Date.now() - new Date(item.date).getTime()) /
+                      1000 /
+                      3600 /
+                      24,
+                )
 
                 return (
                   <TableRow className="border-b-none" key={key}>
@@ -70,10 +97,12 @@ const StakingHistory = () => {
                       {item.node.blockchain.name}
                     </TableCell>
                     <TableCell className="text-[16px] font-[600] text-white max-md:min-w-[130px]">
-                      {item.credit}
+                      {staking?.[key]
+                        ? formatUnits(staking[key], 18)
+                        : undefined}
                     </TableCell>
                     <TableCell className="text-[16px] font-[600] text-white max-md:min-w-[130px]">
-                      {Math.round(item.duration / 1000 / 3600 / 24)} days
+                      {item.duration} days
                     </TableCell>
                     <TableCell className="text-[16px] font-[600] text-white max-md:min-w-[130px]">
                       {remaining < 0 ? (

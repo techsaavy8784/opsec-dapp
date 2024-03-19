@@ -19,5 +19,5 @@ export async function GET(request: NextRequest) {
     },
   })
 
-  return NextResponse.json({ complete: count === 0 })
+  return NextResponse.json({ completed: count === 0 })
 }

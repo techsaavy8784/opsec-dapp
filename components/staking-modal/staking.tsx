@@ -58,7 +58,9 @@ const Staking: React.FC<StakingProps> = ({
 
   const amounts = entries.map(([, amount]) => amount)
 
-  const { data: stakingPerMonth } = useQuery<number | undefined>({
+  const { data: stakingPerMonth, isPending: isGettingRate } = useQuery<
+    number | undefined
+  >({
     queryKey: ["staking", JSON.stringify(entries)],
     queryFn: () =>
       fetch(
@@ -111,12 +113,11 @@ const Staking: React.FC<StakingProps> = ({
       return
     }
 
-    const stakeId = generateRandomString(32)
     const encoder = new TextEncoder()
-    const bytes = encoder.encode(stakeId)
-    const bytesString = Array.from(bytes, (byte) =>
+    const bytes = encoder.encode(generateRandomString(32))
+    const stakeId = `0x${Array.from(bytes, (byte) =>
       byte.toString(16).padStart(2, "0"),
-    ).join("")
+    ).join("")}`
 
     registerStaking(stakeId).then(async (res) => {
       if (res !== "success") {
@@ -159,7 +160,7 @@ const Staking: React.FC<StakingProps> = ({
           abi,
           functionName: "stake",
           args: [
-            `0x${bytesString}`,
+            stakeId,
             stakingPerMonth * month * 10 ** OPSEC_DECIMALS,
             month * 31 * 3600 * 24,
           ],
@@ -182,6 +183,7 @@ const Staking: React.FC<StakingProps> = ({
               toast({
                 title: "Staking completed",
               })
+              clearInterval(timer.current)
               setStakingStatus(undefined)
               refetchBalance()
               onStakingComplete()
@@ -256,6 +258,9 @@ const Staking: React.FC<StakingProps> = ({
       )}
       {stakingStatus === "staking" && (
         <p className="text-gray-400">Staking your $OPSEC balance</p>
+      )}
+      {isGettingRate && (
+        <p className="text-gray-400">Calculating staking amount</p>
       )}
     </div>
   )

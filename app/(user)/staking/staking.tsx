@@ -38,7 +38,7 @@ const StakingPage: React.FC = () => {
 
   return (
     <div className="space-y-6 text-center">
-      <div className="grid items-center grid-cols-1 gap-8 pt-2 md:grid-cols-3">
+      <div className="grid items-center grid-cols-1 sm:grid-cols-2 gap-8 pt-2 xl:grid-cols-3">
         {data.chains.map((chain: any) => (
           <div key={chain.id} className="h-full flex flex-col">
             <NodeCard

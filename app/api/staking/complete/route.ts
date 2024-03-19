@@ -16,7 +16,7 @@ export async function POST(request: NextRequest) {
     address: process.env.NEXT_PUBLIC_STAKING_CONTRACT as `0x${string}`,
     functionName: "stakes",
     args: [stakeId],
-  })) as [string, number, number]
+  })) as [string, bigint, bigint]
 
   await prisma.node.updateMany({
     data: {
@@ -40,8 +40,8 @@ export async function POST(request: NextRequest) {
     data: rewardReserved.map((r) => ({
       nodeId: r.nodeId,
       stakeId,
-      duration,
-      credit: stakingAmount,
+      duration: Number(duration) / 3600 / 24,
+      credit: 0,
     })),
   })
 
