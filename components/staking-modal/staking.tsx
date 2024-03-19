@@ -6,7 +6,8 @@ import { useMutation, useQuery } from "@tanstack/react-query"
 import { Button } from "@/components/ui/button"
 import { Slider } from "@/components/ui/slider"
 import {
-  useBalance,
+  useAccount,
+  useReadContract,
   useWaitForTransactionReceipt,
   useWriteContract,
 } from "wagmi"
@@ -20,6 +21,8 @@ interface StakingProps {
   onStakingComplete: () => void
 }
 
+const OPSEC_DECIMALS = 18
+
 const Staking: React.FC<StakingProps> = ({
   rewards,
   nodeId,
@@ -31,8 +34,21 @@ const Staking: React.FC<StakingProps> = ({
 
   const timer = useRef<NodeJS.Timeout>()
 
-  const { data: opsecBalance, refetch: refetchBalance } = useBalance({
+  const { address } = useAccount()
+
+  const { data: opsecBalance, refetch: refetchBalance } = useReadContract({
+    abi: [
+      {
+        type: "function",
+        name: "balanceOf",
+        stateMutability: "view",
+        inputs: [{ name: "account", type: "address" }],
+        outputs: [{ type: "uint256" }],
+      },
+    ],
     address: process.env.NEXT_PUBLIC_OPSEC_TOKEN_ADDRESS as `0x${string}`,
+    functionName: "balanceOf",
+    args: [address as `0x${string}`],
   })
 
   const entries = Object.entries(rewards)
@@ -94,7 +110,7 @@ const Staking: React.FC<StakingProps> = ({
         functionName: "stake",
         args: [
           bytesString,
-          stakingPerMonth * month * 10 ** opsecBalance.decimals,
+          stakingPerMonth * month * 10 ** OPSEC_DECIMALS,
           month * 31 * 3600 * 24,
         ],
       })
@@ -133,7 +149,7 @@ const Staking: React.FC<StakingProps> = ({
   const lowBalance =
     stakingPerMonth !== undefined &&
     opsecBalance !== undefined &&
-    opsecBalance.value < stakingPerMonth * 10 ** opsecBalance.decimals * month
+    opsecBalance < BigInt(stakingPerMonth * 10 ** OPSEC_DECIMALS * month)
 
   const isPending = isRegistering || isStaking || isConfirming
 
@@ -153,11 +169,6 @@ const Staking: React.FC<StakingProps> = ({
           months
         </p>
       )}
-      {lowBalance && (
-        <p className="text-yellow-500">
-          You don&lsquo;t have enough $OPSEC balance
-        </p>
-      )}
       <Button
         onClick={handleStake}
         variant="custom"
@@ -171,7 +182,12 @@ const Staking: React.FC<StakingProps> = ({
       >
         {isPending && <ReloadIcon className="mr-2 animate-spin" />}
         Stake
-      </Button>{" "}
+      </Button>
+      {lowBalance && (
+        <p className="text-yellow-500">
+          You don&lsquo;t have enough $OPSEC balance
+        </p>
+      )}
     </div>
   )
 }
