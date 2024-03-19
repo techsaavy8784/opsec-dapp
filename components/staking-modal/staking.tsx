@@ -77,14 +77,14 @@ const Staking: React.FC<StakingProps> = ({
                 stakeId,
                 rewards,
               }),
-            })
+            }).then((res) => res.json())
           : fetch("/api/staking/register", {
               method: "PUT",
               body: JSON.stringify({
                 stakeId,
                 nodeId,
               }),
-            }),
+            }).then((res) => res.json()),
     })
 
   const { data: hash, writeContract, isPending: isStaking } = useWriteContract()
@@ -103,7 +103,14 @@ const Staking: React.FC<StakingProps> = ({
       byte.toString(16).padStart(2, "0"),
     ).join("")
 
-    registerStaking(stakeId).then(() => {
+    registerStaking(stakeId).then((res) => {
+      if (res !== "success") {
+        toast({
+          title: "Failed to register staking",
+        })
+        return
+      }
+
       writeContract({
         address: process.env.NEXT_PUBLIC_STAKING_CONTRACT as `0x${string}`,
         abi,
@@ -118,7 +125,7 @@ const Staking: React.FC<StakingProps> = ({
       clearInterval(timer.current)
 
       timer.current = setInterval(() => {
-        fetch(`/api/staking/${stakeId}`)
+        fetch(`/api/staking/status?stakeId=${stakeId}`)
           .then((res) => res.json())
           .then((res) => {
             if (res.completed) {
