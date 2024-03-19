@@ -116,5 +116,12 @@ export async function DELETE(request: NextRequest) {
     },
   })
 
+  // remove reserved for extending subscription
+  await prisma.rewardReserved.deleteMany({
+    where: {
+      stakeId,
+    },
+  })
+
   return NextResponse.json("success", { status: 200 })
 }

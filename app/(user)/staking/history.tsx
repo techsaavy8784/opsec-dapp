@@ -27,7 +27,7 @@ const StakingHistory = () => {
   })
 
   const { data: staking, refetch } = useQuery({
-    queryKey: ["staking-history"],
+    queryKey: ["staking-history-onchain"],
     queryFn: () =>
       Promise.all(
         data

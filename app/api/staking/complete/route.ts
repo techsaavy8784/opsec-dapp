@@ -3,6 +3,7 @@ import prisma from "@/prisma"
 import { publicClient } from "@/contract/client"
 import abi from "@/contract/abi.json"
 import { Status } from "@prisma/client"
+import { formatUnits } from "viem"
 
 export async function POST(request: NextRequest) {
   if (request.headers.get("X-API-KEY") !== process.env.STAKE_WEBHOOK_KEY) {
@@ -41,7 +42,7 @@ export async function POST(request: NextRequest) {
       nodeId: r.nodeId,
       stakeId,
       duration: Number(duration) / 3600 / 24,
-      credit: 0,
+      credit: Number(formatUnits(stakingAmount, 18)),
     })),
   })
 
