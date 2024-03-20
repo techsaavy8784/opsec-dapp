@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useEffect } from "react"
+import React, { useCallback, useEffect } from "react"
 import { useQuery } from "@tanstack/react-query"
 import {
   Table,
@@ -17,6 +17,8 @@ import { Button } from "@/components/ui/button"
 import { publicClient } from "@/contract/client"
 import abi from "@/contract/abi.json"
 import { formatUnits } from "viem"
+import { ReloadIcon } from "@radix-ui/react-icons"
+import { useWalletClient, useWriteContract } from "wagmi"
 
 const StakingHistory = () => {
   const { isPending, data } = useQuery<
@@ -40,11 +42,36 @@ const StakingHistory = () => {
                   functionName: "stakes",
                   args: [item.stakeId],
                 })
-                .then((res) => (res as [string, bigint])[1]),
+                .then(
+                  (res) => res as [string, bigint, bigint, bigint, boolean],
+                ),
             )
           : [],
       ),
   })
+
+  const { data: walletClient, isPending: isUnstaking } = useWalletClient()
+
+  const handleUnstake = useCallback(
+    async (stakeId: string | null) => {
+      if (!stakeId || walletClient === undefined) return
+      const hash = await walletClient.writeContract({
+        abi,
+        address: process.env.NEXT_PUBLIC_STAKING_CONTRACT as `0x${string}`,
+        functionName: "unstake",
+        args: [stakeId],
+      })
+      const tx = await publicClient.waitForTransactionReceipt({
+        hash,
+      })
+
+      if (tx.status !== "success") {
+        throw new Error("TX reverted")
+      }
+      refetch()
+    },
+    [refetch, walletClient],
+  )
 
   useEffect(() => {
     refetch()
@@ -98,7 +125,7 @@ const StakingHistory = () => {
                     </TableCell>
                     <TableCell className="text-[16px] font-[600] text-white max-md:min-w-[130px]">
                       {staking?.[key]
-                        ? formatUnits(staking[key], 18)
+                        ? formatUnits(staking[key][1], 18)
                         : undefined}
                     </TableCell>
                     <TableCell className="text-[16px] font-[600] text-white max-md:min-w-[130px]">
@@ -106,8 +133,20 @@ const StakingHistory = () => {
                     </TableCell>
                     <TableCell className="text-[16px] font-[600] text-white max-md:min-w-[130px]">
                       {remaining < 0 ? (
-                        // todo: call contract unstake function
-                        <Button>Unstake</Button>
+                        staking?.[key]?.[4] === true ? (
+                          "Unstaked"
+                        ) : (
+                          // todo: call contract unstake function
+                          <Button
+                            onClick={() => handleUnstake(item.stakeId)}
+                            disabled={isUnstaking}
+                          >
+                            {isUnstaking && (
+                              <ReloadIcon className="mr-2 animate-spin" />
+                            )}
+                            Unstake
+                          </Button>
+                        )
                       ) : (
                         `${Math.max(0, remaining)} days`
                       )}
