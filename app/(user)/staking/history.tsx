@@ -2,6 +2,10 @@
 
 import React, { useCallback, useEffect, useState } from "react"
 import { useQuery } from "@tanstack/react-query"
+import { ReloadIcon } from "@radix-ui/react-icons"
+import { formatUnits } from "viem"
+import { useWalletClient } from "wagmi"
+import { Payment } from "@prisma/client"
 import {
   Table,
   TableBody,
@@ -10,16 +14,12 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { Payment } from "@prisma/client"
 import { Skeleton } from "@/components/ui/skeleton"
-import { formatDate } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
-import { publicClient } from "@/contract/client"
-import abi from "@/contract/abi.json"
-import { formatUnits } from "viem"
-import { ReloadIcon } from "@radix-ui/react-icons"
-import { useWalletClient } from "wagmi"
 import { useToast } from "@/components/ui/use-toast"
+import { publicClient } from "@/contract/client"
+import { formatDate } from "@/lib/utils"
+import abi from "@/contract/abi.json"
 
 const StakingHistory = () => {
   const { toast } = useToast()
@@ -59,7 +59,9 @@ const StakingHistory = () => {
 
   const handleUnstake = useCallback(
     async (stakeId: string) => {
-      if (walletClient === undefined) return
+      if (walletClient === undefined) {
+        return
+      }
 
       try {
         setUnstakeIds((prev) => prev.concat(stakeId))
