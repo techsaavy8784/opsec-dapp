@@ -1,7 +1,11 @@
 "use client"
 
-import React, { useCallback, useEffect } from "react"
+import React, { useCallback, useEffect, useState } from "react"
 import { useQuery } from "@tanstack/react-query"
+import { ReloadIcon } from "@radix-ui/react-icons"
+import { formatUnits } from "viem"
+import { useWalletClient } from "wagmi"
+import { Payment } from "@prisma/client"
 import {
   Table,
   TableBody,
@@ -10,17 +14,16 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { Payment } from "@prisma/client"
 import { Skeleton } from "@/components/ui/skeleton"
-import { formatDate } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
+import { useToast } from "@/components/ui/use-toast"
 import { publicClient } from "@/contract/client"
+import { formatDate } from "@/lib/utils"
 import abi from "@/contract/abi.json"
-import { formatUnits } from "viem"
-import { ReloadIcon } from "@radix-ui/react-icons"
-import { useWalletClient, useWriteContract } from "wagmi"
 
 const StakingHistory = () => {
+  const { toast } = useToast()
+
   const { isPending, data } = useQuery<
     (Payment & { node: any; onchain: [number, number, number, number] })[]
   >({
@@ -50,27 +53,50 @@ const StakingHistory = () => {
       ),
   })
 
-  const { data: walletClient, isPending: isUnstaking } = useWalletClient()
+  const { data: walletClient } = useWalletClient()
+
+  const [unstakeIds, setUnstakeIds] = useState<string[]>([])
 
   const handleUnstake = useCallback(
-    async (stakeId: string | null) => {
-      if (!stakeId || walletClient === undefined) return
-      const hash = await walletClient.writeContract({
-        abi,
-        address: process.env.NEXT_PUBLIC_STAKING_CONTRACT as `0x${string}`,
-        functionName: "unstake",
-        args: [stakeId],
-      })
-      const tx = await publicClient.waitForTransactionReceipt({
-        hash,
-      })
-
-      if (tx.status !== "success") {
-        throw new Error("TX reverted")
+    async (stakeId: string) => {
+      if (walletClient === undefined) {
+        return
       }
-      refetch()
+
+      try {
+        setUnstakeIds((prev) => prev.concat(stakeId))
+
+        const hash = await walletClient.writeContract({
+          abi,
+          address: process.env.NEXT_PUBLIC_STAKING_CONTRACT as `0x${string}`,
+          functionName: "unstake",
+          args: [stakeId],
+        })
+
+        const tx = await publicClient.waitForTransactionReceipt({
+          hash,
+        })
+
+        if (tx.status !== "success") {
+          throw new Error("TX reverted")
+        }
+
+        refetch()
+
+        toast({
+          title: "Unstake has succeeded",
+        })
+      } catch (e) {
+        toast({
+          title: "Transaction failed",
+        })
+      } finally {
+        setUnstakeIds((prev) =>
+          prev.filter((unstakeId) => unstakeId !== stakeId),
+        )
+      }
     },
-    [refetch, walletClient],
+    [refetch, toast, walletClient],
   )
 
   useEffect(() => {
@@ -115,6 +141,10 @@ const StakingHistory = () => {
                       24,
                 )
 
+                const unstakePending = unstakeIds.some(
+                  (unstakeId) => unstakeId === item.stakeId,
+                )
+
                 return (
                   <TableRow className="border-b-none" key={key}>
                     <TableCell className="text-[16px] font-[600] text-white">
@@ -132,23 +162,22 @@ const StakingHistory = () => {
                       {item.duration} days
                     </TableCell>
                     <TableCell className="text-[16px] font-[600] text-white max-md:min-w-[130px]">
-                      {remaining < 0 ? (
-                        staking?.[key]?.[4] === true ? (
-                          "Unstaked"
-                        ) : (
-                          // todo: call contract unstake function
-                          <Button
-                            onClick={() => handleUnstake(item.stakeId)}
-                            disabled={isUnstaking}
-                          >
-                            {isUnstaking && (
-                              <ReloadIcon className="mr-2 animate-spin" />
-                            )}
-                            Unstake
-                          </Button>
-                        )
+                      {remaining >= 0 ? (
+                        `${remaining} days`
+                      ) : staking === undefined ? (
+                        "0 days"
+                      ) : staking[key]?.[4] ? (
+                        "Unstaked"
                       ) : (
-                        `${Math.max(0, remaining)} days`
+                        <Button
+                          onClick={() => handleUnstake(item.stakeId!)}
+                          disabled={unstakePending}
+                        >
+                          {unstakePending && (
+                            <ReloadIcon className="mr-2 animate-spin" />
+                          )}
+                          Unstake
+                        </Button>
                       )}
                     </TableCell>
                     <TableCell className="text-[16px] font-[600] text-white max-md:min-w-[130px]">
