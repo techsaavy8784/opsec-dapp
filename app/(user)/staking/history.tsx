@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useCallback, useEffect } from "react"
+import React, { useCallback, useEffect, useState } from "react"
 import { useQuery } from "@tanstack/react-query"
 import {
   Table,
@@ -18,9 +18,12 @@ import { publicClient } from "@/contract/client"
 import abi from "@/contract/abi.json"
 import { formatUnits } from "viem"
 import { ReloadIcon } from "@radix-ui/react-icons"
-import { useWalletClient, useWriteContract } from "wagmi"
+import { useWalletClient } from "wagmi"
+import { useToast } from "@/components/ui/use-toast"
 
 const StakingHistory = () => {
+  const { toast } = useToast()
+
   const { isPending, data } = useQuery<
     (Payment & { node: any; onchain: [number, number, number, number] })[]
   >({
@@ -50,27 +53,39 @@ const StakingHistory = () => {
       ),
   })
 
-  const { data: walletClient, isPending: isUnstaking } = useWalletClient()
+  const { data: walletClient } = useWalletClient()
+
+  const [unstakeId, setUnstakeId] = useState<string>()
 
   const handleUnstake = useCallback(
     async (stakeId: string | null) => {
       if (!stakeId || walletClient === undefined) return
-      const hash = await walletClient.writeContract({
-        abi,
-        address: process.env.NEXT_PUBLIC_STAKING_CONTRACT as `0x${string}`,
-        functionName: "unstake",
-        args: [stakeId],
-      })
-      const tx = await publicClient.waitForTransactionReceipt({
-        hash,
-      })
 
-      if (tx.status !== "success") {
-        throw new Error("TX reverted")
+      try {
+        setUnstakeId(stakeId)
+        const hash = await walletClient.writeContract({
+          abi,
+          address: process.env.NEXT_PUBLIC_STAKING_CONTRACT as `0x${string}`,
+          functionName: "unstake",
+          args: [stakeId],
+        })
+        const tx = await publicClient.waitForTransactionReceipt({
+          hash,
+        })
+
+        if (tx.status !== "success") {
+          throw new Error("TX reverted")
+        }
+        refetch()
+      } catch (e) {
+        setUnstakeId(undefined)
+        toast({
+          title: "Transaction failed",
+        })
+        return
       }
-      refetch()
     },
-    [refetch, walletClient],
+    [refetch, toast, walletClient],
   )
 
   useEffect(() => {
@@ -133,20 +148,16 @@ const StakingHistory = () => {
                     </TableCell>
                     <TableCell className="text-[16px] font-[600] text-white max-md:min-w-[130px]">
                       {remaining < 0 ? (
-                        staking?.[key]?.[4] === true ? (
-                          "Unstaked"
-                        ) : (
-                          // todo: call contract unstake function
-                          <Button
-                            onClick={() => handleUnstake(item.stakeId)}
-                            disabled={isUnstaking}
-                          >
-                            {isUnstaking && (
-                              <ReloadIcon className="mr-2 animate-spin" />
-                            )}
-                            Unstake
-                          </Button>
-                        )
+                        // todo: call contract unstake function
+                        <Button
+                          onClick={() => handleUnstake(item.stakeId)}
+                          disabled={unstakeId !== item.stakeId}
+                        >
+                          {unstakeId === item.stakeId && (
+                            <ReloadIcon className="mr-2 animate-spin" />
+                          )}
+                          Unstake
+                        </Button>
                       ) : (
                         `${Math.max(0, remaining)} days`
                       )}
