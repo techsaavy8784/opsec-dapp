@@ -77,18 +77,12 @@ const StakingHistory = () => {
           throw new Error("TX reverted")
         }
         setUnstakeIds((prev) =>
-          prev.splice(
-            prev.findIndex((unstakeId) => unstakeId === stakeId),
-            1,
-          ),
+          prev.filter((unstakeId) => unstakeId === stakeId),
         )
         refetch()
       } catch (e) {
         setUnstakeIds((prev) =>
-          prev.splice(
-            prev.findIndex((unstakeId) => unstakeId === stakeId),
-            1,
-          ),
+          prev.filter((unstakeId) => unstakeId === stakeId),
         )
         toast({
           title: "Transaction failed",
