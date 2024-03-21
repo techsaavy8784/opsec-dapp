@@ -55,14 +55,14 @@ const StakingHistory = () => {
 
   const { data: walletClient } = useWalletClient()
 
-  const [unstakeId, setUnstakeId] = useState<string>()
+  const [unstakeIds, setUnstakeIds] = useState<string[]>([])
 
   const handleUnstake = useCallback(
     async (stakeId: string | null) => {
       if (!stakeId || walletClient === undefined) return
 
       try {
-        setUnstakeId(stakeId)
+        setUnstakeIds((prev) => prev.concat(stakeId))
         const hash = await walletClient.writeContract({
           abi,
           address: process.env.NEXT_PUBLIC_STAKING_CONTRACT as `0x${string}`,
@@ -76,9 +76,20 @@ const StakingHistory = () => {
         if (tx.status !== "success") {
           throw new Error("TX reverted")
         }
+        setUnstakeIds((prev) =>
+          prev.splice(
+            prev.findIndex((unstakeId) => unstakeId === stakeId),
+            1,
+          ),
+        )
         refetch()
       } catch (e) {
-        setUnstakeId(undefined)
+        setUnstakeIds((prev) =>
+          prev.splice(
+            prev.findIndex((unstakeId) => unstakeId === stakeId),
+            1,
+          ),
+        )
         toast({
           title: "Transaction failed",
         })
@@ -153,9 +164,15 @@ const StakingHistory = () => {
                         ) : (
                           <Button
                             onClick={() => handleUnstake(item.stakeId)}
-                            disabled={unstakeId !== item.stakeId}
+                            disabled={
+                              unstakeIds.findIndex(
+                                (unstakeId) => unstakeId === item.stakeId,
+                              ) > -1
+                            }
                           >
-                            {unstakeId === item.stakeId && (
+                            {unstakeIds.findIndex(
+                              (unstakeId) => unstakeId === item.stakeId,
+                            ) > -1 && (
                               <ReloadIcon className="mr-2 animate-spin" />
                             )}
                             Unstake
