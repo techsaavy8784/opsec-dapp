@@ -79,23 +79,19 @@ const StakingHistory = () => {
           throw new Error("TX reverted")
         }
 
-        setUnstakeIds((prev) =>
-          prev.filter((unstakeId) => unstakeId !== stakeId),
-        )
-
         refetch()
 
         toast({
           title: "Unstake has succeeded",
         })
       } catch (e) {
-        setUnstakeIds((prev) =>
-          prev.filter((unstakeId) => unstakeId !== stakeId),
-        )
-
         toast({
           title: "Transaction failed",
         })
+      } finally {
+        setUnstakeIds((prev) =>
+          prev.filter((unstakeId) => unstakeId !== stakeId),
+        )
       }
     },
     [refetch, toast, walletClient],
