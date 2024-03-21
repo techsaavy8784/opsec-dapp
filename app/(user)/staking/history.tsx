@@ -58,17 +58,19 @@ const StakingHistory = () => {
   const [unstakeIds, setUnstakeIds] = useState<string[]>([])
 
   const handleUnstake = useCallback(
-    async (stakeId: string | null) => {
-      if (!stakeId || walletClient === undefined) return
+    async (stakeId: string) => {
+      if (walletClient === undefined) return
 
       try {
         setUnstakeIds((prev) => prev.concat(stakeId))
+
         const hash = await walletClient.writeContract({
           abi,
           address: process.env.NEXT_PUBLIC_STAKING_CONTRACT as `0x${string}`,
           functionName: "unstake",
           args: [stakeId],
         })
+
         const tx = await publicClient.waitForTransactionReceipt({
           hash,
         })
@@ -76,18 +78,24 @@ const StakingHistory = () => {
         if (tx.status !== "success") {
           throw new Error("TX reverted")
         }
+
         setUnstakeIds((prev) =>
           prev.filter((unstakeId) => unstakeId !== stakeId),
         )
+
         refetch()
+
+        toast({
+          title: "Unstake has succeeded",
+        })
       } catch (e) {
         setUnstakeIds((prev) =>
           prev.filter((unstakeId) => unstakeId !== stakeId),
         )
+
         toast({
           title: "Transaction failed",
         })
-        return
       }
     },
     [refetch, toast, walletClient],
@@ -135,6 +143,10 @@ const StakingHistory = () => {
                       24,
                 )
 
+                const unstakePending = unstakeIds.some(
+                  (unstakeId) => unstakeId === item.stakeId,
+                )
+
                 return (
                   <TableRow className="border-b-none" key={key}>
                     <TableCell className="text-[16px] font-[600] text-white">
@@ -152,28 +164,22 @@ const StakingHistory = () => {
                       {item.duration} days
                     </TableCell>
                     <TableCell className="text-[16px] font-[600] text-white max-md:min-w-[130px]">
-                      {remaining < 0 ? (
-                        staking?.[key]?.[4] === true ? (
-                          "Unstaked"
-                        ) : (
-                          <Button
-                            onClick={() => handleUnstake(item.stakeId)}
-                            disabled={
-                              unstakeIds.findIndex(
-                                (unstakeId) => unstakeId === item.stakeId,
-                              ) > -1
-                            }
-                          >
-                            {unstakeIds.findIndex(
-                              (unstakeId) => unstakeId === item.stakeId,
-                            ) > -1 && (
-                              <ReloadIcon className="mr-2 animate-spin" />
-                            )}
-                            Unstake
-                          </Button>
-                        )
+                      {remaining >= 0 ? (
+                        `${remaining} days`
+                      ) : staking === undefined ? (
+                        "0 days"
+                      ) : staking[key]?.[4] ? (
+                        "Unstaked"
                       ) : (
-                        `${Math.max(0, remaining)} days`
+                        <Button
+                          onClick={() => handleUnstake(item.stakeId!)}
+                          disabled={unstakePending}
+                        >
+                          {unstakePending && (
+                            <ReloadIcon className="mr-2 animate-spin" />
+                          )}
+                          Unstake
+                        </Button>
                       )}
                     </TableCell>
                     <TableCell className="text-[16px] font-[600] text-white max-md:min-w-[130px]">
