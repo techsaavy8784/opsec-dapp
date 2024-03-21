@@ -148,16 +148,19 @@ const StakingHistory = () => {
                     </TableCell>
                     <TableCell className="text-[16px] font-[600] text-white max-md:min-w-[130px]">
                       {remaining < 0 ? (
-                        // todo: call contract unstake function
-                        <Button
-                          onClick={() => handleUnstake(item.stakeId)}
-                          disabled={unstakeId !== item.stakeId}
-                        >
-                          {unstakeId === item.stakeId && (
-                            <ReloadIcon className="mr-2 animate-spin" />
-                          )}
-                          Unstake
-                        </Button>
+                        staking?.[key]?.[4] === true ? (
+                          "Unstaked"
+                        ) : (
+                          <Button
+                            onClick={() => handleUnstake(item.stakeId)}
+                            disabled={unstakeId !== item.stakeId}
+                          >
+                            {unstakeId === item.stakeId && (
+                              <ReloadIcon className="mr-2 animate-spin" />
+                            )}
+                            Unstake
+                          </Button>
+                        )
                       ) : (
                         `${Math.max(0, remaining)} days`
                       )}
