@@ -124,9 +124,9 @@ const Node: React.FC<NodeProps> = ({ params: { id } }) => {
           </div>
         )}
 
-        <div className="text-center flex flex-col gap-3">
-          <label>Extend subscription with</label>
-          <Button onClick={() => setModal(true)}>Credit</Button>
+        {/* {soonExpired && ( */}
+        <div className="text-center">
+          <Button onClick={() => setModal(true)}>Extend subscription</Button>
           <NodePaymentModal
             nodeId={data.id}
             open={modal}

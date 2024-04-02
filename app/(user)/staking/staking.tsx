@@ -94,8 +94,19 @@ const Staking: React.FC = () => {
         title: "Transaction failed",
       })
       return
+    } finally {
+      refetchBalance()
+      refetchAllowance()
     }
-  }, [allowance, amount, month, toast, walletClient])
+  }, [
+    allowance,
+    amount,
+    month,
+    refetchAllowance,
+    refetchBalance,
+    toast,
+    walletClient,
+  ])
 
   if (opsecBalance === undefined) {
     return null
