@@ -9,6 +9,7 @@ import { daysPassedSince, formatDate } from "@/lib/utils"
 import clsx from "clsx"
 import { NodePaymentModal } from "@/components/payment-modal/node"
 import { Button } from "@/components/ui/button"
+import { ExtendStakingModal } from "@/components/extend-staking-modal"
 
 interface NodeProps {
   params: {
@@ -54,6 +55,10 @@ const Node: React.FC<NodeProps> = ({ params: { id } }) => {
 
   const soonExpired =
     daysTillExpiration < Number(process.env.NEXT_PUBLIC_NODE_EXPIRE_WARN_DAYS)
+
+  const stakeId = data.payments.find(
+    (payment) => payment.stakeId !== null,
+  )?.stakeId
 
   return (
     <div className="w-full space-y-2">
@@ -124,16 +129,24 @@ const Node: React.FC<NodeProps> = ({ params: { id } }) => {
           </div>
         )}
 
-        {/* {soonExpired && ( */}
         <div className="text-center">
           <Button onClick={() => setModal(true)}>Extend subscription</Button>
-          <NodePaymentModal
-            nodeId={data.id}
-            open={modal}
-            chain={data.blockchain}
-            onOpenChange={() => setModal(false)}
-            onPurchaseComplete={() => refetch()}
-          />
+          {stakeId ? (
+            <ExtendStakingModal
+              stakeId={stakeId}
+              open={modal}
+              onOpenChange={() => setModal(false)}
+              onComplete={() => refetch()}
+            />
+          ) : (
+            <NodePaymentModal
+              nodeId={data.id}
+              open={modal}
+              chain={data.blockchain}
+              onOpenChange={() => setModal(false)}
+              onPurchaseComplete={() => refetch()}
+            />
+          )}
         </div>
       </div>
 

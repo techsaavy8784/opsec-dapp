@@ -1,10 +1,8 @@
 "use client"
 
-import React, { useCallback, useEffect, useState } from "react"
+import React, { useEffect } from "react"
 import { useQuery } from "@tanstack/react-query"
-import { ReloadIcon } from "@radix-ui/react-icons"
 import { formatUnits } from "viem"
-import { useWalletClient } from "wagmi"
 import { Payment } from "@prisma/client"
 import {
   Table,
@@ -15,24 +13,20 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { Skeleton } from "@/components/ui/skeleton"
-import { Button } from "@/components/ui/button"
-import { useToast } from "@/components/ui/use-toast"
 import { publicClient } from "@/contract/client"
 import { formatDate } from "@/lib/utils"
 import abi from "@/contract/abi.json"
 
-const StakingHistory = () => {
-  const { toast } = useToast()
-
+const StakingProgress = () => {
   const { isPending, data } = useQuery<
     (Payment & { node: any; onchain: [number, number, number, number] })[]
   >({
-    queryKey: ["staking-history"],
-    queryFn: () => fetch("/api/staking").then((res) => res.json()),
+    queryKey: ["staking-progress"],
+    queryFn: () => fetch("/api/staking/list").then((res) => res.json()),
   })
 
   const { data: staking, refetch } = useQuery({
-    queryKey: ["staking-history-onchain"],
+    queryKey: ["staking-progress-onchain"],
     queryFn: () =>
       Promise.all(
         data
@@ -53,65 +47,24 @@ const StakingHistory = () => {
       ),
   })
 
-  const { data: walletClient } = useWalletClient()
-
-  const [unstakeIds, setUnstakeIds] = useState<string[]>([])
-
-  const handleUnstake = useCallback(
-    async (stakeId: string) => {
-      if (walletClient === undefined) {
-        return
-      }
-
-      try {
-        setUnstakeIds((prev) => prev.concat(stakeId))
-
-        const hash = await walletClient.writeContract({
-          abi,
-          address: process.env.NEXT_PUBLIC_STAKING_CONTRACT as `0x${string}`,
-          functionName: "unstake",
-          args: [stakeId],
-        })
-
-        const tx = await publicClient.waitForTransactionReceipt({
-          hash,
-        })
-
-        if (tx.status !== "success") {
-          throw new Error("TX reverted")
-        }
-
-        refetch()
-
-        toast({
-          title: "Unstake has succeeded",
-        })
-      } catch (e) {
-        toast({
-          title: "Transaction failed",
-        })
-      } finally {
-        setUnstakeIds((prev) =>
-          prev.filter((unstakeId) => unstakeId !== stakeId),
-        )
-      }
-    },
-    [refetch, toast, walletClient],
-  )
-
   useEffect(() => {
     refetch()
   }, [data, refetch])
 
+  if (!data || data.length === 0) {
+    return null
+  }
+
   return (
     <div>
-      <p className="my-3">Staking History</p>
+      <p>Currently working on rewards for the following stakings</p>
+      <hr className="my-4" />
       <div className="border border-[#FFFFFF33] rounded-[16px]">
         <Table>
           <TableHeader>
             <TableRow className="border-b-[#FFFFFF4D]">
               <TableHead>#</TableHead>
-              <TableHead>Node</TableHead>
+              <TableHead>Stake Id</TableHead>
               <TableHead>Amount</TableHead>
               <TableHead>Duration</TableHead>
               <TableHead>Unlock remaining</TableHead>
@@ -140,11 +93,6 @@ const StakingHistory = () => {
                       3600 /
                       24,
                 )
-
-                const unstakePending = unstakeIds.some(
-                  (unstakeId) => unstakeId === item.stakeId,
-                )
-
                 return (
                   <TableRow className="border-b-none" key={key}>
                     <TableCell className="text-[16px] font-[600] text-white">
@@ -162,26 +110,7 @@ const StakingHistory = () => {
                       {item.duration} days
                     </TableCell>
                     <TableCell className="text-[16px] font-[600] text-white max-md:min-w-[130px] flex gap-2">
-                      {remaining >= 0 ? (
-                        `${remaining} days`
-                      ) : staking === undefined ? (
-                        "0 days"
-                      ) : staking[key]?.[4] ? (
-                        "Unstaked"
-                      ) : (
-                        <>
-                          <Button
-                            onClick={() => handleUnstake(item.stakeId!)}
-                            disabled={unstakePending}
-                          >
-                            {unstakePending && (
-                              <ReloadIcon className="mr-2 animate-spin" />
-                            )}
-                            Unstake
-                          </Button>
-                          <Button>Extend</Button>
-                        </>
-                      )}
+                      {remaining} days
                     </TableCell>
                     <TableCell className="text-[16px] font-[600] text-white max-md:min-w-[130px]">
                       {formatDate(item.date)}
@@ -197,4 +126,4 @@ const StakingHistory = () => {
   )
 }
 
-export default StakingHistory
+export default StakingProgress

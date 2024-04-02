@@ -10,14 +10,11 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 })
   }
 
-  const url = request.nextUrl
-  const stakeId = String(url.searchParams.get("stakeId"))
-
-  const count = await prisma.rewardReserved.count({
+  const staking = await prisma.staking.findMany({
     where: {
-      stakeId,
+      userId: session.user.id,
     },
   })
 
-  return NextResponse.json({ completed: count === 0 })
+  return NextResponse.json(staking)
 }

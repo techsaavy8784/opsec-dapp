@@ -31,6 +31,12 @@
           "items": {
             "$ref": "#/definitions/Credit"
           }
+        },
+        "Staking": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Staking"
+          }
         }
       },
       "required": [
@@ -63,8 +69,7 @@
             "INSTALLING",
             "LIVE",
             "FAILED",
-            "EXPIRED",
-            "REWARD_RESERVED"
+            "EXPIRED"
           ]
         },
         "createdAt": {
@@ -85,16 +90,6 @@
         },
         "blockchain": {
           "$ref": "#/definitions/Blockchain"
-        },
-        "rewardReserved": {
-          "anyOf": [
-            {
-              "$ref": "#/definitions/RewardReserved"
-            },
-            {
-              "type": "null"
-            }
-          ]
         }
       },
       "required": [
@@ -103,14 +98,14 @@
         "blockchainId"
       ]
     },
-    "RewardReserved": {
+    "Staking": {
       "type": "object",
       "properties": {
         "id": {
           "type": "integer"
         },
-        "node": {
-          "$ref": "#/definitions/Node"
+        "user": {
+          "$ref": "#/definitions/User"
         },
         "stakeId": {
           "type": "string"
@@ -121,7 +116,7 @@
         }
       },
       "required": [
-        "nodeId",
+        "userId",
         "stakeId"
       ]
     },
@@ -148,8 +143,7 @@
             "INSTALLING",
             "LIVE",
             "FAILED",
-            "EXPIRED",
-            "REWARD_RESERVED"
+            "EXPIRED"
           ]
         }
       },
@@ -325,8 +319,8 @@
     "node": {
       "$ref": "#/definitions/Node"
     },
-    "rewardReserved": {
-      "$ref": "#/definitions/RewardReserved"
+    "staking": {
+      "$ref": "#/definitions/Staking"
     },
     "nodeHistory": {
       "$ref": "#/definitions/NodeHistory"
