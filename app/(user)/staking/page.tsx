@@ -10,7 +10,9 @@ const StakingPage: React.FC = () => (
       <TabsTrigger value="history">History</TabsTrigger>
     </TabsList>
     <TabsContent value="staking">
-      <Staking />
+      <div className="mt-8">
+        <Staking />
+      </div>
     </TabsContent>
     <TabsContent value="history">
       <StakingHistory />

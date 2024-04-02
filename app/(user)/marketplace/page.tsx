@@ -52,7 +52,7 @@ const Nodes: React.FC = () => {
             name={chain.name}
             description={chain.description}
             onBuy={() => setChain(chain)}
-            disabled={chain.available === 0}
+            disabled={chain.disabled}
           />
         ))}
         <NodePaymentModal

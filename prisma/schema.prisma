@@ -17,12 +17,13 @@ datasource db {
 }
 
 model User {
-    id       Int      @id @default(autoincrement())
-    address  String   @unique // address is used as email for admins
+    id       Int       @id @default(autoincrement())
+    address  String    @unique // address is used as email for admins
     password String? // if password is not null, he is admin, otherwise user
-    balance  Int      @default(0)
+    balance  Int       @default(0)
     nodes    Node[]
     credits  Credit[]
+    Staking  Staking[]
 
     @@map("users")
 }
@@ -33,35 +34,33 @@ enum Status {
     LIVE
     FAILED
     EXPIRED
-    REWARD_RESERVED
 }
 
 model Node {
-    id             Int             @id @default(autoincrement())
-    userId         Int             @map("user_id")
-    user           User            @relation(fields: [userId], references: [id])
-    serverId       Int             @map("server_id")
-    server         Server          @relation(fields: [serverId], references: [id])
-    wallet         String?
-    status         Status          @default(CREATED)
-    createdAt      DateTime        @default(now()) @map("created_at")
-    nodeHistory    NodeHistory[]
-    payments       Payment[]
-    blockchainId   Int             @map("blockchain_id")
-    blockchain     Blockchain      @relation(fields: [blockchainId], references: [id])
-    rewardReserved RewardReserved?
+    id           Int           @id @default(autoincrement())
+    userId       Int           @map("user_id")
+    user         User          @relation(fields: [userId], references: [id])
+    serverId     Int           @map("server_id")
+    server       Server        @relation(fields: [serverId], references: [id])
+    wallet       String?
+    status       Status        @default(CREATED)
+    createdAt    DateTime      @default(now()) @map("created_at")
+    nodeHistory  NodeHistory[]
+    payments     Payment[]
+    blockchainId Int           @map("blockchain_id")
+    blockchain   Blockchain    @relation(fields: [blockchainId], references: [id])
 
     @@map("nodes")
 }
 
-model RewardReserved {
+model Staking {
     id        Int      @id @default(autoincrement())
-    nodeId    Int      @unique @map("node_id")
-    node      Node     @relation(fields: [nodeId], references: [id], onDelete: Cascade)
+    user      User     @relation(fields: [userId], references: [id])
+    userId    Int      @map("user_id")
     stakeId   String   @map("stake_id")
     createdAt DateTime @default(now()) @map("created_at")
 
-    @@map("reward_reserved")
+    @@map("stakings")
 }
 
 model NodeHistory {
