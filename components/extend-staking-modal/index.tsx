@@ -13,6 +13,8 @@ import { ReloadIcon } from "@radix-ui/react-icons"
 import clsx from "clsx"
 import { useWalletClient } from "wagmi"
 import abi from "@/contract/abi.json"
+import usePollStatus from "@/hooks/usePollStatus"
+import { useToast } from "../ui/use-toast"
 
 interface ExtendStakingModalProps extends DialogProps {
   stakeId: string
@@ -32,20 +34,52 @@ export const ExtendStakingModal: React.FC<ExtendStakingModalProps> = ({
 
   const [pending, setPending] = useState(false)
 
+  const { toast } = useToast()
+
+  const { startPoll, stopPoll } = usePollStatus({
+    cb: (stakeId: string, prevDuration: number) =>
+      fetch(
+        `/api/staking/extend/status?stakeId=${stakeId}&prevDuration=${prevDuration}`,
+      )
+        .then((res) => res.json())
+        .then((res) => res.extended),
+    stopWhen: (extended: boolean) => extended,
+    onStop: () => {
+      toast({ title: "Stake period extended" })
+      onComplete()
+    },
+  })
+
   const handleExtendClick = useCallback(async () => {
     if (!walletClient) {
       return
     }
 
-    walletClient.writeContract({
-      address: process.env.NEXT_PUBLIC_STAKING_CONTRACT as `0x${string}`,
-      abi,
-      functionName: "extendUnlockTime",
-      args: [stakeId, month * 31 * 3600 * 24],
-    })
-  }, [walletClient, month, stakeId])
+    try {
+      setPending(true)
 
-  // todo: show toast on success
+      const [duration] = await Promise.all([
+        fetch(`/api/staking/extend/duration?stakeId=${stakeId}`).then((res) =>
+          res.json(),
+        ),
+        walletClient.writeContract({
+          address: process.env.NEXT_PUBLIC_STAKING_CONTRACT as `0x${string}`,
+          abi,
+          functionName: "extendUnlockTime",
+          args: [stakeId, month * 31 * 3600 * 24],
+        }),
+      ])
+
+      stopPoll()
+      startPoll(stakeId, duration)
+    } catch {
+      stopPoll()
+      setPending(false)
+      toast({
+        title: "Failed to extend",
+      })
+    }
+  }, [walletClient, stakeId, month, startPoll, stopPoll, toast])
 
   return (
     <Dialog {...props} open={open} onOpenChange={onOpenChange}>

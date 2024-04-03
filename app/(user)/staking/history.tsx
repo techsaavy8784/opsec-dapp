@@ -20,12 +20,17 @@ import { useToast } from "@/components/ui/use-toast"
 import { publicClient } from "@/contract/client"
 import { formatDate } from "@/lib/utils"
 import abi from "@/contract/abi.json"
+import { ExtendStakingModal } from "@/components/extend-staking-modal"
 
 const StakingHistory = () => {
   const { toast } = useToast()
 
   const { isPending, data } = useQuery<
-    (Payment & { node: any; onchain: [number, number, number, number] })[]
+    (Payment & {
+      stakeId: string
+      node: any
+      onchain: [number, number, number, number]
+    })[]
   >({
     queryKey: ["staking-history"],
     queryFn: () => fetch("/api/staking").then((res) => res.json()),
@@ -54,6 +59,8 @@ const StakingHistory = () => {
   })
 
   const { data: walletClient } = useWalletClient()
+
+  const [stakeModal, setStakeModal] = useState<string>()
 
   const [unstakeIds, setUnstakeIds] = useState<string[]>([])
 
@@ -171,7 +178,7 @@ const StakingHistory = () => {
                       ) : (
                         <>
                           <Button
-                            onClick={() => handleUnstake(item.stakeId!)}
+                            onClick={() => handleUnstake(item.stakeId)}
                             disabled={unstakePending}
                           >
                             {unstakePending && (
@@ -179,7 +186,9 @@ const StakingHistory = () => {
                             )}
                             Unstake
                           </Button>
-                          <Button>Extend</Button>
+                          <Button onClick={() => setStakeModal(item.stakeId)}>
+                            Extend
+                          </Button>
                         </>
                       )}
                     </TableCell>
@@ -192,6 +201,12 @@ const StakingHistory = () => {
             )}
           </TableBody>
         </Table>
+        <ExtendStakingModal
+          stakeId={stakeModal ?? ""}
+          open={stakeModal !== undefined}
+          onOpenChange={() => setStakeModal(undefined)}
+          onComplete={() => refetch()}
+        />
       </div>
     </div>
   )

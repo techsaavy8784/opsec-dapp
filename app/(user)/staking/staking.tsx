@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useCallback, useState } from "react"
+import React, { useCallback, useEffect, useRef, useState } from "react"
 import { ReloadIcon } from "@radix-ui/react-icons"
 import { Button } from "@/components/ui/button"
 import { Slider } from "@/components/ui/slider"
@@ -13,6 +13,8 @@ import { erc20Abi } from "viem"
 import { publicClient } from "@/contract/client"
 import clsx from "clsx"
 import { stakingRewardAmount } from "@/app/api/payment/subscriptions"
+import { useQuery } from "@tanstack/react-query"
+import usePollStatus from "@/hooks/usePollStatus"
 
 const OPSEC_DECIMALS = 18
 
@@ -45,6 +47,23 @@ const Staking: React.FC = () => {
   const [stakingStatus, setStakingStatus] = useState<"approving" | "staking">()
 
   const { toast } = useToast()
+
+  const { refetch } = useQuery({
+    queryKey: ["staking-progress"],
+    queryFn: () => fetch("/api/staking/list").then((res) => res.json()),
+  })
+
+  const { startPoll, stopPoll } = usePollStatus({
+    cb: (stakeId: string) =>
+      fetch(`/api/staking/add/status?stakeId=${stakeId}`)
+        .then((res) => res.json())
+        .then((res) => res.added),
+    stopWhen: (added: boolean) => added,
+    onStop: () => {
+      toast({ title: "Stake completed" })
+      refetch()
+    },
+  })
 
   const handleStake = useCallback(async () => {
     if (walletClient === undefined || allowance === undefined) {
@@ -88,7 +107,11 @@ const Staking: React.FC = () => {
         functionName: "stake",
         args: [stakeId, amount, month * 31 * 3600 * 24],
       })
+
+      stopPoll()
+      startPoll(stakeId)
     } catch (e) {
+      stopPoll()
       setStakingStatus(undefined)
       toast({
         title: "Transaction failed",
@@ -104,6 +127,8 @@ const Staking: React.FC = () => {
     month,
     refetchAllowance,
     refetchBalance,
+    startPoll,
+    stopPoll,
     toast,
     walletClient,
   ])
