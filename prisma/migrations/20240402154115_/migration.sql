@@ -1,6 +1,12 @@
 -- AlterTable
 ALTER TABLE "payments" ADD COLUMN     "stake_id" TEXT;
 
+-- DropForeignKey
+ALTER TABLE "payments" DROP CONSTRAINT "payments_node_id_fkey";
+
+-- AddForeignKey
+ALTER TABLE "payments" ADD CONSTRAINT "payments_node_id_fkey" FOREIGN KEY ("node_id") REFERENCES "nodes"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
 -- CreateTable
 CREATE TABLE "stakings" (
     "id" SERIAL NOT NULL,

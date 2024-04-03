@@ -59,7 +59,22 @@ export async function POST(request: NextRequest) {
     const servers = await availableServers(blockchainId)
 
     if (servers.length === 0) {
-      throw new Error(`No server to allocate blockchain ${blockchainId}`)
+      await prisma.node.deleteMany({
+        where: {
+          status: Status.FAILED,
+          userId: staking.userId,
+          payments: {
+            some: {
+              stakeId: staking.stakeId,
+            },
+          },
+        },
+      })
+
+      return NextResponse.json(
+        `No server to allocate blockchain ${blockchainId}`,
+        { status: 500 },
+      )
     }
 
     await prisma.node.create({
@@ -67,7 +82,7 @@ export async function POST(request: NextRequest) {
         userId: staking.userId,
         serverId: servers[0].id,
         blockchainId,
-        status: Status.CREATED,
+        status: Status.FAILED,
         payments: {
           create: [
             {
@@ -84,6 +99,21 @@ export async function POST(request: NextRequest) {
   await prisma.staking.delete({
     where: {
       id: staking.id,
+    },
+  })
+
+  await prisma.node.updateMany({
+    data: {
+      status: Status.CREATED,
+    },
+    where: {
+      status: Status.FAILED,
+      userId: staking.userId,
+      payments: {
+        some: {
+          stakeId: staking.stakeId,
+        },
+      },
     },
   })
 

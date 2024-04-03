@@ -89,7 +89,7 @@ model Payment {
     id       Int      @id @default(autoincrement())
     duration Int      @default(0)
     nodeId   Int      @map("node_id")
-    node     Node     @relation(fields: [nodeId], references: [id])
+    node     Node     @relation(fields: [nodeId], references: [id], onDelete: Cascade)
     credit   Int
     stakeId  String?  @map("stake_id")
     date     DateTime @default(now())
