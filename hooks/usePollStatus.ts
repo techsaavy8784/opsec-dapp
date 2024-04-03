@@ -10,7 +10,7 @@ const usePollStatus = ({
   cb,
   stopWhen,
   onStop,
-  interval = 1000,
+  interval = 3000,
 }: PollStatusArgs) => {
   const timerRef = useRef<NodeJS.Timeout>()
 

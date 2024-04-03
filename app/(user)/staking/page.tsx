@@ -13,7 +13,7 @@ const StakingPage: React.FC = () => (
     <TabsContent value="staking">
       <div className="mt-8">
         <StakingProgress />
-        <p className="mt-24">Stake to get reward</p>
+        <p className="mt-12">Stake to get reward</p>
         <hr className="my-4" />
         <Staking />
       </div>

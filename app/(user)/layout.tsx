@@ -15,7 +15,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => (
       <SidebarMobile />
       <div className="flex flex-col flex-1">
         <Navbar />
-        <div className="px-6 overflow-y-scroll">
+        <div className="p-6 overflow-y-scroll">
           <ProtectRoutes>{children}</ProtectRoutes>
         </div>
       </div>

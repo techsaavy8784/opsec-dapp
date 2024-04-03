@@ -33,3 +33,11 @@ export const formatBalance = (value: number) => {
 
   return String(Math.round(value * 1000) / 1000)
 }
+
+export const abbreviateWithEllipsis = (val: string) => {
+  if (val.length <= 10) {
+    return val
+  }
+
+  return val.slice(0, 5) + "..." + val.slice(-5)
+}

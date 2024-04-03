@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button"
 import { Slider } from "@/components/ui/slider"
 import { useAccount, useReadContract, useWalletClient } from "wagmi"
 import { generateRandomString } from "@/lib/utils"
-import { formatUnits } from "viem"
+import { formatUnits, parseUnits } from "viem"
 import abi from "@/contract/abi.json"
 import { useToast } from "../../../components/ui/use-toast"
 import { erc20Abi } from "viem"
@@ -71,7 +71,9 @@ const Staking: React.FC = () => {
     }
 
     try {
-      if (allowance < BigInt(amount)) {
+      const amountInUnit = parseUnits(String(amount), OPSEC_DECIMALS)
+
+      if (allowance < amountInUnit) {
         setStakingStatus("approving")
 
         const hash = await walletClient.writeContract({
@@ -80,7 +82,7 @@ const Staking: React.FC = () => {
           functionName: "approve",
           args: [
             process.env.NEXT_PUBLIC_STAKING_CONTRACT as `0x${string}`,
-            BigInt(amount),
+            amountInUnit,
           ],
         })
 
@@ -105,7 +107,7 @@ const Staking: React.FC = () => {
         address: process.env.NEXT_PUBLIC_STAKING_CONTRACT as `0x${string}`,
         abi,
         functionName: "stake",
-        args: [stakeId, amount, month * 31 * 3600 * 24],
+        args: [stakeId, amountInUnit, month * 31 * 3600 * 24],
       })
 
       stopPoll()
@@ -183,12 +185,12 @@ const Staking: React.FC = () => {
       </Button>
 
       {stakingStatus === "approving" && (
-        <p className="text-gray-400">
+        <p className="text-gray-400 mt-4">
           Approving your $OPSEC balance to be handled by staking contract
         </p>
       )}
       {stakingStatus === "staking" && (
-        <p className="text-gray-400">Staking your $OPSEC balance</p>
+        <p className="text-gray-400 mt-4">Staking your $OPSEC balance</p>
       )}
     </div>
   )
