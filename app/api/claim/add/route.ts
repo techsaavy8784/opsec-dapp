@@ -10,24 +10,29 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 })
   }
 
+  const { amount } = await request.json()
+  let oldAmount = 0
+
   const data = await prisma.claim.findFirst({
     where: {
       user_id: session.user.id,
     },
   })
 
-  if (data)
+  if (data) {
     await prisma.claim.delete({
       where: {
         id: data.id,
       },
     })
-
+    oldAmount = data.amount
+  }
   await prisma.claim.create({
     data: {
       user_id: session.user.id,
       address: session.user.address,
       lasted_at: new Date(),
+      amount: oldAmount,
     },
   })
 

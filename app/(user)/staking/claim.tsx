@@ -26,7 +26,12 @@ const ClaimF: React.FC = () => {
   })
 
   const handleClaim = async () => {
-    await fetch("/api/claim/add")
+    const requestOptions = {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ amount: ethBalance }),
+    }
+    await fetch("/api/claim/add", requestOptions)
   }
 
   const millisecondsIn24Hours = 24 * 60 * 60 * 1000 // 24 hours in milliseconds

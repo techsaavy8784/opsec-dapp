@@ -7,6 +7,7 @@ CREATE TABLE "claims" (
     "user_id" INTEGER NOT NULL,
     "address" TEXT NOT NULL,
     "lasted_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "amount" INTEGER NOT NULL,
 
     CONSTRAINT "claims_pkey" PRIMARY KEY ("id")
 );
