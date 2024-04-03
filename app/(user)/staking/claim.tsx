@@ -46,7 +46,8 @@ const ClaimF: React.FC = () => {
               disabled={
                 data &&
                 today.getTime() - data[0].lasted_at.getTime() <
-                  millisecondsIn24Hours
+                  millisecondsIn24Hours &&
+                (ethBalance as any) < 0.01
               }
               onClick={() => handleClaim()}
             >
