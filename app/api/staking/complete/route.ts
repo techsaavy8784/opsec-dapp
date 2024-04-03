@@ -10,45 +10,45 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 })
   }
 
-  const { stakeId } = await request.json()
+  const staking = await prisma.staking.findFirstOrThrow()
 
   const [, stakingAmount, duration] = (await publicClient.readContract({
     abi,
     address: process.env.NEXT_PUBLIC_STAKING_CONTRACT as `0x${string}`,
     functionName: "stakes",
-    args: [stakeId],
+    args: [staking.stakeId],
   })) as [string, bigint, bigint]
 
-  await prisma.node.updateMany({
-    data: {
-      status: Status.CREATED,
-    },
-    where: {
-      status: Status.REWARD_RESERVED,
-      rewardReserved: {
-        stakeId,
-      },
-    },
-  })
+  const amount = Number(formatUnits(stakingAmount, 18))
+  const durationInDays = Number(duration) / 3600 / 24
+  const serverIds: number[] = []
+  const blockchainIds: number[] = []
 
-  const rewardReserved = await prisma.rewardReserved.findMany({
-    where: {
-      stakeId,
-    },
-  })
+  await Promise.all(
+    serverIds.map((serverId, key) =>
+      prisma.node.create({
+        data: {
+          userId: staking.userId,
+          serverId,
+          blockchainId: blockchainIds[key],
+          status: Status.CREATED,
+          payments: {
+            create: [
+              {
+                stakeId: staking.stakeId,
+                duration: durationInDays,
+                credit: amount,
+              },
+            ],
+          },
+        },
+      }),
+    ),
+  )
 
-  await prisma.payment.createMany({
-    data: rewardReserved.map((r) => ({
-      nodeId: r.nodeId,
-      stakeId,
-      duration: Number(duration) / 3600 / 24,
-      credit: Number(formatUnits(stakingAmount, 18)),
-    })),
-  })
-
-  await prisma.rewardReserved.deleteMany({
+  await prisma.staking.delete({
     where: {
-      stakeId,
+      id: staking.id,
     },
   })
 

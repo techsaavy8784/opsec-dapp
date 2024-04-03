@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useCallback, useEffect, useRef, useState } from "react"
+import React, { useCallback, useState } from "react"
 import { ReloadIcon } from "@radix-ui/react-icons"
 import { Button } from "@/components/ui/button"
 import { Slider } from "@/components/ui/slider"
@@ -117,6 +117,7 @@ const Staking: React.FC = () => {
       setStakingStatus(undefined)
       toast({
         title: "Transaction failed",
+        description: JSON.stringify(e),
       })
       return
     } finally {
@@ -149,7 +150,7 @@ const Staking: React.FC = () => {
             onClick={() => setMonth(m)}
             className={clsx(
               "border-[#F44336] w-1/3 border-solid border-2 px-3 py-12 cursor-pointer hover:border-red-700 text-center",
-              m === month ? "border-green-400" : null,
+              m === month ? "border-green-400 bg-green-400" : null,
             )}
           >
             <p className="text-6xl">{m}</p>

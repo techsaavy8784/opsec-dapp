@@ -56,7 +56,7 @@ const StakingProgress = () => {
   }
 
   return (
-    <div>
+    <div className="mt-12">
       <p>Currently working on rewards for the following stakings</p>
       <hr className="my-4" />
       <div className="border border-[#FFFFFF33] rounded-[16px]">
