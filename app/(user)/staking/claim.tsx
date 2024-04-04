@@ -2,9 +2,13 @@
 
 import { Button } from "@/components/ui/button"
 import { useAccount, useReadContract, useWalletClient } from "wagmi"
+import { formatUnits } from "viem"
 import abi from "@/contract/abi.json"
 import { Claim } from "@prisma/client"
 import { useQuery } from "@tanstack/react-query"
+
+const OPSEC_DECIMALS = 18
+const ETH_DECIMALS = 18
 
 const ClaimF: React.FC = () => {
   const { address } = useAccount()
@@ -53,14 +57,19 @@ const ClaimF: React.FC = () => {
 
   const handleClaim = async () => {
     if (!ethLoading && !myLoading && !allLoading) {
-      const requestOptions = {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          amount: Number(ethBalance) * (Number(myBalance) / Number(allBalance)),
-        }),
+      if (ethBalance !== undefined && ethBalance !== null) {
+        const requestOptions = {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            amount:
+              Number(formatUnits(ethBalance as bigint, OPSEC_DECIMALS)) *
+              (Number(formatUnits(myBalance as bigint, OPSEC_DECIMALS)) /
+                Number(formatUnits(allBalance as bigint, OPSEC_DECIMALS))),
+          }),
+        }
+        await fetch("/api/claim/add", requestOptions)
       }
-      await fetch("/api/claim/add", requestOptions)
     }
   }
 
@@ -73,7 +82,9 @@ const ClaimF: React.FC = () => {
         <div className="flex flex-col p-2 w-[70%]">
           <div className="flex justify-between p-1 border-b-2 border-slate-300 mb-3">
             <div>ETH Ballance for Claim: </div>
-            <div>{ethBalance as any} ETH</div>
+            <div>
+              {Number(formatUnits(ethBalance as bigint, OPSEC_DECIMALS))} ETH
+            </div>
           </div>
           <div className="w-full flex justify-center">
             <Button
@@ -82,7 +93,7 @@ const ClaimF: React.FC = () => {
                 data &&
                 today.getTime() - data[0].lasted_at.getTime() <
                   millisecondsIn24Hours &&
-                (ethBalance as any) < 0.01
+                Number(formatUnits(ethBalance as bigint, OPSEC_DECIMALS)) < 0.01
               }
               onClick={() => handleClaim()}
             >
