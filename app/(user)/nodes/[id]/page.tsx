@@ -10,6 +10,7 @@ import clsx from "clsx"
 import { NodePaymentModal } from "@/components/payment-modal/node"
 import { Button } from "@/components/ui/button"
 import { ExtendStakingModal } from "@/components/extend-staking-modal"
+import usePollStatus from "@/hooks/usePollStatus"
 
 interface NodeProps {
   params: {
@@ -20,8 +21,6 @@ interface NodeProps {
 const uptimeDayCount = 90
 
 const Node: React.FC<NodeProps> = ({ params: { id } }) => {
-  const timer = useRef<NodeJS.Timeout>()
-
   const [modal, setModal] = useState(false)
 
   const { isPending, data, refetch } = useQuery<NodeType>({
@@ -29,17 +28,17 @@ const Node: React.FC<NodeProps> = ({ params: { id } }) => {
     queryFn: () => fetch(`/api/nodes/${id}`).then((res) => res.json()),
   })
 
-  useEffect(() => {
-    if (data?.status === "LIVE") {
-      clearInterval(timer.current)
-    } else {
-      timer.current = setInterval(() => {
-        refetch()
-      }, 10000)
-    }
+  const { startPoll } = usePollStatus({
+    cb: () => refetch(),
+    stopWhen: () => data?.status === "LIVE",
+    interval: 10000,
+  })
 
-    return () => clearInterval(timer.current)
-  }, [data?.status, refetch])
+  useEffect(() => {
+    if (data?.status !== "LIVE") {
+      startPoll()
+    }
+  }, [data?.status, startPoll])
 
   if (isPending || !data) {
     return (
