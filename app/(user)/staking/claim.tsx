@@ -9,10 +9,36 @@ import { useQuery } from "@tanstack/react-query"
 const ClaimF: React.FC = () => {
   const { address } = useAccount()
 
-  const { data: ethBalance, refetch: refetchBalance } = useReadContract({
+  const {
+    data: ethBalance,
+    isLoading: ethLoading,
+    refetch: refetchBalance,
+  } = useReadContract({
+    abi: abi,
+    address: process.env.NEXT_PUBLIC_STAKING_CONTRACT as `0x${string}`,
+    functionName: "ethBallence",
+    args: [address as `0x${string}`],
+  })
+
+  const {
+    data: myBalance,
+    isLoading: myLoading,
+    refetch: refetchMyBalance,
+  } = useReadContract({
     abi: abi,
     address: process.env.NEXT_PUBLIC_OPSEC_TOKEN_ADDRESS as `0x${string}`,
-    functionName: "ethBallence",
+    functionName: "balanceOf",
+    args: [address as `0x${string}`],
+  })
+
+  const {
+    data: allBalance,
+    isLoading: allLoading,
+    refetch: refetchAllBalance,
+  } = useReadContract({
+    abi: abi,
+    address: process.env.NEXT_PUBLIC_STAKING_CONTRACT as `0x${string}`,
+    functionName: "allBallence",
     args: [address as `0x${string}`],
   })
 
@@ -26,12 +52,16 @@ const ClaimF: React.FC = () => {
   })
 
   const handleClaim = async () => {
-    const requestOptions = {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ amount: ethBalance }),
+    if (!ethLoading && !myLoading && !allLoading) {
+      const requestOptions = {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          amount: Number(ethBalance) * (Number(myBalance) / Number(allBalance)),
+        }),
+      }
+      await fetch("/api/claim/add", requestOptions)
     }
-    await fetch("/api/claim/add", requestOptions)
   }
 
   const millisecondsIn24Hours = 24 * 60 * 60 * 1000 // 24 hours in milliseconds
