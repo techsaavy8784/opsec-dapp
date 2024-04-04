@@ -1,7 +1,7 @@
 "use client"
 
 import { Button } from "@/components/ui/button"
-import { useAccount, useReadContract, useWalletClient } from "wagmi"
+import { useAccount, useReadContract } from "wagmi"
 import { formatUnits } from "viem"
 import abi from "@/contract/abi.json"
 import { Claim } from "@prisma/client"
@@ -15,7 +15,7 @@ const ClaimF: React.FC = () => {
 
   const {
     data: ethBalance,
-    isLoading: ethLoading,
+    isLoading: isLoadingForEth,
     refetch: refetchBalance,
   } = useReadContract({
     abi: abi,
@@ -25,8 +25,8 @@ const ClaimF: React.FC = () => {
   })
 
   const {
-    data: myBalance,
-    isLoading: myLoading,
+    data: opsecBalance,
+    isLoading: isLoadingForOpSec,
     refetch: refetchMyBalance,
   } = useReadContract({
     abi: abi,
@@ -36,8 +36,8 @@ const ClaimF: React.FC = () => {
   })
 
   const {
-    data: allBalance,
-    isLoading: allLoading,
+    data: opsecAllBalance,
+    isLoading: isLoadingForOpSecAll,
     refetch: refetchAllBalance,
   } = useReadContract({
     abi: abi,
@@ -51,21 +51,21 @@ const ClaimF: React.FC = () => {
       lasted_at: any
     })[]
   >({
-    queryKey: ["claim-"],
+    queryKey: ["claim-list"],
     queryFn: () => fetch("/api/claim").then((res) => res.json()),
   })
 
   const handleClaim = async () => {
-    if (!ethLoading && !myLoading && !allLoading) {
+    if (!isLoadingForEth && !isLoadingForOpSec && !isLoadingForOpSecAll) {
       if (ethBalance !== undefined && ethBalance !== null) {
         const requestOptions = {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
             amount:
-              Number(formatUnits(ethBalance as bigint, OPSEC_DECIMALS)) *
-              (Number(formatUnits(myBalance as bigint, OPSEC_DECIMALS)) /
-                Number(formatUnits(allBalance as bigint, OPSEC_DECIMALS))),
+              Number(formatUnits(ethBalance as bigint, ETH_DECIMALS)) *
+              (Number(formatUnits(opsecBalance as bigint, OPSEC_DECIMALS)) /
+                Number(formatUnits(opsecAllBalance as bigint, OPSEC_DECIMALS))),
           }),
         }
         await fetch("/api/claim/add", requestOptions)
@@ -83,7 +83,7 @@ const ClaimF: React.FC = () => {
           <div className="flex justify-between p-1 border-b-2 border-slate-300 mb-3">
             <div>ETH Ballance for Claim: </div>
             <div>
-              {Number(formatUnits(ethBalance as bigint, OPSEC_DECIMALS))} ETH
+              {Number(formatUnits(ethBalance as bigint, ETH_DECIMALS))} ETH
             </div>
           </div>
           <div className="w-full flex justify-center">
@@ -93,7 +93,7 @@ const ClaimF: React.FC = () => {
                 data &&
                 today.getTime() - data[0].lasted_at.getTime() <
                   millisecondsIn24Hours &&
-                Number(formatUnits(ethBalance as bigint, OPSEC_DECIMALS)) < 0.01
+                Number(formatUnits(ethBalance as bigint, ETH_DECIMALS)) < 0.01
               }
               onClick={() => handleClaim()}
             >
