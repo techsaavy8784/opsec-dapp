@@ -61,6 +61,8 @@ const Staking: React.FC = () => {
     stopWhen: (added: boolean) => added,
     onStop: () => {
       toast({ title: "Stake completed" })
+      refetchBalance()
+      setStakingStatus(undefined)
       refetch()
     },
   })
@@ -95,6 +97,7 @@ const Staking: React.FC = () => {
         }
       }
 
+      refetchAllowance()
       setStakingStatus("staking")
 
       const encoder = new TextEncoder()
@@ -120,16 +123,12 @@ const Staking: React.FC = () => {
         description: JSON.stringify(e),
       })
       return
-    } finally {
-      refetchBalance()
-      refetchAllowance()
     }
   }, [
     allowance,
     amount,
     month,
     refetchAllowance,
-    refetchBalance,
     startPoll,
     stopPoll,
     toast,
