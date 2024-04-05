@@ -3,7 +3,7 @@
 import React, { useEffect } from "react"
 import { useQuery } from "@tanstack/react-query"
 import { formatUnits } from "viem"
-import { Payment } from "@prisma/client"
+import { Staking } from "@prisma/client"
 import {
   Table,
   TableBody,
@@ -14,12 +14,12 @@ import {
 } from "@/components/ui/table"
 import { Skeleton } from "@/components/ui/skeleton"
 import { publicClient } from "@/contract/client"
-import { formatDate } from "@/lib/utils"
+import { abbreviateWithEllipsis, formatDate } from "@/lib/utils"
 import abi from "@/contract/abi.json"
 
 const StakingProgress = () => {
   const { isPending, data } = useQuery<
-    (Payment & { node: any; onchain: [number, number, number, number] })[]
+    (Staking & { onchain: [number, number, number, number] })[]
   >({
     queryKey: ["staking-progress"],
     queryFn: () => fetch("/api/staking/list").then((res) => res.json()),
@@ -56,7 +56,7 @@ const StakingProgress = () => {
   }
 
   return (
-    <div>
+    <div className="mt-12">
       <p>Currently working on rewards for the following stakings</p>
       <hr className="my-4" />
       <div className="border border-[#FFFFFF33] rounded-[16px]">
@@ -86,20 +86,29 @@ const StakingProgress = () => {
               </TableRow>
             ) : (
               data.map((item, key) => {
-                const remaining = Math.round(
-                  item.duration -
-                    (Date.now() - new Date(item.date).getTime()) /
-                      1000 /
-                      3600 /
-                      24,
-                )
+                const duration = staking?.[key]
+                  ? Number(staking[key][2]) / 3600 / 24
+                  : undefined
+
+                const remaining = duration
+                  ? Math.round(
+                      duration -
+                        (Date.now() - new Date(item.createdAt).getTime()) /
+                          1000 /
+                          3600 /
+                          24,
+                    )
+                  : undefined
                 return (
                   <TableRow className="border-b-none" key={key}>
                     <TableCell className="text-[16px] font-[600] text-white">
                       {key + 1}
                     </TableCell>
-                    <TableCell className="text-[16px] font-[600] text-white max-md:min-w-[130px]">
-                      {item.node.blockchain.name}
+                    <TableCell
+                      className="text-[16px] font-[600] text-white max-md:min-w-[130px]"
+                      title={item.stakeId}
+                    >
+                      {abbreviateWithEllipsis(item.stakeId)}
                     </TableCell>
                     <TableCell className="text-[16px] font-[600] text-white max-md:min-w-[130px]">
                       {staking?.[key]
@@ -107,13 +116,13 @@ const StakingProgress = () => {
                         : undefined}
                     </TableCell>
                     <TableCell className="text-[16px] font-[600] text-white max-md:min-w-[130px]">
-                      {item.duration} days
-                    </TableCell>
-                    <TableCell className="text-[16px] font-[600] text-white max-md:min-w-[130px] flex gap-2">
-                      {remaining} days
+                      {duration && <>{Math.round(duration)} days</>}
                     </TableCell>
                     <TableCell className="text-[16px] font-[600] text-white max-md:min-w-[130px]">
-                      {formatDate(item.date)}
+                      {remaining && <>{remaining} days</>}
+                    </TableCell>
+                    <TableCell className="text-[16px] font-[600] text-white max-md:min-w-[130px]">
+                      {formatDate(item.createdAt)}
                     </TableCell>
                   </TableRow>
                 )

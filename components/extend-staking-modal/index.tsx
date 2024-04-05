@@ -45,7 +45,7 @@ export const ExtendStakingModal: React.FC<ExtendStakingModalProps> = ({
         .then((res) => res.extended),
     stopWhen: (extended: boolean) => extended,
     onStop: () => {
-      toast({ title: "Stake period extended" })
+      toast({ title: "Stake period has been extended" })
       onComplete()
     },
   })
@@ -72,11 +72,12 @@ export const ExtendStakingModal: React.FC<ExtendStakingModalProps> = ({
 
       stopPoll()
       startPoll(stakeId, duration)
-    } catch {
+    } catch (e) {
       stopPoll()
       setPending(false)
       toast({
         title: "Failed to extend",
+        description: JSON.stringify(e),
       })
     }
   }, [walletClient, stakeId, month, startPoll, stopPoll, toast])
@@ -97,7 +98,7 @@ export const ExtendStakingModal: React.FC<ExtendStakingModalProps> = ({
                 onClick={() => setMonth(m)}
                 className={clsx(
                   "border-[#F44336] w-1/3 border-solid border-2 px-3 py-12 cursor-pointer hover:border-red-700 text-center",
-                  m === month ? "border-green-400" : null,
+                  m === month ? "border-green-400 bg-green-400" : null,
                 )}
               >
                 <p className="text-6xl">{m}</p>

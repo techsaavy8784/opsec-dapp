@@ -23,7 +23,8 @@ export async function GET() {
     server.nodes = server.nodes.filter((node) => node.status !== "EXPIRED")
   }
 
-  const totalCapacity = servers.length * 8
+  const totalCapacity =
+    servers.length * Number(process.env.NODE_COUNT_PER_SERVER)
   const usedCapacity = servers.reduce(
     (acc, server) => acc + server.nodes.length,
     0,

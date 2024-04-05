@@ -3,14 +3,14 @@ import { useEffect, useRef } from "react"
 type PollStatusArgs = {
   cb: (...arg: any[]) => Promise<any>
   stopWhen: (result: any) => boolean
-  onStop: (result: any) => void
+  onStop?: (result: any) => void
   interval?: number
 }
 const usePollStatus = ({
   cb,
   stopWhen,
   onStop,
-  interval = 1000,
+  interval = 3000,
 }: PollStatusArgs) => {
   const timerRef = useRef<NodeJS.Timeout>()
 
@@ -23,7 +23,7 @@ const usePollStatus = ({
       cb(...arg).then((res) => {
         if (stopWhen(res)) {
           stopPoll()
-          onStop(res)
+          onStop?.(res)
         }
       })
     }, interval)

@@ -1,12 +1,12 @@
 "use client"
 
-import React, { useCallback, useEffect, useRef, useState } from "react"
+import React, { useCallback, useState } from "react"
 import { ReloadIcon } from "@radix-ui/react-icons"
 import { Button } from "@/components/ui/button"
 import { Slider } from "@/components/ui/slider"
 import { useAccount, useReadContract, useWalletClient } from "wagmi"
 import { generateRandomString } from "@/lib/utils"
-import { formatUnits } from "viem"
+import { formatUnits, parseUnits } from "viem"
 import abi from "@/contract/abi.json"
 import { useToast } from "../../../components/ui/use-toast"
 import { erc20Abi } from "viem"
@@ -61,6 +61,8 @@ const Staking: React.FC = () => {
     stopWhen: (added: boolean) => added,
     onStop: () => {
       toast({ title: "Stake completed" })
+      refetchBalance()
+      setStakingStatus(undefined)
       refetch()
     },
   })
@@ -71,7 +73,9 @@ const Staking: React.FC = () => {
     }
 
     try {
-      if (allowance < BigInt(amount)) {
+      const amountInUnit = parseUnits(String(amount), OPSEC_DECIMALS)
+
+      if (allowance < amountInUnit) {
         setStakingStatus("approving")
 
         const hash = await walletClient.writeContract({
@@ -80,7 +84,7 @@ const Staking: React.FC = () => {
           functionName: "approve",
           args: [
             process.env.NEXT_PUBLIC_STAKING_CONTRACT as `0x${string}`,
-            BigInt(amount),
+            amountInUnit,
           ],
         })
 
@@ -93,6 +97,7 @@ const Staking: React.FC = () => {
         }
       }
 
+      refetchAllowance()
       setStakingStatus("staking")
 
       const encoder = new TextEncoder()
@@ -105,7 +110,7 @@ const Staking: React.FC = () => {
         address: process.env.NEXT_PUBLIC_STAKING_CONTRACT as `0x${string}`,
         abi,
         functionName: "stake",
-        args: [stakeId, amount, month * 31 * 3600 * 24],
+        args: [stakeId, amountInUnit, month * 31 * 3600 * 24],
       })
 
       stopPoll()
@@ -115,18 +120,15 @@ const Staking: React.FC = () => {
       setStakingStatus(undefined)
       toast({
         title: "Transaction failed",
+        description: JSON.stringify(e),
       })
       return
-    } finally {
-      refetchBalance()
-      refetchAllowance()
     }
   }, [
     allowance,
     amount,
     month,
     refetchAllowance,
-    refetchBalance,
     startPoll,
     stopPoll,
     toast,
@@ -136,6 +138,8 @@ const Staking: React.FC = () => {
   if (opsecBalance === undefined) {
     return null
   }
+
+  const balance = Math.floor(Number(formatUnits(opsecBalance, OPSEC_DECIMALS)))
 
   return (
     <div className="text-center">
@@ -147,7 +151,7 @@ const Staking: React.FC = () => {
             onClick={() => setMonth(m)}
             className={clsx(
               "border-[#F44336] w-1/3 border-solid border-2 px-3 py-12 cursor-pointer hover:border-red-700 text-center",
-              m === month ? "border-green-400" : null,
+              m === month ? "border-green-400 bg-green-400" : null,
             )}
           >
             <p className="text-6xl">{m}</p>
@@ -161,20 +165,25 @@ const Staking: React.FC = () => {
         <br />
         and you will get {stakingRewardAmount(amount)} nodes for reward
       </p>
-      <Slider
-        value={[amount]}
-        min={1}
-        max={Math.floor(Number(formatUnits(opsecBalance, OPSEC_DECIMALS)))}
-        step={1}
-        className="my-4"
-        onValueChange={([value]) => setAmount(value)}
-      />
+
+      {balance > 0 ? (
+        <Slider
+          value={[amount]}
+          min={1}
+          max={balance}
+          step={1}
+          className="my-4"
+          onValueChange={([value]) => setAmount(value)}
+        />
+      ) : (
+        <p className="text-yellow-500">Not enough balance to stake</p>
+      )}
 
       <Button
         onClick={handleStake}
         variant="custom"
         className="max-w-32 mt-12"
-        disabled={stakingStatus !== undefined}
+        disabled={stakingStatus !== undefined || balance === 0}
       >
         {stakingStatus !== undefined && (
           <ReloadIcon className="mr-2 animate-spin" />
@@ -183,12 +192,12 @@ const Staking: React.FC = () => {
       </Button>
 
       {stakingStatus === "approving" && (
-        <p className="text-gray-400">
+        <p className="text-gray-400 mt-4">
           Approving your $OPSEC balance to be handled by staking contract
         </p>
       )}
       {stakingStatus === "staking" && (
-        <p className="text-gray-400">Staking your $OPSEC balance</p>
+        <p className="text-gray-400 mt-4">Staking your $OPSEC balance</p>
       )}
     </div>
   )

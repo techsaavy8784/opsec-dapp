@@ -25,7 +25,7 @@ const StakingPage: React.FC = () => (
       </TabsContent>
     </Tabs>
     <ClaimF />
-  </>
+   </>
 )
 
 export default StakingPage

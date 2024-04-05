@@ -33,3 +33,30 @@ export const formatBalance = (value: number) => {
 
   return String(Math.round(value * 1000) / 1000)
 }
+
+export const abbreviateWithEllipsis = (val: string) => {
+  if (val.length <= 10) {
+    return val
+  }
+
+  return val.slice(0, 5) + "..." + val.slice(-5)
+}
+
+export const pickFromProbabilities = (probs: number[]) => {
+  const sum = probs.reduce((acc, p) => acc + p, 0)
+  let acc = probs[0] / sum
+  const val = Math.random()
+
+  if (val < acc) {
+    return 0
+  }
+
+  for (let i = 1; i < probs.length; i++) {
+    acc += probs[i] / sum
+    if (val < acc) {
+      return i
+    }
+  }
+
+  return probs.length - 1
+}
