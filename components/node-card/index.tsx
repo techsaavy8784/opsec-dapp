@@ -5,7 +5,7 @@ import React from "react"
 import { Button } from "@/components/ui/button"
 import { FaArrowRightLong } from "react-icons/fa6"
 import Link from "next/link"
-import { Badge } from "../ui/badge"
+import { Badge } from "@/components/ui/badge"
 
 type NodeCardProps = {
   id?: number
@@ -65,12 +65,14 @@ export const NodeCard: React.FC<NodeCardProps> = ({
         <FaArrowRightLong className="ml-2 font-[300]" />
       </Button>
     ) : (
-      <Button asChild variant="custom">
-        <Link href={`nodes/${id}`}>
-          Details
-          <FaArrowRightLong className="ml-2 font-[300]" />
-        </Link>
-      </Button>
+      id !== undefined && (
+        <Button asChild variant="custom">
+          <Link href={`nodes/${id}`}>
+            Details
+            <FaArrowRightLong className="ml-2 font-[300]" />
+          </Link>
+        </Button>
+      )
     )}
   </div>
 )

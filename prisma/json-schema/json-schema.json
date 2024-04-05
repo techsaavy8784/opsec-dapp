@@ -31,6 +31,12 @@
           "items": {
             "$ref": "#/definitions/Credit"
           }
+        },
+        "Staking": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Staking"
+          }
         }
       },
       "required": [
@@ -90,6 +96,28 @@
         "userId",
         "serverId",
         "blockchainId"
+      ]
+    },
+    "Staking": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer"
+        },
+        "user": {
+          "$ref": "#/definitions/User"
+        },
+        "stakeId": {
+          "type": "string"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "userId",
+        "stakeId"
       ]
     },
     "NodeHistory": {
@@ -174,6 +202,12 @@
         },
         "credit": {
           "type": "integer"
+        },
+        "stakeId": {
+          "type": [
+            "string",
+            "null"
+          ]
         },
         "date": {
           "type": "string",
@@ -284,6 +318,9 @@
     },
     "node": {
       "$ref": "#/definitions/Node"
+    },
+    "staking": {
+      "$ref": "#/definitions/Staking"
     },
     "nodeHistory": {
       "$ref": "#/definitions/NodeHistory"

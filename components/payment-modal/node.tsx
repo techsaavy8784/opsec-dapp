@@ -17,7 +17,7 @@ import { useMutation, useQuery } from "@tanstack/react-query"
 import { useToast } from "../ui/use-toast"
 import clsx from "clsx"
 import subscriptions from "@/app/api/payment/subscriptions"
-import { redirect, useRouter } from "next/navigation"
+import { useRouter } from "next/navigation"
 
 interface PaymentModalProps extends DialogProps {
   open: boolean

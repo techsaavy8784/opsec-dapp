@@ -12,15 +12,17 @@ import {
   RainbowKitProvider,
 } from "@rainbow-me/rainbowkit"
 import { WagmiProvider } from "wagmi"
-import { mainnet } from "wagmi/chains"
+import { mainnet, sepolia } from "wagmi/chains"
 import { QueryClientProvider, QueryClient } from "@tanstack/react-query"
 
 const projectId = process.env.NEXT_PUBLIC_WALLET_CONNECT_PROJECT_ID!
 
+export const chain = process.env.NODE_ENV === "production" ? mainnet : sepolia
+
 const config = getDefaultConfig({
   appName: "Opsec",
   projectId: projectId,
-  chains: [mainnet],
+  chains: [chain],
   ssr: true,
 })
 

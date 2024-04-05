@@ -5,11 +5,12 @@ import { useQuery } from "@tanstack/react-query"
 import { Skeleton } from "@/components/ui/skeleton"
 import { NodeType } from "../page"
 import Image from "next/image"
-import Link from "next/link"
 import { daysPassedSince, formatDate } from "@/lib/utils"
 import clsx from "clsx"
 import { NodePaymentModal } from "@/components/payment-modal/node"
 import { Button } from "@/components/ui/button"
+import { ExtendStakingModal } from "@/components/extend-staking-modal"
+import usePollStatus from "@/hooks/usePollStatus"
 
 interface NodeProps {
   params: {
@@ -20,8 +21,6 @@ interface NodeProps {
 const uptimeDayCount = 90
 
 const Node: React.FC<NodeProps> = ({ params: { id } }) => {
-  const timer = useRef<NodeJS.Timeout>()
-
   const [modal, setModal] = useState(false)
 
   const { isPending, data, refetch } = useQuery<NodeType>({
@@ -29,17 +28,17 @@ const Node: React.FC<NodeProps> = ({ params: { id } }) => {
     queryFn: () => fetch(`/api/nodes/${id}`).then((res) => res.json()),
   })
 
-  useEffect(() => {
-    if (data?.status === "LIVE") {
-      clearInterval(timer.current)
-    } else {
-      timer.current = setInterval(() => {
-        refetch()
-      }, 10000)
-    }
+  const { startPoll } = usePollStatus({
+    cb: () => refetch(),
+    stopWhen: () => data?.status === "LIVE",
+    interval: 10000,
+  })
 
-    return () => clearInterval(timer.current)
-  }, [data?.status, refetch])
+  useEffect(() => {
+    if (data?.status !== "LIVE") {
+      startPoll()
+    }
+  }, [data?.status, startPoll])
 
   if (isPending || !data) {
     return (
@@ -55,6 +54,10 @@ const Node: React.FC<NodeProps> = ({ params: { id } }) => {
 
   const soonExpired =
     daysTillExpiration < Number(process.env.NEXT_PUBLIC_NODE_EXPIRE_WARN_DAYS)
+
+  const stakeId = data.payments.find(
+    (payment) => payment.stakeId !== null,
+  )?.stakeId
 
   return (
     <div className="w-full space-y-2">
@@ -125,18 +128,25 @@ const Node: React.FC<NodeProps> = ({ params: { id } }) => {
           </div>
         )}
 
-        {/* {soonExpired && ( */}
         <div className="text-center">
           <Button onClick={() => setModal(true)}>Extend subscription</Button>
-          <NodePaymentModal
-            nodeId={data.id}
-            open={modal}
-            chain={data.blockchain}
-            onOpenChange={() => setModal(false)}
-            onPurchaseComplete={() => refetch()}
-          />
+          {stakeId ? (
+            <ExtendStakingModal
+              stakeId={stakeId}
+              open={modal}
+              onOpenChange={() => setModal(false)}
+              onComplete={() => refetch()}
+            />
+          ) : (
+            <NodePaymentModal
+              nodeId={data.id}
+              open={modal}
+              chain={data.blockchain}
+              onOpenChange={() => setModal(false)}
+              onPurchaseComplete={() => refetch()}
+            />
+          )}
         </div>
-        {/* )} */}
       </div>
 
       {data.status === "LIVE" && (

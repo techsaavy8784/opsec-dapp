@@ -4,6 +4,7 @@ import { getServerSession } from "next-auth"
 import { NextResponse, NextRequest } from "next/server"
 import { Status } from "@prisma/client"
 import subscriptions from "./subscriptions"
+import availableServers from "./available-servers"
 
 export async function GET(request: NextRequest) {
   const session = await getServerSession(authOptions)
@@ -17,6 +18,7 @@ export async function GET(request: NextRequest) {
       node: {
         userId: session.user.id,
       },
+      stakeId: null,
     },
     include: {
       node: {
@@ -102,28 +104,9 @@ export async function POST(request: NextRequest) {
 
   const blockchainId = id
 
-  const serverIds = await prisma.server.findMany({
-    where: {
-      NOT: [
-        {
-          nodes: {
-            some: {
-              blockchainId,
-              status: {
-                not: Status.EXPIRED,
-              },
-            },
-          },
-        },
-      ],
-      active: true,
-    },
-    select: {
-      id: true,
-    },
-  })
+  const servers = await availableServers(blockchainId)
 
-  if (serverIds.length === 0) {
+  if (servers.length === 0) {
     return NextResponse.json(
       { message: "No suitable server found" },
       { status: 404 },
@@ -163,7 +146,7 @@ export async function POST(request: NextRequest) {
   const node = await prisma.node.create({
     data: {
       wallet,
-      serverId: serverIds[Math.floor(Math.random() * serverIds.length)].id,
+      serverId: servers[Math.floor(Math.random() * servers.length)].id,
       userId: session.user.id,
       blockchainId,
     },
