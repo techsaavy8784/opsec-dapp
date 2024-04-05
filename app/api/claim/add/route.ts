@@ -20,14 +20,14 @@ export async function POST(request: NextRequest) {
   })
 
   if (data) {
-    await prisma.claim.delete({
+    await prisma.claims.delete({
       where: {
         id: data.id,
       },
     })
     oldAmount = data.amount
   }
-  await prisma.claim.create({
+  await prisma.claims.create({
     data: {
       user_id: session.user.id,
       address: session.user.address,
