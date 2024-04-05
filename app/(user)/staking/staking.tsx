@@ -139,6 +139,8 @@ const Staking: React.FC = () => {
     return null
   }
 
+  const balance = Math.floor(Number(formatUnits(opsecBalance, OPSEC_DECIMALS)))
+
   return (
     <div className="text-center">
       <p>Staking period</p>
@@ -163,20 +165,25 @@ const Staking: React.FC = () => {
         <br />
         and you will get {stakingRewardAmount(amount)} nodes for reward
       </p>
-      <Slider
-        value={[amount]}
-        min={1}
-        max={Math.floor(Number(formatUnits(opsecBalance, OPSEC_DECIMALS)))}
-        step={1}
-        className="my-4"
-        onValueChange={([value]) => setAmount(value)}
-      />
+
+      {balance > 0 ? (
+        <Slider
+          value={[amount]}
+          min={1}
+          max={balance}
+          step={1}
+          className="my-4"
+          onValueChange={([value]) => setAmount(value)}
+        />
+      ) : (
+        <p className="text-yellow-500">Not enough balance to stake</p>
+      )}
 
       <Button
         onClick={handleStake}
         variant="custom"
         className="max-w-32 mt-12"
-        disabled={stakingStatus !== undefined}
+        disabled={stakingStatus !== undefined || balance === 0}
       >
         {stakingStatus !== undefined && (
           <ReloadIcon className="mr-2 animate-spin" />
