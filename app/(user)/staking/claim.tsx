@@ -76,7 +76,11 @@ const ClaimF: React.FC = () => {
   const millisecondsIn24Hours = 24 * 60 * 60 * 1000 // 24 hours in milliseconds
   const today = new Date()
 
-  if (ethBalance === undefined) {
+  if (
+    ethBalance === undefined ||
+    opsecBalance === undefined ||
+    opsecAllBalance === undefined
+  ) {
     return <></>
   }
 
@@ -87,7 +91,12 @@ const ClaimF: React.FC = () => {
           <div className="flex justify-between p-1 border-b-2 border-slate-300 mb-3">
             <div>ETH Ballance for Claim: </div>
             <div>
-              {Number(formatUnits(ethBalance as bigint, ETH_DECIMALS))} ETH
+              {Number(formatUnits(ethBalance as bigint, ETH_DECIMALS)) *
+                (Number(formatUnits(opsecBalance as bigint, OPSEC_DECIMALS)) /
+                  Number(
+                    formatUnits(opsecAllBalance as bigint, OPSEC_DECIMALS),
+                  ))}{" "}
+              ETH
             </div>
           </div>
           <div className="w-full flex justify-center">
