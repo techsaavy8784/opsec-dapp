@@ -1,6 +1,3 @@
--- AlterTable
-ALTER TABLE "payments" ADD COLUMN     "stake_id" TEXT;
-
 -- CreateTable
 CREATE TABLE "claims" (
     "id" SERIAL NOT NULL,

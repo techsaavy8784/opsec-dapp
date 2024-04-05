@@ -13,7 +13,7 @@ export async function POST(request: NextRequest) {
   const { amount } = await request.json()
   let oldAmount = 0
 
-  const data = await prisma.claim.findFirst({
+  const data = await prisma.claims.findFirst({
     where: {
       user_id: session.user.id,
     },

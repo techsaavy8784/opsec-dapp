@@ -6,7 +6,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 })
   }
 
-  const claim = await prisma.claim.findMany()
+  const claim = await prisma.claims.findMany()
 
   return NextResponse.json({ data: claim })
 }

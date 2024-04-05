@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button"
 import { useAccount, useReadContract } from "wagmi"
 import { formatUnits } from "viem"
 import abi from "@/contract/abi.json"
-import { Claim } from "@prisma/client"
+import { Claims } from "@prisma/client"
 import { useQuery } from "@tanstack/react-query"
 
 const OPSEC_DECIMALS = 18
@@ -47,7 +47,7 @@ const ClaimF: React.FC = () => {
   })
 
   const { isPending, data } = useQuery<
-    (Claim & {
+    (Claims & {
       lasted_at: any
     })[]
   >({
@@ -76,6 +76,10 @@ const ClaimF: React.FC = () => {
   const millisecondsIn24Hours = 24 * 60 * 60 * 1000 // 24 hours in milliseconds
   const today = new Date()
 
+  if (ethBalance === undefined) {
+    return <></>
+  }
+
   return (
     <>
       <div className="m-4 text-slate-500 rounded-lg p-5 flex justify-center items-center bg-white">
@@ -90,9 +94,12 @@ const ClaimF: React.FC = () => {
             <Button
               className="bg-[#0eb592] text-white rounded-3xl hover:bg-[#70cdb7]"
               disabled={
-                data &&
-                today.getTime() - data[0].lasted_at.getTime() <
-                  millisecondsIn24Hours &&
+                !data ||
+                (data && data?.length === 0) ||
+                (data &&
+                  data?.length !== 0 &&
+                  today.getTime() - data[0].lasted_at.getTime() <
+                    millisecondsIn24Hours) ||
                 Number(formatUnits(ethBalance as bigint, ETH_DECIMALS)) < 0.01
               }
               onClick={() => handleClaim()}

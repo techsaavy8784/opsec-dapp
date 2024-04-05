@@ -7,7 +7,7 @@ export async function POST(request: NextRequest) {
   }
 
   const { userId } = await request.json()
-  await prisma.claim.update({
+  await prisma.claims.update({
     data: {
       amount: 0,
     },
