@@ -8,8 +8,10 @@ import { stakingRewardAmount } from "../../payment/subscriptions"
 import { pickFromProbabilities } from "@/lib/utils"
 import availableServers from "../../payment/available-servers"
 
-export async function POST(request: NextRequest) {
-  if (request.headers.get("X-API-KEY") !== process.env.STAKE_WEBHOOK_KEY) {
+export async function GET(request: NextRequest) {
+  if (
+    request.headers.get("Authorization") !== `Bearer ${process.env.CRON_SECRET}`
+  ) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 })
   }
 
