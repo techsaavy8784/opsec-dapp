@@ -1,0 +1,8 @@
+{
+  "crons": [
+    {
+      "path": "/api/staking/complete",
+      "schedule": "0 * * * *"
+    }
+  ]
+}
