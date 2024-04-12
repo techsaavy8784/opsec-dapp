@@ -6,15 +6,20 @@ import { formatUnits } from "viem"
 import abi from "@/contract/abi.json"
 import { Claims } from "@prisma/client"
 import { useQuery } from "@tanstack/react-query"
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import { CovalentClient } from "@covalenthq/client-sdk"
-const client = new CovalentClient(process.env.COVALENT_API_KEY)
+const client = new CovalentClient(
+  process.env.NEXT_PUBLIC_COVALENT_API_KEY as string,
+)
 
 const OPSEC_DECIMALS = 18
 const ETH_DECIMALS = 18
 
 const ClaimF: React.FC = () => {
   const { address } = useAccount()
+  const [opsecAllBalance, setOpsecAllBalance] = useState<number>(0)
+  const [isLoadingForOpSecAll, setIsLoadingForOpSecAll] =
+    useState<boolean>(false)
 
   const {
     data: ethBalance,
@@ -38,26 +43,23 @@ const ClaimF: React.FC = () => {
     args: [address as `0x${string}`],
   })
 
-  const {
-    data: opsecAllBalance,
-    isLoading: isLoadingForOpSecAll,
-    refetch: refetchAllBalance,
-  } = useReadContract({
-    abi: abi,
-    address: process.env.NEXT_PUBLIC_STAKING_CONTRACT as `0x${string}`,
-    functionName: "allBallence",
-    args: [address as `0x${string}`],
-  })
-
   useEffect(() => {
     const holdersAllBalance = async () => {
       try {
+        let sum: number = 0
+        setIsLoadingForOpSecAll(true)
         for await (const resp of client.BalanceService.getTokenHoldersV2ForTokenAddress(
           "eth-mainnet",
-          "0x6a7eff1e2c355ad6eb91bebb5ded49257f3fed98",
+          process.env.NEXT_PUBLIC_OPSEC_TOKEN_ADDRESS as `0x${string}`,
+          { pageSize: 1000 },
         )) {
-          console.log(resp)
+          sum =
+            sum +
+            Number(formatUnits(resp.balance as bigint, resp.contract_decimals))
         }
+
+        setOpsecAllBalance(sum)
+        setIsLoadingForOpSecAll(false)
       } catch (error) {
         console.log("Error")
       }
@@ -84,7 +86,7 @@ const ClaimF: React.FC = () => {
             amount:
               Number(formatUnits(ethBalance as bigint, ETH_DECIMALS)) *
               (Number(formatUnits(opsecBalance as bigint, OPSEC_DECIMALS)) /
-                Number(formatUnits(opsecAllBalance as bigint, OPSEC_DECIMALS))),
+                opsecAllBalance),
           }),
         }
         await fetch("/api/claim/add", requestOptions)
@@ -98,9 +100,20 @@ const ClaimF: React.FC = () => {
   if (
     ethBalance === undefined ||
     opsecBalance === undefined ||
-    opsecAllBalance === undefined
+    isLoadingForOpSecAll
   ) {
-    return <></>
+    return (
+      <>
+        <div
+          className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-current border-e-transparent align-[-0.125em] text-surface motion-reduce:animate-[spin_1.5s_linear_infinite] dark:text-white"
+          role="status"
+        >
+          <span className="!absolute !-m-px !h-px !w-px !overflow-hidden !whitespace-nowrap !border-0 !p-0 ![clip:rect(0,0,0,0)]">
+            Loading...
+          </span>
+        </div>
+      </>
+    )
   }
 
   return (
@@ -112,9 +125,7 @@ const ClaimF: React.FC = () => {
             <div>
               {Number(formatUnits(ethBalance as bigint, ETH_DECIMALS)) *
                 (Number(formatUnits(opsecBalance as bigint, OPSEC_DECIMALS)) /
-                  Number(
-                    formatUnits(opsecAllBalance as bigint, OPSEC_DECIMALS),
-                  ))}{" "}
+                  opsecAllBalance)}{" "}
               ETH
             </div>
           </div>
