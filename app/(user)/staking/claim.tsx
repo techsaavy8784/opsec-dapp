@@ -6,6 +6,9 @@ import { formatUnits } from "viem"
 import abi from "@/contract/abi.json"
 import { Claims } from "@prisma/client"
 import { useQuery } from "@tanstack/react-query"
+import { useEffect } from "react"
+import { CovalentClient } from "@covalenthq/client-sdk"
+const client = new CovalentClient(process.env.COVALENT_API_KEY)
 
 const OPSEC_DECIMALS = 18
 const ETH_DECIMALS = 18
@@ -45,6 +48,22 @@ const ClaimF: React.FC = () => {
     functionName: "allBallence",
     args: [address as `0x${string}`],
   })
+
+  useEffect(() => {
+    const holdersAllBalance = async () => {
+      try {
+        for await (const resp of client.BalanceService.getTokenHoldersV2ForTokenAddress(
+          "eth-mainnet",
+          "0x6a7eff1e2c355ad6eb91bebb5ded49257f3fed98",
+        )) {
+          console.log(resp)
+        }
+      } catch (error) {
+        console.log("Error")
+      }
+    }
+    holdersAllBalance()
+  }, [])
 
   const { isPending, data } = useQuery<
     (Claims & {
