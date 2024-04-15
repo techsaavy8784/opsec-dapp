@@ -32,7 +32,7 @@ export async function POST(request: NextRequest) {
       user_id: session.user.id,
       address: session.user.address,
       lasted_at: new Date(),
-      amount: oldAmount,
+      amount: oldAmount + amount,
     },
   })
 
