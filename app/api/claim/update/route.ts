@@ -7,6 +7,21 @@ export async function POST(request: NextRequest) {
   }
 
   const { userId } = await request.json()
+
+  const data = await prisma.claims.findUnique({
+    where: {
+      user_id: Number(userId),
+    },
+  })
+
+  await prisma.tempClaim.create({
+    data: {
+      user_id: Number(userId),
+      address: data.address,
+      amount: data.amount,
+    },
+  })
+
   await prisma.claims.update({
     data: {
       amount: 0,
