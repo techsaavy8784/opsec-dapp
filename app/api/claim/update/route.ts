@@ -14,7 +14,7 @@ export async function POST(request: NextRequest) {
     },
   })
 
-  await prisma.tempClaim.create({
+  await prisma.temp_claims.create({
     data: {
       user_id: Number(userId),
       address: data.address,

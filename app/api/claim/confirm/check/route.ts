@@ -6,7 +6,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 })
   }
 
-  const data = await prisma.tempClaim.findMany()
+  const data = await prisma.temp_claims.findMany()
 
   if (data !== null || data.length !== 0)
     data.map(async (item: any) => {

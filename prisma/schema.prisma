@@ -1,130 +1,146 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
-    provider = "prisma-client-js"
+  provider = "prisma-client-js"
 }
 
 generator jsonSchema {
-    provider              = "prisma-json-schema-generator"
-    includeRequiredFields = "true"
+  provider              = "prisma-json-schema-generator"
+  includeRequiredFields = "true"
 }
 
 datasource db {
-    provider  = "postgresql"
-    url       = env("DATABASE_URL")
-    directUrl = env("DIRECT_URL")
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
 }
 
 model User {
-    id       Int       @id @default(autoincrement())
-    address  String    @unique // address is used as email for admins
-    password String? // if password is not null, he is admin, otherwise user
-    balance  Int       @default(0)
-    nodes    Node[]
-    credits  Credit[]
-    Staking  Staking[]
+  id          Int           @id @default(autoincrement())
+  address     String        @unique
+  password    String?
+  balance     Int           @default(0)
+  claims      claims[]
+  credits     Credit[]
+  nodes       Node[]
+  Staking     Staking[]
+  temp_claims temp_claims[]
 
-    @@map("users")
-}
-
-enum Status {
-    CREATED
-    INSTALLING
-    LIVE
-    FAILED
-    EXPIRED
+  @@map("users")
 }
 
 model Node {
-    id           Int           @id @default(autoincrement())
-    userId       Int           @map("user_id")
-    user         User          @relation(fields: [userId], references: [id])
-    serverId     Int           @map("server_id")
-    server       Server        @relation(fields: [serverId], references: [id])
-    wallet       String?
-    status       Status        @default(CREATED)
-    createdAt    DateTime      @default(now()) @map("created_at")
-    nodeHistory  NodeHistory[]
-    payments     Payment[]
-    blockchainId Int           @map("blockchain_id")
-    blockchain   Blockchain    @relation(fields: [blockchainId], references: [id])
+  id           Int          @id @default(autoincrement())
+  userId       Int          @map("user_id")
+  serverId     Int          @map("server_id")
+  wallet       String?
+  status       Status       @default(CREATED)
+  createdAt    DateTime     @default(now()) @map("created_at")
+  blockchainId Int          @map("blockchain_id")
+  nodeHistory  NodeHistory?
+  blockchain   Blockchain   @relation(fields: [blockchainId], references: [id])
+  server       Server       @relation(fields: [serverId], references: [id])
+  user         User         @relation(fields: [userId], references: [id])
+  payments     Payment[]
 
-    @@map("nodes")
+  @@map("nodes")
 }
 
 model Staking {
-    id        Int      @id @default(autoincrement())
-    user      User     @relation(fields: [userId], references: [id])
-    userId    Int      @map("user_id")
-    stakeId   String   @map("stake_id")
-    createdAt DateTime @default(now()) @map("created_at")
+  id        Int      @id @default(autoincrement())
+  userId    Int      @map("user_id")
+  stakeId   String   @map("stake_id")
+  createdAt DateTime @default(now()) @map("created_at")
+  user      User     @relation(fields: [userId], references: [id])
 
-    @@map("stakings")
+  @@map("stakings")
 }
 
 model NodeHistory {
-    id      Int     @id @default(autoincrement())
-    nodeId  Int     @unique @map("node_id")
-    node    Node    @relation(fields: [nodeId], references: [id])
-    message String?
-    status  Status  @default(CREATED)
+  id      Int     @id @default(autoincrement())
+  nodeId  Int     @unique @map("node_id")
+  message String?
+  status  Status  @default(CREATED)
+  node    Node    @relation(fields: [nodeId], references: [id])
 
-    @@map("node_histories")
+  @@map("node_histories")
 }
 
 model Server {
-    id       Int     @id @default(autoincrement())
-    host     String  @default("")
-    port     Int     @default(22)
-    username String  @default("")
-    password String  @default("")
-    active   Boolean
-    nodes    Node[]
+  id       Int     @id @default(autoincrement())
+  host     String  @default("")
+  port     Int     @default(22)
+  username String  @default("")
+  password String  @default("")
+  active   Boolean
+  nodes    Node[]
 
-    @@map("servers")
+  @@map("servers")
 }
 
 model Payment {
-    id       Int      @id @default(autoincrement())
-    duration Int      @default(0)
-    nodeId   Int      @map("node_id")
-    node     Node     @relation(fields: [nodeId], references: [id], onDelete: Cascade)
-    credit   Int
-    stakeId  String?  @map("stake_id")
-    date     DateTime @default(now())
+  id       Int      @id @default(autoincrement())
+  duration Int      @default(0)
+  nodeId   Int      @map("node_id")
+  credit   Int
+  date     DateTime @default(now())
+  stakeId  String?  @map("stake_id")
+  node     Node     @relation(fields: [nodeId], references: [id], onDelete: Cascade)
 
-    @@map("payments")
+  @@map("payments")
 }
 
 model TxVerifier {
-    id       Int    @id @default(autoincrement())
-    verifier String @unique
-    tx       Json
+  id       Int    @id @default(autoincrement())
+  verifier String @unique
+  tx       Json
 
-    @@map("tx_verifiers")
+  @@map("tx_verifiers")
 }
 
 model Blockchain {
-    id          Int      @id @default(autoincrement())
-    name        String
-    description String   @default("")
-    url         String
-    price       Float
-    hasWallet   Boolean  @default(false) @map("has_wallet")
-    launchedAt  DateTime @default(now()) @map("launched_at")
-    Node        Node[]
+  id          Int      @id @default(autoincrement())
+  name        String
+  description String   @default("")
+  url         String
+  price       Float
+  hasWallet   Boolean  @default(false) @map("has_wallet")
+  launchedAt  DateTime @default(now()) @map("launched_at")
+  Node        Node[]
 
-    @@map("blockchains")
+  @@map("blockchains")
 }
 
 model Credit {
-    id      Int      @id @default(autoincrement())
-    tx      String
-    credits Int
-    user    User     @relation(fields: [userId], references: [id])
-    userId  Int      @map("user_id")
-    date    DateTime @default(now())
+  id      Int      @id @default(autoincrement())
+  tx      String
+  credits Int
+  userId  Int      @map("user_id")
+  date    DateTime @default(now())
+  user    User     @relation(fields: [userId], references: [id])
 
-    @@map("credits")
+  @@map("credits")
+}
+
+model claims {
+  id        Int      @id @default(autoincrement())
+  user_id   Int
+  address   String
+  lasted_at DateTime @default(now())
+  amount    Int
+  users     User     @relation(fields: [user_id], references: [id])
+}
+
+model temp_claims {
+  id      Int    @id @default(autoincrement())
+  user_id Int
+  address String
+  amount  Int
+  users   User   @relation(fields: [user_id], references: [id])
+}
+
+enum Status {
+  CREATED
+  INSTALLING
+  LIVE
+  FAILED
+  EXPIRED
 }
