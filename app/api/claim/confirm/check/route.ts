@@ -6,16 +6,16 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 })
   }
 
-  const data = await prisma.temp_claims.findMany()
+  const data = await prisma.tempClaim.findMany()
 
-  if (data !== null || data.length !== 0)
+  if (data !== null && data.length !== 0)
     data.map(async (item: any) => {
-      await prisma.claims.update({
+      await prisma.claim.updateMany({
         data: {
           amount: { increment: item.amount },
         },
         where: {
-          address: item.address,
+          userId: item.userId,
         },
       })
     })

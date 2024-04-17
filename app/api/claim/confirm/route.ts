@@ -8,7 +8,7 @@ export async function POST(request: NextRequest) {
 
   const { address } = await request.json()
 
-  await prisma.temp_claims.delete({
+  await prisma.tempClaim.deleteMany({
     where: {
       address: address,
     },

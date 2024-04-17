@@ -1,4 +1,5 @@
 import prisma from "@/prisma"
+import { Claim } from "@prisma/client"
 import { NextResponse, NextRequest } from "next/server"
 
 export async function POST(request: NextRequest) {
@@ -8,28 +9,30 @@ export async function POST(request: NextRequest) {
 
   const { userId } = await request.json()
 
-  const data = await prisma.claims.findUnique({
+  const data: Claim | null = await prisma.claim.findFirst({
     where: {
-      user_id: Number(userId),
+      userId: Number(userId),
     },
   })
 
-  await prisma.temp_claims.create({
-    data: {
-      user_id: Number(userId),
-      address: data.address,
-      amount: data.amount,
-    },
-  })
+  if (data !== null) {
+    await prisma.tempClaim.create({
+      data: {
+        userId: Number(userId),
+        address: data.address,
+        amount: data.amount,
+      },
+    })
 
-  await prisma.claims.update({
-    data: {
-      amount: 0,
-    },
-    where: {
-      user_id: Number(userId),
-    },
-  })
+    await prisma.claim.update({
+      data: {
+        amount: 0,
+      },
+      where: {
+        id: data.id,
+      },
+    })
+  }
 
   return NextResponse.json("success", { status: 201 })
 }

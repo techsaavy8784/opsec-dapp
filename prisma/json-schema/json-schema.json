@@ -20,10 +20,10 @@
           "type": "integer",
           "default": 0
         },
-        "nodes": {
+        "Claim": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/Node"
+            "$ref": "#/definitions/Claim"
           }
         },
         "credits": {
@@ -32,10 +32,22 @@
             "$ref": "#/definitions/Credit"
           }
         },
+        "nodes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Node"
+          }
+        },
         "Staking": {
           "type": "array",
           "items": {
             "$ref": "#/definitions/Staking"
+          }
+        },
+        "TempClaim": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/TempClaim"
           }
         }
       },
@@ -48,12 +60,6 @@
       "properties": {
         "id": {
           "type": "integer"
-        },
-        "user": {
-          "$ref": "#/definitions/User"
-        },
-        "server": {
-          "$ref": "#/definitions/Server"
         },
         "wallet": {
           "type": [
@@ -77,19 +83,29 @@
           "format": "date-time"
         },
         "nodeHistory": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/NodeHistory"
-          }
+          "anyOf": [
+            {
+              "$ref": "#/definitions/NodeHistory"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "blockchain": {
+          "$ref": "#/definitions/Blockchain"
+        },
+        "server": {
+          "$ref": "#/definitions/Server"
+        },
+        "user": {
+          "$ref": "#/definitions/User"
         },
         "payments": {
           "type": "array",
           "items": {
             "$ref": "#/definitions/Payment"
           }
-        },
-        "blockchain": {
-          "$ref": "#/definitions/Blockchain"
         }
       },
       "required": [
@@ -104,15 +120,15 @@
         "id": {
           "type": "integer"
         },
-        "user": {
-          "$ref": "#/definitions/User"
-        },
         "stakeId": {
           "type": "string"
         },
         "createdAt": {
           "type": "string",
           "format": "date-time"
+        },
+        "user": {
+          "$ref": "#/definitions/User"
         }
       },
       "required": [
@@ -125,9 +141,6 @@
       "properties": {
         "id": {
           "type": "integer"
-        },
-        "node": {
-          "$ref": "#/definitions/Node"
         },
         "message": {
           "type": [
@@ -145,6 +158,9 @@
             "FAILED",
             "EXPIRED"
           ]
+        },
+        "node": {
+          "$ref": "#/definitions/Node"
         }
       },
       "required": [
@@ -197,11 +213,12 @@
           "type": "integer",
           "default": 0
         },
-        "node": {
-          "$ref": "#/definitions/Node"
-        },
         "credit": {
           "type": "integer"
+        },
+        "date": {
+          "type": "string",
+          "format": "date-time"
         },
         "stakeId": {
           "type": [
@@ -209,9 +226,14 @@
             "null"
           ]
         },
-        "date": {
-          "type": "string",
-          "format": "date-time"
+        "validatorId": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "node": {
+          "$ref": "#/definitions/Node"
         }
       },
       "required": [
@@ -296,12 +318,12 @@
         "credits": {
           "type": "integer"
         },
-        "user": {
-          "$ref": "#/definitions/User"
-        },
         "date": {
           "type": "string",
           "format": "date-time"
+        },
+        "user": {
+          "$ref": "#/definitions/User"
         }
       },
       "required": [
@@ -309,6 +331,110 @@
         "credits",
         "userId"
       ]
+    },
+    "Claim": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer"
+        },
+        "address": {
+          "type": "string"
+        },
+        "lasted_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "amount": {
+          "type": "integer"
+        },
+        "users": {
+          "$ref": "#/definitions/User"
+        }
+      },
+      "required": [
+        "userId",
+        "address",
+        "amount"
+      ]
+    },
+    "TempClaim": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer"
+        },
+        "address": {
+          "type": "string"
+        },
+        "amount": {
+          "type": "integer"
+        },
+        "users": {
+          "$ref": "#/definitions/User"
+        }
+      },
+      "required": [
+        "userId",
+        "address",
+        "amount"
+      ]
+    },
+    "ValidatorType": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer"
+        },
+        "name": {
+          "type": "string"
+        },
+        "rewardLockTime": {
+          "type": "integer"
+        },
+        "rewardPerMonth": {
+          "type": "integer"
+        },
+        "price": {
+          "type": "number"
+        },
+        "priceUnit": {
+          "type": "number"
+        },
+        "rewardWallet": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "rewardLockTime",
+        "rewardPerMonth",
+        "price",
+        "priceUnit",
+        "rewardWallet"
+      ]
+    },
+    "Validator": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer"
+        },
+        "typeId": {
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "purchaseTime": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time"
+        }
+      },
+      "required": []
     }
   },
   "type": "object",
@@ -339,6 +465,18 @@
     },
     "credit": {
       "$ref": "#/definitions/Credit"
+    },
+    "claim": {
+      "$ref": "#/definitions/Claim"
+    },
+    "tempClaim": {
+      "$ref": "#/definitions/TempClaim"
+    },
+    "validatorType": {
+      "$ref": "#/definitions/ValidatorType"
+    },
+    "validator": {
+      "$ref": "#/definitions/Validator"
     }
   }
 }

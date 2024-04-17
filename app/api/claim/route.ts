@@ -10,9 +10,9 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 })
   }
 
-  const claim = await prisma.claims.findMany({
+  const claim = await prisma.claim.findMany({
     where: {
-      user_id: session.user.id,
+      userId: session.user.id,
     },
   })
 

@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button"
 import { useAccount, useReadContract } from "wagmi"
 import { formatUnits } from "viem"
 import abi from "@/contract/abi.json"
-import { Claims } from "@prisma/client"
+import { Claim } from "@prisma/client"
 import { useQuery } from "@tanstack/react-query"
 import { useEffect, useState } from "react"
 import { CovalentClient } from "@covalenthq/client-sdk"
@@ -68,7 +68,7 @@ const ClaimF: React.FC = () => {
   }, [])
 
   const { isPending, data } = useQuery<
-    (Claims & {
+    (Claim & {
       lasted_at: any
     })[]
   >({

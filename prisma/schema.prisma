@@ -14,15 +14,15 @@ datasource db {
 }
 
 model User {
-  id          Int           @id @default(autoincrement())
-  address     String        @unique
-  password    String?
-  balance     Int           @default(0)
-  claims      claims[]
-  credits     Credit[]
-  nodes       Node[]
-  Staking     Staking[]
-  temp_claims temp_claims[]
+  id        Int         @id @default(autoincrement())
+  address   String      @unique
+  password  String?
+  balance   Int         @default(0)
+  Claim     Claim[]
+  credits   Credit[]
+  nodes     Node[]
+  Staking   Staking[]
+  TempClaim TempClaim[]
 
   @@map("users")
 }
@@ -77,13 +77,14 @@ model Server {
 }
 
 model Payment {
-  id       Int      @id @default(autoincrement())
-  duration Int      @default(0)
-  nodeId   Int      @map("node_id")
-  credit   Int
-  date     DateTime @default(now())
-  stakeId  String?  @map("stake_id")
-  node     Node     @relation(fields: [nodeId], references: [id], onDelete: Cascade)
+  id          Int      @id @default(autoincrement())
+  duration    Int      @default(0)
+  nodeId      Int      @map("node_id")
+  credit      Int
+  date        DateTime @default(now())
+  stakeId     String?  @map("stake_id")
+  validatorId String?  @map("validator_id")
+  node        Node     @relation(fields: [nodeId], references: [id], onDelete: Cascade)
 
   @@map("payments")
 }
@@ -120,21 +121,45 @@ model Credit {
   @@map("credits")
 }
 
-model claims {
+model Claim {
   id        Int      @id @default(autoincrement())
-  user_id   Int
+  userId    Int      @map("user_id")
   address   String
   lasted_at DateTime @default(now())
   amount    Int
-  users     User     @relation(fields: [user_id], references: [id])
+  users     User     @relation(fields: [userId], references: [id])
+
+  @@map("claims")
 }
 
-model temp_claims {
+model TempClaim {
   id      Int    @id @default(autoincrement())
-  user_id Int
+  userId  Int    @map("user_id")
   address String
   amount  Int
-  users   User   @relation(fields: [user_id], references: [id])
+  users   User   @relation(fields: [userId], references: [id])
+
+  @@map("temp_claims")
+}
+
+model ValidatorType {
+  id             Int    @id @default(autoincrement())
+  name           String
+  rewardLockTime Int    @map("reward_lock_time")
+  rewardPerMonth Int    @map("reward_per_month")
+  price          Float
+  priceUnit      Float  @map("price_unit")
+  rewardWallet   String @map("reward_wallet")
+
+  @@map("validator_types")
+}
+
+model Validator {
+  id           Int       @id @default(autoincrement())
+  typeId       Int?      @map("type_id")
+  purchaseTime DateTime? @map("purchase_time")
+
+  @@map("validators")
 }
 
 enum Status {
