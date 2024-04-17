@@ -46,6 +46,7 @@ export const ExtendStakingModal: React.FC<ExtendStakingModalProps> = ({
     stopWhen: (extended: boolean) => extended,
     onStop: () => {
       toast({ title: "Stake period has been extended" })
+      onOpenChange?.(false)
       onComplete()
     },
   })
