@@ -226,10 +226,14 @@
             "null"
           ]
         },
-        "validatorId": {
-          "type": [
-            "string",
-            "null"
+        "validators": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/Validator"
+            },
+            {
+              "type": "null"
+            }
           ]
         },
         "node": {
@@ -399,10 +403,20 @@
           "type": "number"
         },
         "priceUnit": {
-          "type": "number"
+          "type": "string",
+          "default": "ETH",
+          "enum": [
+            "ETH"
+          ]
         },
         "rewardWallet": {
           "type": "string"
+        },
+        "validators": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Validator"
+          }
         }
       },
       "required": [
@@ -410,7 +424,6 @@
         "rewardLockTime",
         "rewardPerMonth",
         "price",
-        "priceUnit",
         "rewardWallet"
       ]
     },
@@ -420,18 +433,28 @@
         "id": {
           "type": "integer"
         },
-        "typeId": {
-          "type": [
-            "integer",
-            "null"
-          ]
-        },
         "purchaseTime": {
           "type": [
             "string",
             "null"
           ],
           "format": "date-time"
+        },
+        "payments": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Payment"
+          }
+        },
+        "validator_types": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/ValidatorType"
+            },
+            {
+              "type": "null"
+            }
+          ]
         }
       },
       "required": []

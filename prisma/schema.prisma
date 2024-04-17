@@ -77,14 +77,15 @@ model Server {
 }
 
 model Payment {
-  id          Int      @id @default(autoincrement())
-  duration    Int      @default(0)
-  nodeId      Int      @map("node_id")
+  id          Int        @id @default(autoincrement())
+  duration    Int        @default(0)
+  nodeId      Int        @map("node_id")
   credit      Int
-  date        DateTime @default(now())
-  stakeId     String?  @map("stake_id")
-  validatorId String?  @map("validator_id")
-  node        Node     @relation(fields: [nodeId], references: [id], onDelete: Cascade)
+  date        DateTime   @default(now())
+  stakeId     String?    @map("stake_id")
+  validatorId Int?       @map("validator_id")
+  validators  Validator? @relation(fields: [validatorId], references: [id], onDelete: Restrict, map: "payments_id_fkey")
+  node        Node       @relation(fields: [nodeId], references: [id], onDelete: Cascade)
 
   @@map("payments")
 }
@@ -143,21 +144,24 @@ model TempClaim {
 }
 
 model ValidatorType {
-  id             Int    @id @default(autoincrement())
+  id             Int         @id @default(autoincrement())
   name           String
-  rewardLockTime Int    @map("reward_lock_time")
-  rewardPerMonth Int    @map("reward_per_month")
+  rewardLockTime Int         @map("reward_lock_time")
+  rewardPerMonth Int         @map("reward_per_month")
   price          Float
-  priceUnit      Float  @map("price_unit")
-  rewardWallet   String @map("reward_wallet")
+  priceUnit      Unit        @default(ETH) @map("price_unit")
+  rewardWallet   String      @map("reward_wallet")
+  validators     Validator[]
 
   @@map("validator_types")
 }
 
 model Validator {
-  id           Int       @id @default(autoincrement())
-  typeId       Int?      @map("type_id")
-  purchaseTime DateTime? @map("purchase_time")
+  id              Int            @id @default(autoincrement())
+  typeId          Int?           @map("type_id")
+  purchaseTime    DateTime?      @map("purchase_time")
+  payments        Payment[]
+  validator_types ValidatorType? @relation(fields: [typeId], references: [id], onDelete: Restrict)
 
   @@map("validators")
 }
@@ -168,4 +172,8 @@ enum Status {
   LIVE
   FAILED
   EXPIRED
+}
+
+enum Unit {
+  ETH
 }

@@ -14,14 +14,12 @@ export async function GET(request: NextRequest) {
     where: {
       purchaseTime: null,
     },
+    include: {
+      validator_types: true,
+    },
   })
 
   inactiveValidators.map(async (item: any) => {
-    const validatorType = await prisma.validatorType.findUnique({
-      where: {
-        id: item.typeId,
-      },
-    })
     const usersForThisValidator = await prisma.payment.findMany({
       where: {
         validatorId: item.id,
@@ -32,7 +30,7 @@ export async function GET(request: NextRequest) {
       0,
     )
     const sumCreditETH = sumCreditUSD
-    if (sumCreditETH >= validatorType.price)
+    if (sumCreditETH >= item.validator_types.price)
       await prisma.validator.update({
         data: {
           purchaseTime: new Date(),
