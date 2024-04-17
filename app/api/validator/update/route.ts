@@ -2,6 +2,8 @@ import prisma from "@/prisma"
 import { authOptions } from "@/lib/auth"
 import { getServerSession } from "next-auth"
 import { NextResponse, NextRequest } from "next/server"
+import axios from "axios"
+import getUSDAmountForETH from "@/lib/getUSDAmountForETH"
 
 export async function GET(request: NextRequest) {
   const session = await getServerSession(authOptions)
@@ -9,6 +11,8 @@ export async function GET(request: NextRequest) {
   if (!session) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 })
   }
+
+  const ethUSDRatio = await getUSDAmountForETH(1)
 
   const inactiveValidators = await prisma.validator.findMany({
     where: {
@@ -29,7 +33,7 @@ export async function GET(request: NextRequest) {
       (total, item) => total + item.credit,
       0,
     )
-    const sumCreditETH = sumCreditUSD
+    const sumCreditETH = sumCreditUSD / ethUSDRatio
     if (sumCreditETH >= item.validator_types.price)
       await prisma.validator.update({
         data: {
