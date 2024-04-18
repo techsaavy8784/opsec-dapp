@@ -1,6 +1,6 @@
 "use client"
 
-import React from "react"
+import React, { useState } from "react"
 import { useQuery } from "@tanstack/react-query"
 import {
   Table,
@@ -14,8 +14,11 @@ import { Validator } from "@prisma/client"
 import { Skeleton } from "@/components/ui/skeleton"
 import getRestAmount from "@/lib/getRestAmount"
 import { Button } from "@/components/ui/button"
+import { NewValidatorPurchaseModal } from "@/components/validator-modal/new"
 
 const Purchase = () => {
+  const [modal, setModal] = useState<boolean>(false)
+
   const { isPending, data } = useQuery<
     (Validator & { validator_types: any })[]
   >({
@@ -26,9 +29,13 @@ const Purchase = () => {
 
   return (
     <div className="pt-5">
-      <Button className="float-right" onClick={() => {}}>
+      <Button className="float-right" onClick={() => setModal(true)}>
         Purchase New Node
       </Button>
+      <NewValidatorPurchaseModal
+        open={modal}
+        onOpenChange={() => setModal((prev) => !prev)}
+      />
       <p className="my-3">Pending Validator Nodes</p>
       <div className="border border-[#FFFFFF33] rounded-[16px]">
         <Table>

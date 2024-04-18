@@ -34,7 +34,9 @@ export async function POST(request: NextRequest) {
       userId: session.user.id,
       typeId: typeId,
       purchaseTime:
-        getUSDAmountForETH(validatorType!.price) > amount ? null : new Date(),
+        (await getUSDAmountForETH(validatorType!.price)) > amount
+          ? null
+          : new Date(),
     },
   })
 

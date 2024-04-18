@@ -46,7 +46,7 @@ export async function POST(request: NextRequest) {
     data: {
       purchaseTime:
         totalAmountForValidator + amount <
-        getUSDAmountForETH(validator!.validator_types!.price)
+        (await getUSDAmountForETH(validator!.validator_types!.price))
           ? null
           : new Date(),
     },
