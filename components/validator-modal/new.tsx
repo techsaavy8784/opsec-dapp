@@ -27,6 +27,7 @@ import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 
 interface NewValidatorPurchaseModalProps extends DialogProps {
   open: boolean
+  onOpenChange: () => void
 }
 
 export const NewValidatorPurchaseModal: React.FC<
@@ -85,23 +86,45 @@ export const NewValidatorPurchaseModal: React.FC<
           ),
         ),
       )
+      setErrorStatus(false)
+      setErrorMessage("")
     }
     setTypeId(value)
   }
 
-  const onPurchase = () => {
-    checkError()
+  const onPurchase = async () => {
+    if (await checkError()) return
+    fetch("/api/validator/add", {
+      method: "POST",
+      body: JSON.stringify({
+        typeId: Number(typeId),
+        amount: Number(amount),
+      }),
+    })
+      .then((res) => {
+        onOpenChange()
+      })
+      .catch((err) => alert(err))
   }
 
   const checkError = async () => {
     if (typeId !== "" && amount !== "") {
-      if (creditPrice < Number(amount)) {
+      if (creditPrice < Number(amount) || balance.balance < Number(amount)) {
         setErrorStatus(true)
         setErrorMessage("Exceed the amount")
+        return true
+      } else if (Number(amount) === 0) {
+        setErrorStatus(true)
+        setErrorMessage("Input the amount")
+        return true
+      } else {
+        setErrorStatus(false)
+        return false
       }
     } else {
       setErrorStatus(true)
       setErrorMessage("Please Select the validator type & Input the amount")
+      return true
     }
   }
 
@@ -116,7 +139,7 @@ export const NewValidatorPurchaseModal: React.FC<
           </DialogTitle>
           <DialogDescription className="text-[#54597C] w-full text-center font-[500] text-[16px]">
             <div className="flex flex-col items-center gap-4">
-              {`Your Balance is ${balance.balance ?? 0} credit`}
+              {`Your Balance is ${!isBalanceLoading && (balance.balance ?? 0)} credit`}
             </div>
           </DialogDescription>
           <Select onValueChange={(value) => onSelectValueChage(value)}>
@@ -160,7 +183,7 @@ export const NewValidatorPurchaseModal: React.FC<
               <AlertDescription>{errorMessage}</AlertDescription>
             </Alert>
           )}
-          <Button onClick={() => onPurchase}>Purchase</Button>
+          <Button onClick={() => onPurchase()}>Purchase</Button>
         </DialogContent>
       )}
     </Dialog>

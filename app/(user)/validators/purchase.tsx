@@ -24,7 +24,7 @@ const Purchase = () => {
   >({
     queryKey: ["pending-validator-node-notme"],
     queryFn: () =>
-      fetch(`/api/validator/list/notme?status=${2}`).then((res) => res.json()),
+      fetch(`/api/validator?status=${2}`).then((res) => res.json()),
   })
 
   return (
@@ -97,7 +97,7 @@ const Purchase = () => {
                     {item.validator_types.priceUnit}
                   </TableCell>
                   <TableCell className="text-[16px] font-[600] text-white max-md:min-w-[130px]">
-                    {getRestAmount(item.id)}
+                    {/* {await getRestAmount(item.id)} */}
                     {` `}
                     {item.validator_types.priceUnit}
                   </TableCell>

@@ -30,11 +30,12 @@ export async function POST(request: NextRequest) {
 
   const validator = await prisma.validator.create({
     data: {
-      serverId: servers[Math.floor(Math.random() * servers.length)].id,
+      // serverId: servers[Math.floor(Math.random() * servers.length)].id,
+      serverId: 1,
       userId: session.user.id,
       typeId: typeId,
       purchaseTime:
-        (await getUSDAmountForETH(validatorType!.price)) > amount
+        Math.ceil(await getUSDAmountForETH(validatorType!.price)) > amount
           ? null
           : new Date(),
     },
@@ -56,5 +57,5 @@ export async function POST(request: NextRequest) {
     },
   })
 
-  return NextResponse.json({})
+  return NextResponse.json({ status: 201 })
 }

@@ -14,7 +14,7 @@ export async function GET(request: NextRequest) {
   const url = request.nextUrl
   const status = String(url.searchParams.get("status"))
 
-  checkRestAmount()
+  await checkRestAmount()
 
   const data =
     Number(status) === 1
