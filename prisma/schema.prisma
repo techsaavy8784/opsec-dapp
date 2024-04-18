@@ -74,7 +74,6 @@ model Server {
   active     Boolean
   nodes      Node[]
   validators Validator[]
-
   @@map("servers")
 }
 
