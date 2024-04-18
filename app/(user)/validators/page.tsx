@@ -1,15 +1,33 @@
 import React from "react"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import Purchase from "./purchase"
 
 const Validators = () => {
   return (
-    <div className="p-6 flex flex-col gap-6">
-      <div>
-        <h1 className="text-white text-[22px] font-[600]">Choose validator</h1>
-      </div>
-      <div className="max-md:px-4 m-0 p-0">
-        <div className="grid grid-cols-1 md:grid-cols-4 items-center gap-8"></div>
-      </div>
-    </div>
+    <>
+      <Tabs defaultValue="runnig">
+        <TabsList className="grid w-full grid-cols-3">
+          <TabsTrigger value="runnig">Running Validator</TabsTrigger>
+          <TabsTrigger value="pending">Pending Validator</TabsTrigger>
+          <TabsTrigger value="purchase">Purchase Validator Nodes</TabsTrigger>
+        </TabsList>
+        <TabsContent value="runnig">
+          <div className="mt-8">
+            <p className="mt-24">Running Validator</p>
+            <hr className="my-4" />
+          </div>
+        </TabsContent>
+        <TabsContent value="pending">
+          <div className="mt-8">
+            <p className="mt-24">Pending Validator</p>
+            <hr className="my-4" />
+          </div>
+        </TabsContent>
+        <TabsContent value="purchase">
+          <Purchase />
+        </TabsContent>
+      </Tabs>
+    </>
   )
 }
 

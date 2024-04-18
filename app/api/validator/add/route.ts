@@ -3,6 +3,7 @@ import { authOptions } from "@/lib/auth"
 import { getServerSession } from "next-auth"
 import { NextResponse, NextRequest } from "next/server"
 import getUSDAmountForETH from "@/lib/getUSDAmountForETH"
+import availableServers from "../../payment/available-servers"
 
 export async function POST(request: NextRequest) {
   const session = await getServerSession(authOptions)
@@ -12,6 +13,8 @@ export async function POST(request: NextRequest) {
   }
 
   const { typeId, amount } = await request.json()
+
+  const servers = await availableServers(1)
 
   const user = await prisma.user.findFirst({
     where: {
@@ -27,7 +30,7 @@ export async function POST(request: NextRequest) {
 
   const validator = await prisma.validator.create({
     data: {
-      //   serverId: servers[Math.floor(Math.random() * servers.length)].id,
+      serverId: servers[Math.floor(Math.random() * servers.length)].id,
       userId: session.user.id,
       typeId: typeId,
       purchaseTime:
