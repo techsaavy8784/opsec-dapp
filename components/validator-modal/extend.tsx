@@ -8,42 +8,31 @@ import {
   DialogTitle,
   DialogDescription,
 } from "@/components/ui/dialog"
-import {
-  Select,
-  SelectContent,
-  SelectGroup,
-  SelectItem,
-  SelectLabel,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select"
 import { useQuery } from "@tanstack/react-query"
-import { ValidatorType } from "@prisma/client"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import getUSDAmountForETH from "@/lib/getUSDAmountForETH"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 
-interface NewValidatorPurchaseModalProps extends DialogProps {
+interface ExistValidatorPurchaseModalProps extends DialogProps {
   open: boolean
   onOpenChange: () => void
+  validatorID: number
 }
 
-export const NewValidatorPurchaseModal: React.FC<
-  NewValidatorPurchaseModalProps
-> = ({ open, onOpenChange, ...props }) => {
-  const [typeId, setTypeId] = useState<string>("")
-  const [price, setPrice] = useState<string>("")
+export const ExistValidatorPurchaseModal: React.FC<
+  ExistValidatorPurchaseModalProps
+> = ({ open, onOpenChange, validatorID, ...props }) => {
   const [creditPrice, setCreditPrice] = useState<number>(0)
-  const [unit, setUnit] = useState<string>("")
   const [amount, setAmount] = useState<string>("")
   const [errorStatus, setErrorStatus] = useState<boolean>(false)
   const [errorMessage, setErrorMessage] = useState<string>("")
 
-  const { data: validatorTypes, isLoading } = useQuery({
-    queryKey: ["validator-node-types"],
-    queryFn: () => fetch("/api/validatortype").then((res) => res.json()),
+  const { data: validator, isLoading } = useQuery({
+    queryKey: ["validator-by-ID"],
+    queryFn: () =>
+      fetch(`/api/validator/${validatorID}`).then((res) => res.json()),
   })
 
   const { data: balance, isLoading: isBalanceLoading } = useQuery({
@@ -52,9 +41,6 @@ export const NewValidatorPurchaseModal: React.FC<
   })
 
   const init = () => {
-    setTypeId("")
-    setPrice("")
-    setUnit("")
     setAmount("")
     setCreditPrice(0)
     setErrorStatus(false)
@@ -63,41 +49,21 @@ export const NewValidatorPurchaseModal: React.FC<
 
   useEffect(() => {
     if (open === false) init()
-  }, [open])
-
-  const onSelectValueChage = async (value: string) => {
-    if (value !== "") {
-      setPrice(
-        validatorTypes
-          .filter((item: ValidatorType) => item.id === Number(value))[0]
-          ?.price.toString(),
-      )
-      setUnit(
-        validatorTypes.filter(
-          (item: ValidatorType) => item.id === Number(value),
-        )[0]?.priceUnit,
-      )
-      setCreditPrice(
-        Math.ceil(
-          await getUSDAmountForETH(
-            validatorTypes.filter(
-              (item: ValidatorType) => item.id === Number(value),
-            )[0]?.price,
-          ),
-        ),
-      )
-      setErrorStatus(false)
-      setErrorMessage("")
+    const calcCredit = async () => {
+      if (!isLoading)
+        setCreditPrice(
+          Math.ceil(await getUSDAmountForETH(validator.validator_types.price)),
+        )
     }
-    setTypeId(value)
-  }
+    calcCredit()
+  }, [isLoading, open])
 
   const onPurchase = async () => {
     if (await checkError()) return
-    fetch("/api/validator/add", {
+    fetch("/api/validator/add/exist", {
       method: "POST",
       body: JSON.stringify({
-        typeId: Number(typeId),
+        typeId: Number(validatorID),
         amount: Number(amount),
       }),
     })
@@ -108,7 +74,7 @@ export const NewValidatorPurchaseModal: React.FC<
   }
 
   const checkError = async () => {
-    if (typeId !== "" && amount !== "") {
+    if (amount !== "") {
       if (creditPrice < Number(amount) || balance.balance < Number(amount)) {
         setErrorStatus(true)
         setErrorMessage("Exceed the amount")
@@ -123,7 +89,7 @@ export const NewValidatorPurchaseModal: React.FC<
       }
     } else {
       setErrorStatus(true)
-      setErrorMessage("Please Select the validator type & Input the amount")
+      setErrorMessage("Input the amount")
       return true
     }
   }
@@ -142,37 +108,18 @@ export const NewValidatorPurchaseModal: React.FC<
               {`Your Balance is ${!isBalanceLoading && (balance.balance ?? 0)} credit`}
             </div>
           </DialogDescription>
-          <Select onValueChange={(value) => onSelectValueChage(value)}>
-            <SelectTrigger className="w-full">
-              <SelectValue placeholder="Select a Validator Node" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectGroup>
-                <SelectLabel>Validator Nodes</SelectLabel>
-                {validatorTypes.map((item: ValidatorType) => (
-                  <SelectItem
-                    key={item.id}
-                    value={item.id.toString()}
-                    onClick={() => alert(item.id)}
-                  >
-                    {item.name}
-                  </SelectItem>
-                ))}
-              </SelectGroup>
-            </SelectContent>
-          </Select>
+
           <Label htmlFor="amount">
             Price: {creditPrice}
             {` credit`} {"("}
-            {price}
-            {` ${unit}`}
+            {validator.validator_types.price}
+            {` ${validator.validator_types.priceUnit}`}
             {")"}
           </Label>
           <Input
             value={amount}
             id="amount"
             placeholder="Amount"
-            disabled={typeId === ""}
             onChange={(e) => setAmount(e.target.value)}
           />
           {errorStatus && (
