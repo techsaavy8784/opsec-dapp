@@ -50,7 +50,7 @@ CREATE TABLE "servers" (
 CREATE TABLE "payments" (
     "id" SERIAL NOT NULL,
     "duration" INTEGER NOT NULL DEFAULT 0,
-    "node_id" INTEGER NOT NULL,
+    "node_id" INTEGER,
     "credit" INTEGER NOT NULL,
     "date" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
 

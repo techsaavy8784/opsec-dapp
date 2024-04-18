@@ -14,15 +14,16 @@ datasource db {
 }
 
 model User {
-  id        Int         @id @default(autoincrement())
-  address   String      @unique
-  password  String?
-  balance   Int         @default(0)
-  Claim     Claim[]
-  credits   Credit[]
-  nodes     Node[]
-  Staking   Staking[]
-  TempClaim TempClaim[]
+  id         Int         @id @default(autoincrement())
+  address    String      @unique
+  password   String?
+  balance    Int         @default(0)
+  Claim      Claim[]
+  credits    Credit[]
+  nodes      Node[]
+  Staking    Staking[]
+  TempClaim  TempClaim[]
+  validators Validator[]
 
   @@map("users")
 }
@@ -65,13 +66,14 @@ model NodeHistory {
 }
 
 model Server {
-  id       Int     @id @default(autoincrement())
-  host     String  @default("")
-  port     Int     @default(22)
-  username String  @default("")
-  password String  @default("")
-  active   Boolean
-  nodes    Node[]
+  id         Int         @id @default(autoincrement())
+  host       String      @default("")
+  port       Int         @default(22)
+  username   String      @default("")
+  password   String      @default("")
+  active     Boolean
+  nodes      Node[]
+  validators Validator[]
 
   @@map("servers")
 }
@@ -79,13 +81,13 @@ model Server {
 model Payment {
   id          Int        @id @default(autoincrement())
   duration    Int        @default(0)
-  nodeId      Int        @map("node_id")
+  nodeId      Int?       @map("node_id")
   credit      Int
   date        DateTime   @default(now())
   stakeId     String?    @map("stake_id")
   validatorId Int?       @map("validator_id")
   validators  Validator? @relation(fields: [validatorId], references: [id], onDelete: Restrict, map: "payments_id_fkey")
-  node        Node       @relation(fields: [nodeId], references: [id], onDelete: Cascade)
+  node        Node?      @relation(fields: [nodeId], references: [id], onDelete: Cascade)
 
   @@map("payments")
 }
@@ -157,11 +159,15 @@ model ValidatorType {
 }
 
 model Validator {
-  id              Int            @id @default(autoincrement())
-  typeId          Int?           @map("type_id")
-  purchaseTime    DateTime?      @map("purchase_time")
+  id              Int           @id @default(autoincrement())
+  typeId          Int           @map("type_id")
+  userId          Int           @map("user_id")
+  serverId        Int?          @map("server_id")
+  purchaseTime    DateTime?     @map("purchase_time")
   payments        Payment[]
-  validator_types ValidatorType? @relation(fields: [typeId], references: [id], onDelete: Restrict)
+  servers         Server?       @relation(fields: [serverId], references: [id], onDelete: Restrict)
+  validator_types ValidatorType @relation(fields: [typeId], references: [id])
+  users           User          @relation(fields: [userId], references: [id])
 
   @@map("validators")
 }

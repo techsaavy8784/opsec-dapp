@@ -49,6 +49,12 @@
           "items": {
             "$ref": "#/definitions/TempClaim"
           }
+        },
+        "validators": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Validator"
+          }
         }
       },
       "required": [
@@ -197,6 +203,12 @@
           "items": {
             "$ref": "#/definitions/Node"
           }
+        },
+        "validators": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Validator"
+          }
         }
       },
       "required": [
@@ -237,11 +249,17 @@
           ]
         },
         "node": {
-          "$ref": "#/definitions/Node"
+          "anyOf": [
+            {
+              "$ref": "#/definitions/Node"
+            },
+            {
+              "type": "null"
+            }
+          ]
         }
       },
       "required": [
-        "nodeId",
         "credit"
       ]
     },
@@ -446,18 +464,27 @@
             "$ref": "#/definitions/Payment"
           }
         },
-        "validator_types": {
+        "servers": {
           "anyOf": [
             {
-              "$ref": "#/definitions/ValidatorType"
+              "$ref": "#/definitions/Server"
             },
             {
               "type": "null"
             }
           ]
+        },
+        "validator_types": {
+          "$ref": "#/definitions/ValidatorType"
+        },
+        "users": {
+          "$ref": "#/definitions/User"
         }
       },
-      "required": []
+      "required": [
+        "typeId",
+        "userId"
+      ]
     }
   },
   "type": "object",

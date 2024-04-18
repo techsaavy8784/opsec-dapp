@@ -6,9 +6,14 @@ import axios from "axios"
 import getUSDAmountForETH from "@/lib/getUSDAmountForETH"
 
 export async function GET(request: NextRequest) {
-  const session = await getServerSession(authOptions)
+  // const session = await getServerSession(authOptions)
 
-  if (!session) {
+  // if (!session) {
+  //   return NextResponse.json({ message: "Unauthorized" }, { status: 401 })
+  // }
+  if (
+    request.headers.get("Authorization") !== `Bearer ${process.env.CRON_SECRET}`
+  ) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 })
   }
 
