@@ -18,13 +18,12 @@ const ViewValidatorStatus = ({ status }: { status: number }) => {
       validatorType: any
       restAmount: number
       paiedSumAmount: number
+      mePaiedAmount: number
     })[]
   >({
-    queryKey: ["pending-validator-node-me"],
+    queryKey: ["Validator-nodess"],
     queryFn: () =>
-      fetch(`/api/validator/list/me?status=${status}`).then((res) =>
-        res.json(),
-      ),
+      fetch(`/api/validator?status=${status}`).then((res) => res.json()),
   })
 
   useEffect(() => {
@@ -40,7 +39,9 @@ const ViewValidatorStatus = ({ status }: { status: number }) => {
               <TableHead>#</TableHead>
               <TableHead>Name</TableHead>
               <TableHead>Full Amount</TableHead>
+              <TableHead>You Paied Amount</TableHead>
               {status !== 1 && <TableHead>Rest Amount</TableHead>}
+              {status === 1 && <TableHead>Start Date:</TableHead>}
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -70,11 +71,23 @@ const ViewValidatorStatus = ({ status }: { status: number }) => {
                     {` `}
                     {item.validatorType.priceUnit}
                   </TableCell>
+                  <TableCell className="text-[16px] font-[600] text-white max-md:min-w-[130px]">
+                    {item.mePaiedAmount}
+                    {` `}
+                    {item.validatorType.priceUnit}
+                  </TableCell>
                   {status !== 1 && (
                     <TableCell className="text-[16px] font-[600] text-white max-md:min-w-[130px]">
                       {item.restAmount}
                       {` `}
                       {item.validatorType.priceUnit}
+                    </TableCell>
+                  )}
+                  {status === 1 && (
+                    <TableCell className="text-[16px] font-[600] text-white max-md:min-w-[130px]">
+                      {item.purchaseTime !== null
+                        ? item.purchaseTime.toString()
+                        : ""}
                     </TableCell>
                   )}
                 </TableRow>

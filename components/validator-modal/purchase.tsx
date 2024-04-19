@@ -15,15 +15,18 @@ import { Label } from "@/components/ui/label"
 import getUSDAmountForETH from "@/lib/getUSDAmountForETH"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
 
-interface ExistValidatorPurchaseModalProps extends DialogProps {
+interface PurchaseModalProps extends DialogProps {
   open: boolean
   onOpenChange: () => void
   validatorID: number
 }
 
-export const ExistValidatorPurchaseModal: React.FC<
-  ExistValidatorPurchaseModalProps
-> = ({ open, onOpenChange, validatorID, ...props }) => {
+export const PurchaseModal: React.FC<PurchaseModalProps> = ({
+  open,
+  onOpenChange,
+  validatorID,
+  ...props
+}) => {
   const [creditPrice, setCreditPrice] = useState<number>(0)
   const [amount, setAmount] = useState<string>("")
   const [errorStatus, setErrorStatus] = useState<boolean>(false)
@@ -73,10 +76,10 @@ export const ExistValidatorPurchaseModal: React.FC<
 
   const onPurchase = async () => {
     if (await checkError()) return
-    fetch("/api/validator/add/exist", {
+    fetch("/api/validator/add/purchase", {
       method: "POST",
       body: JSON.stringify({
-        typeId: Number(validatorID),
+        validatorId: Number(validatorID),
         amount: Number(amount),
       }),
     })

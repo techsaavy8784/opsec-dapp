@@ -47,24 +47,37 @@ export async function GET(request: NextRequest) {
           })
   const sendingData = await Promise.all(
     data.map(async (item: any) => {
+      const meForThisValidator = await prisma.payment.findMany({
+        where: {
+          validatorId: item.id,
+          userId: session.user.id,
+        },
+      })
+      const meCreditUSD = meForThisValidator.reduce(
+        (total, item) => total + item.credit,
+        0,
+      )
       if (item.purchaseTime === null) {
         const usersForThisValidator = await prisma.payment.findMany({
           where: {
             validatorId: item.id,
           },
         })
+
         const sumCreditUSD = usersForThisValidator.reduce(
           (total, item) => total + item.credit,
           0,
         )
         return {
           ...item,
+          mePaiedAmount: meCreditUSD / ratio,
           paiedSumAmount: sumCreditUSD / ratio,
           restAmount: item.validatorType.price - sumCreditUSD / ratio,
         }
       } else
         return {
           ...item,
+          mePaiedAmount: meCreditUSD / ratio,
           paiedSumAmount: item.validatorType.price,
           restAmount: 0,
         }

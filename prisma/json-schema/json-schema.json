@@ -38,6 +38,12 @@
             "$ref": "#/definitions/Node"
           }
         },
+        "payments": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Payment"
+          }
+        },
         "Staking": {
           "type": "array",
           "items": {
@@ -48,12 +54,6 @@
           "type": "array",
           "items": {
             "$ref": "#/definitions/TempClaim"
-          }
-        },
-        "validators": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/Validator"
           }
         }
       },
@@ -238,20 +238,30 @@
             "null"
           ]
         },
-        "validators": {
+        "node": {
           "anyOf": [
             {
-              "$ref": "#/definitions/Validator"
+              "$ref": "#/definitions/Node"
             },
             {
               "type": "null"
             }
           ]
         },
-        "node": {
+        "users": {
           "anyOf": [
             {
-              "$ref": "#/definitions/Node"
+              "$ref": "#/definitions/User"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "validator": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/Validator"
             },
             {
               "type": "null"
@@ -458,6 +468,12 @@
           ],
           "format": "date-time"
         },
+        "typeId": {
+          "type": "integer"
+        },
+        "serverId": {
+          "type": "integer"
+        },
         "payments": {
           "type": "array",
           "items": {
@@ -476,14 +492,10 @@
         },
         "validatorType": {
           "$ref": "#/definitions/ValidatorType"
-        },
-        "users": {
-          "$ref": "#/definitions/User"
         }
       },
       "required": [
-        "typeId",
-        "userId"
+        "typeId"
       ]
     }
   },

@@ -3,7 +3,6 @@ import { authOptions } from "@/lib/auth"
 import { getServerSession } from "next-auth"
 import { NextResponse, NextRequest } from "next/server"
 import getUSDAmountForETH from "@/lib/getUSDAmountForETH"
-import availableServers from "../../payment/available-servers"
 
 export async function POST(request: NextRequest) {
   const session = await getServerSession(authOptions)
@@ -12,9 +11,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 })
   }
 
-  const { typeId, amount } = await request.json()
-
-  const servers = await availableServers(1)
+  const { validatorId, amount } = await request.json()
 
   const user = await prisma.user.findFirst({
     where: {
@@ -22,20 +19,34 @@ export async function POST(request: NextRequest) {
     },
   })
 
-  const validatorType = await prisma.validatorType.findFirst({
+  const validator = await prisma.validator.findUnique({
     where: {
-      id: typeId,
+      id: validatorId,
+    },
+    include: {
+      validatorType: true,
     },
   })
 
-  const validator = await prisma.validator.create({
+  const payments = await prisma.payment.findMany({
+    where: {
+      validatorId: validatorId,
+    },
+  })
+
+  const totalAmountForValidator = payments.reduce(
+    (total, item) => total + item.credit,
+    0,
+  )
+
+  const updateValidator = await prisma.validator.update({
+    where: {
+      id: validatorId,
+    },
     data: {
-      // serverId: servers[Math.floor(Math.random() * servers.length)].id,
-      serverId: 1,
-      userId: session.user.id,
-      typeId: typeId,
       purchaseTime:
-        Math.ceil(await getUSDAmountForETH(validatorType!.price)) > amount
+        totalAmountForValidator + amount <
+        Math.ceil(await getUSDAmountForETH(validator!.validatorType!.price))
           ? null
           : new Date(),
     },
@@ -44,7 +55,8 @@ export async function POST(request: NextRequest) {
   const payment = await prisma.payment.create({
     data: {
       credit: amount,
-      validatorId: validator.id,
+      validatorId: validatorId,
+      userId: session.user.id,
     },
   })
 

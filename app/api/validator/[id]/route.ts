@@ -18,8 +18,20 @@ export async function GET(
   const ethUSDRatio = await getUSDAmountForETH(1)
   await checkRestAmount()
   let restAmount: number = 0,
-    paiedSumAmount: number = 0
+    paiedSumAmount: number = 0,
+    mePaiedAmount: number = 0
 
+  const meForThisValidator = await prisma.payment.findMany({
+    where: {
+      validatorId: Number(params.id),
+      userId: session.user.id,
+    },
+  })
+  const meCreditUSD = meForThisValidator.reduce(
+    (total, item) => total + item.credit,
+    0,
+  )
+  mePaiedAmount = meCreditUSD / ethUSDRatio
   const data = await prisma.validator.findUnique({
     where: {
       id: Number(params.id),
@@ -50,5 +62,6 @@ export async function GET(
     ...data,
     restAmount,
     paiedSumAmount,
+    mePaiedAmount,
   })
 }

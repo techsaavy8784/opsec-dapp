@@ -54,6 +54,14 @@ const options: NextAdminOptions = {
         ],
       },
     },
+    Validator: {
+      edit: {
+        display: ["id", "typeId", "serverId", "purchaseTime"],
+      },
+      list: {
+        display: ["id", "typeId", "serverId", "purchaseTime"],
+      },
+    },
   },
 }
 
