@@ -1,6 +1,7 @@
 import React from "react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import Purchase from "./purchase"
+import ViewValidatorStatus from "./show/view"
 
 const Validators = () => (
   <Tabs defaultValue="runnig">
@@ -10,16 +11,10 @@ const Validators = () => (
       <TabsTrigger value="purchase">Purchase Validator Nodes</TabsTrigger>
     </TabsList>
     <TabsContent value="runnig">
-      <div className="mt-8">
-        <p className="mt-24">Running Validator</p>
-        <hr className="my-4" />
-      </div>
+      <ViewValidatorStatus status={1} />
     </TabsContent>
     <TabsContent value="pending">
-      <div className="mt-8">
-        <p className="mt-24">Pending Validator</p>
-        <hr className="my-4" />
-      </div>
+      <ViewValidatorStatus status={2} />
     </TabsContent>
     <TabsContent value="purchase">
       <Purchase />

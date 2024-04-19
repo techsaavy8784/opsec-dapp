@@ -29,13 +29,21 @@ export const ExistValidatorPurchaseModal: React.FC<
   const [errorStatus, setErrorStatus] = useState<boolean>(false)
   const [errorMessage, setErrorMessage] = useState<string>("")
 
-  const { data: validator, isLoading } = useQuery({
+  const {
+    data: validator,
+    isFetching,
+    refetch,
+  } = useQuery({
     queryKey: ["validator-by-ID"],
     queryFn: () =>
       fetch(`/api/validator/${validatorID}`).then((res) => res.json()),
   })
 
-  const { data: balance, isLoading: isBalanceLoading } = useQuery({
+  const {
+    data: balance,
+    isFetching: isBalanceFetching,
+    refetch: balanceRefetch,
+  } = useQuery({
     queryKey: ["get-user-balance"],
     queryFn: () => fetch("/api/credits/balance").then((res) => res.json()),
   })
@@ -48,15 +56,20 @@ export const ExistValidatorPurchaseModal: React.FC<
   }
 
   useEffect(() => {
+    refetch()
+    balanceRefetch()
+  }, [validatorID])
+
+  useEffect(() => {
     if (open === false) init()
     const calcCredit = async () => {
-      if (!isLoading)
+      if (!isFetching)
         setCreditPrice(
-          Math.ceil(await getUSDAmountForETH(validator.validator_types.price)),
+          Math.ceil(await getUSDAmountForETH(validator.restAmount)),
         )
     }
     calcCredit()
-  }, [isLoading, open])
+  }, [isFetching, open])
 
   const onPurchase = async () => {
     if (await checkError()) return
@@ -96,7 +109,7 @@ export const ExistValidatorPurchaseModal: React.FC<
 
   return (
     <Dialog {...props} open={open} onOpenChange={onOpenChange}>
-      {!isLoading && (
+      {!isFetching && (
         <DialogContent
           className={`bg-[#18181B] border-none rounded-[24px] p-8 w-[350px] md:w-[450px]`}
         >
@@ -105,15 +118,15 @@ export const ExistValidatorPurchaseModal: React.FC<
           </DialogTitle>
           <DialogDescription className="text-[#54597C] w-full text-center font-[500] text-[16px]">
             <div className="flex flex-col items-center gap-4">
-              {`Your Balance is ${!isBalanceLoading && (balance.balance ?? 0)} credit`}
+              {`Your Balance is ${!isBalanceFetching && (balance.balance ?? 0)} credit`}
             </div>
           </DialogDescription>
 
           <Label htmlFor="amount">
             Price: {creditPrice}
             {` credit`} {"("}
-            {validator.validator_types.price}
-            {` ${validator.validator_types.priceUnit}`}
+            {validator.restAmount}
+            {` ${validator.validatorType.priceUnit}`}
             {")"}
           </Label>
           <Input
@@ -124,7 +137,6 @@ export const ExistValidatorPurchaseModal: React.FC<
           />
           {errorStatus && (
             <Alert variant="destructive">
-              {/* <AlertCircle className="h-4 w-4" /> */}
               <AlertTitle>Error</AlertTitle>
               <AlertDescription>{errorMessage}</AlertDescription>
             </Alert>

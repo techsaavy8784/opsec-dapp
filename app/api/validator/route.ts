@@ -3,6 +3,7 @@ import { authOptions } from "@/lib/auth"
 import { getServerSession } from "next-auth"
 import { NextResponse, NextRequest } from "next/server"
 import checkRestAmount from "@/lib/checkRestAmount"
+import getUSDAmountForETH from "@/lib/getUSDAmountForETH"
 
 export async function GET(request: NextRequest) {
   const session = await getServerSession(authOptions)
@@ -16,6 +17,8 @@ export async function GET(request: NextRequest) {
 
   await checkRestAmount()
 
+  const ratio = await getUSDAmountForETH(1)
+
   const data =
     Number(status) === 1
       ? await prisma.validator.findMany({
@@ -25,7 +28,7 @@ export async function GET(request: NextRequest) {
             },
           },
           include: {
-            validator_types: true,
+            validatorType: true,
           },
         })
       : Number(status) === 2
@@ -34,14 +37,39 @@ export async function GET(request: NextRequest) {
               purchaseTime: null,
             },
             include: {
-              validator_types: true,
+              validatorType: true,
             },
           })
         : await prisma.validator.findMany({
             include: {
-              validator_types: true,
+              validatorType: true,
             },
           })
+  const sendingData = await Promise.all(
+    data.map(async (item: any) => {
+      if (item.purchaseTime === null) {
+        const usersForThisValidator = await prisma.payment.findMany({
+          where: {
+            validatorId: item.id,
+          },
+        })
+        const sumCreditUSD = usersForThisValidator.reduce(
+          (total, item) => total + item.credit,
+          0,
+        )
+        return {
+          ...item,
+          paiedSumAmount: sumCreditUSD / ratio,
+          restAmount: item.validatorType.price - sumCreditUSD / ratio,
+        }
+      } else
+        return {
+          ...item,
+          paiedSumAmount: item.validatorType.price,
+          restAmount: 0,
+        }
+    }),
+  )
 
-  return NextResponse.json(data)
+  return NextResponse.json(sendingData)
 }

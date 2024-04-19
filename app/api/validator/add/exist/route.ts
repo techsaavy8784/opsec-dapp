@@ -24,7 +24,7 @@ export async function POST(request: NextRequest) {
       id: validatorId,
     },
     include: {
-      validator_types: true,
+      validatorType: true,
     },
   })
 
@@ -46,7 +46,7 @@ export async function POST(request: NextRequest) {
     data: {
       purchaseTime:
         totalAmountForValidator + amount <
-        Math.ceil(await getUSDAmountForETH(validator!.validator_types!.price))
+        Math.ceil(await getUSDAmountForETH(validator!.validatorType!.price))
           ? null
           : new Date(),
     },
@@ -68,5 +68,5 @@ export async function POST(request: NextRequest) {
     },
   })
 
-  return NextResponse.json({})
+  return NextResponse.json({ status: 201 })
 }

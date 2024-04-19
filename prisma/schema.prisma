@@ -164,8 +164,8 @@ model Validator {
   serverId        Int?          @map("server_id")
   purchaseTime    DateTime?     @map("purchase_time")
   payments        Payment[]
-  servers         Server?       @relation(fields: [serverId], references: [id], onDelete: Restrict)
-  validator_types ValidatorType @relation(fields: [typeId], references: [id])
+  server         Server?       @relation(fields: [serverId], references: [id], onDelete: Restrict)
+  validatorType ValidatorType @relation(fields: [typeId], references: [id])
   users           User          @relation(fields: [userId], references: [id])
 
   @@map("validators")

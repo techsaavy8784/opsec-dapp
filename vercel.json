@@ -3,6 +3,10 @@
     {
       "path": "/api/staking/complete",
       "schedule": "0 * * * *"
+    },
+    {
+      "path": "/api/validator/update",
+      "schedule": "0 * * * *"
     }
   ]
 }

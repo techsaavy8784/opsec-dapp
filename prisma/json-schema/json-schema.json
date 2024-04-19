@@ -464,7 +464,7 @@
             "$ref": "#/definitions/Payment"
           }
         },
-        "servers": {
+        "server": {
           "anyOf": [
             {
               "$ref": "#/definitions/Server"
@@ -474,7 +474,7 @@
             }
           ]
         },
-        "validator_types": {
+        "validatorType": {
           "$ref": "#/definitions/ValidatorType"
         },
         "users": {

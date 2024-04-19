@@ -9,7 +9,7 @@ const getRestAmount = async (validatorId: number) => {
       id: validatorId,
     },
     include: {
-      validator_types: true,
+      validatorType: true,
     },
   })
 
@@ -23,7 +23,7 @@ const getRestAmount = async (validatorId: number) => {
     0,
   )
   const sumCreditETH = sumCreditUSD / ethUSDRatio
-  if (sumCreditETH >= validator!.validator_types.price) {
+  if (sumCreditETH >= validator!.validatorType.price) {
     await prisma.validator.update({
       data: {
         purchaseTime: new Date(),
@@ -34,7 +34,7 @@ const getRestAmount = async (validatorId: number) => {
     })
     return null
   } else {
-    return validator!.validator_types.price - sumCreditETH
+    return validator!.validatorType.price - sumCreditETH
   }
 }
 
