@@ -14,16 +14,15 @@ datasource db {
 }
 
 model User {
-  id        Int         @id @default(autoincrement())
-  address   String      @unique
-  password  String?
-  balance   Int         @default(0)
-  Claim     Claim[]
-  credits   Credit[]
-  nodes     Node[]
-  payments  Payment[]
-  Staking   Staking[]
-  TempClaim TempClaim[]
+  id       Int       @id @default(autoincrement())
+  address  String    @unique
+  password String?
+  balance  Int       @default(0)
+  Claim    Claim[]
+  credits  Credit[]
+  nodes    Node[]
+  payments Payment[]
+  Staking  Staking[]
 
   @@map("users")
 }
@@ -130,21 +129,12 @@ model Claim {
   id        Int      @id @default(autoincrement())
   userId    Int      @map("user_id")
   address   String
+  status    Boolean  @default(false)
   lasted_at DateTime @default(now())
   amount    Int
   users     User     @relation(fields: [userId], references: [id])
 
   @@map("claims")
-}
-
-model TempClaim {
-  id      Int    @id @default(autoincrement())
-  userId  Int    @map("user_id")
-  address String
-  amount  Int
-  users   User   @relation(fields: [userId], references: [id])
-
-  @@map("temp_claims")
 }
 
 model ValidatorType {

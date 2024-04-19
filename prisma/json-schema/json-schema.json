@@ -49,12 +49,6 @@
           "items": {
             "$ref": "#/definitions/Staking"
           }
-        },
-        "TempClaim": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/TempClaim"
-          }
         }
       },
       "required": [
@@ -373,31 +367,13 @@
         "address": {
           "type": "string"
         },
+        "status": {
+          "type": "boolean",
+          "default": false
+        },
         "lasted_at": {
           "type": "string",
           "format": "date-time"
-        },
-        "amount": {
-          "type": "integer"
-        },
-        "users": {
-          "$ref": "#/definitions/User"
-        }
-      },
-      "required": [
-        "userId",
-        "address",
-        "amount"
-      ]
-    },
-    "TempClaim": {
-      "type": "object",
-      "properties": {
-        "id": {
-          "type": "integer"
-        },
-        "address": {
-          "type": "string"
         },
         "amount": {
           "type": "integer"
@@ -461,18 +437,18 @@
         "id": {
           "type": "integer"
         },
+        "typeId": {
+          "type": "integer"
+        },
+        "serverId": {
+          "type": "integer"
+        },
         "purchaseTime": {
           "type": [
             "string",
             "null"
           ],
           "format": "date-time"
-        },
-        "typeId": {
-          "type": "integer"
-        },
-        "serverId": {
-          "type": "integer"
         },
         "payments": {
           "type": "array",
@@ -530,9 +506,6 @@
     },
     "claim": {
       "$ref": "#/definitions/Claim"
-    },
-    "tempClaim": {
-      "$ref": "#/definitions/TempClaim"
     },
     "validatorType": {
       "$ref": "#/definitions/ValidatorType"

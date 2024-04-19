@@ -6,19 +6,14 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 })
   }
 
-  const data = await prisma.tempClaim.findMany()
-
-  if (data !== null && data.length !== 0)
-    data.map(async (item: any) => {
-      await prisma.claim.updateMany({
-        data: {
-          amount: { increment: item.amount },
-        },
-        where: {
-          userId: item.userId,
-        },
-      })
-    })
+  await prisma.claim.updateMany({
+    data: {
+      status: false,
+    },
+    where: {
+      status: true,
+    },
+  })
 
   return NextResponse.json("success", { status: 201 })
 }

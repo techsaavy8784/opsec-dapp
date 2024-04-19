@@ -8,7 +8,11 @@ export async function POST(request: NextRequest) {
 
   const { address } = await request.json()
 
-  await prisma.tempClaim.deleteMany({
+  await prisma.claim.updateMany({
+    data: {
+      amount: 0,
+      status: false,
+    },
     where: {
       address: address,
     },

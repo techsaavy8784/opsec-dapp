@@ -16,17 +16,9 @@ export async function POST(request: NextRequest) {
   })
 
   if (data !== null) {
-    await prisma.tempClaim.create({
-      data: {
-        userId: Number(userId),
-        address: data.address,
-        amount: data.amount,
-      },
-    })
-
     await prisma.claim.update({
       data: {
-        amount: 0,
+        status: true,
       },
       where: {
         id: data.id,
