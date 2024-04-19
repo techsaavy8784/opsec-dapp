@@ -21,17 +21,16 @@ export async function GET(
     paiedSumAmount: number = 0,
     mePaiedAmount: number = 0
 
-  const meForThisValidator = await prisma.payment.findMany({
+  const meCreditUSD = await prisma.payment.aggregate({
     where: {
       validatorId: Number(params.id),
       userId: session.user.id,
     },
+    _sum: {
+      credit: true,
+    },
   })
-  const meCreditUSD = meForThisValidator.reduce(
-    (total, item) => total + item.credit,
-    0,
-  )
-  mePaiedAmount = meCreditUSD / ethUSDRatio
+  mePaiedAmount = Number(meCreditUSD._sum.credit ?? 0) / ethUSDRatio
   const data = await prisma.validator.findUnique({
     where: {
       id: Number(params.id),
@@ -42,16 +41,15 @@ export async function GET(
   })
 
   if (data?.purchaseTime === null) {
-    const usersForThisValidator = await prisma.payment.findMany({
+    const sumCreditUSD = await prisma.payment.aggregate({
       where: {
         validatorId: Number(params.id),
       },
+      _sum: {
+        credit: true,
+      },
     })
-    const sumCreditUSD = usersForThisValidator.reduce(
-      (total, item) => total + item.credit,
-      0,
-    )
-    paiedSumAmount = sumCreditUSD / ethUSDRatio
+    paiedSumAmount = Number(sumCreditUSD._sum.credit ?? 0) / ethUSDRatio
     restAmount = data!.validatorType.price - paiedSumAmount
   } else {
     paiedSumAmount = data!.validatorType.price

@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useState } from "react"
+import React, { useEffect, useState } from "react"
 import { useQuery } from "@tanstack/react-query"
 import {
   Table,
@@ -16,10 +16,10 @@ import { Button } from "@/components/ui/button"
 import { PurchaseModal } from "@/components/validator-modal/purchase"
 
 const Purchase = () => {
-  const [extendModal, setExtendModal] = useState<boolean>(false)
+  const [purchaseModal, setPurchasedModal] = useState<boolean>(false)
   const [validatorID, setValidatorID] = useState<number>(-1)
 
-  const { isFetching, data } = useQuery<
+  const { isFetching, data, refetch } = useQuery<
     (Validator & {
       validatorType: any
       restAmount: number
@@ -34,15 +34,19 @@ const Purchase = () => {
 
   const onExtendModal = (value: number) => {
     setValidatorID(value)
-    setExtendModal(true)
+    setPurchasedModal(true)
   }
+
+  useEffect(() => {
+    if (!purchaseModal) refetch()
+  }, [purchaseModal])
 
   return (
     <div className="pt-5">
       {validatorID !== -1 && (
         <PurchaseModal
-          open={extendModal}
-          onOpenChange={() => setExtendModal((prev) => !prev)}
+          open={purchaseModal}
+          onOpenChange={() => setPurchasedModal((prev) => !prev)}
           validatorID={validatorID}
         />
       )}

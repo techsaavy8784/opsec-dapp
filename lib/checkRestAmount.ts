@@ -14,16 +14,15 @@ const checkRestAmount = async () => {
   })
 
   inactiveValidators.map(async (item: any) => {
-    const usersForThisValidator = await prisma.payment.findMany({
+    const sumCreditUSD = await prisma.payment.aggregate({
       where: {
         validatorId: item.id,
       },
+      _sum: {
+        credit: true,
+      },
     })
-    const sumCreditUSD = usersForThisValidator.reduce(
-      (total, item) => total + item.credit,
-      0,
-    )
-    const sumCreditETH = sumCreditUSD / ethUSDRatio
+    const sumCreditETH = Number(sumCreditUSD._sum.credit ?? 0) / ethUSDRatio
     if (sumCreditETH >= item.validatorType.price)
       await prisma.validator.update({
         data: {

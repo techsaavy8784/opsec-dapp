@@ -28,16 +28,14 @@ export async function POST(request: NextRequest) {
     },
   })
 
-  const payments = await prisma.payment.findMany({
+  const totalAmountForValidator = await prisma.payment.aggregate({
     where: {
       validatorId: validatorId,
     },
+    _sum: {
+      credit: true,
+    },
   })
-
-  const totalAmountForValidator = payments.reduce(
-    (total, item) => total + item.credit,
-    0,
-  )
 
   const updateValidator = await prisma.validator.update({
     where: {
@@ -45,7 +43,7 @@ export async function POST(request: NextRequest) {
     },
     data: {
       purchaseTime:
-        totalAmountForValidator + amount <
+        Number(totalAmountForValidator._sum.credit ?? 0) + amount <
         Math.ceil(await getUSDAmountForETH(validator!.validatorType!.price))
           ? null
           : new Date(),
