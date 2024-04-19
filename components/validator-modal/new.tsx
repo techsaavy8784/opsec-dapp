@@ -131,9 +131,7 @@ export const NewValidatorPurchaseModal: React.FC<
   return (
     <Dialog {...props} open={open} onOpenChange={onOpenChange}>
       {!isLoading && (
-        <DialogContent
-          className={`bg-[#18181B] border-none rounded-[24px] p-8 w-[350px] md:w-[450px]`}
-        >
+        <DialogContent className="bg-[#18181B] border-none rounded-[24px] p-8 w-[350px] md:w-[450px]">
           <DialogTitle className="text-white text-center font-[600] text-[28px]">
             {"Purchase a Validator Node"}
           </DialogTitle>
@@ -162,11 +160,7 @@ export const NewValidatorPurchaseModal: React.FC<
             </SelectContent>
           </Select>
           <Label htmlFor="amount">
-            Price: {creditPrice}
-            {` credit`} {"("}
-            {price}
-            {` ${unit}`}
-            {")"}
+            Price: {creditPrice} credit ({price} {unit})
           </Label>
           <Input
             value={amount}
@@ -177,7 +171,6 @@ export const NewValidatorPurchaseModal: React.FC<
           />
           {errorStatus && (
             <Alert variant="destructive">
-              {/* <AlertCircle className="h-4 w-4" /> */}
               <AlertTitle>Error</AlertTitle>
               <AlertDescription>{errorMessage}</AlertDescription>
             </Alert>

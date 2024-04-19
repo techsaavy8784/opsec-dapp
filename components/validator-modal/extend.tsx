@@ -110,9 +110,7 @@ export const ExistValidatorPurchaseModal: React.FC<
   return (
     <Dialog {...props} open={open} onOpenChange={onOpenChange}>
       {!isFetching && (
-        <DialogContent
-          className={`bg-[#18181B] border-none rounded-[24px] p-8 w-[350px] md:w-[450px]`}
-        >
+        <DialogContent className="bg-[#18181B] border-none rounded-[24px] p-8 w-[350px] md:w-[450px]">
           <DialogTitle className="text-white text-center font-[600] text-[28px]">
             {"Purchase a Validator Node"}
           </DialogTitle>
@@ -123,11 +121,8 @@ export const ExistValidatorPurchaseModal: React.FC<
           </DialogDescription>
 
           <Label htmlFor="amount">
-            Price: {creditPrice}
-            {` credit`} {"("}
-            {validator.restAmount}
-            {` ${validator.validatorType.priceUnit}`}
-            {")"}
+            Price: {creditPrice} credit ({validator.restAmount}{" "}
+            {validator.validatorType.priceUnit})
           </Label>
           <Input
             value={amount}
