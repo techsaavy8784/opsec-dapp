@@ -1,6 +1,4 @@
 import prisma from "@/prisma"
-import getUSDAmountForETH from "@/lib/getUSDAmountForETH"
-import availableServers from "@/app/api/payment/available-servers"
 import validatorRestAmount from "./validatorRestAmount"
 
 const checkRestAmount = async () => {
