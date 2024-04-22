@@ -12,7 +12,7 @@ const checkRestAmount = async () => {
   })
 
   inactiveValidators.forEach(async (item: any) => {
-    validatorRestAmount(item)
+    await validatorRestAmount(item)
   })
 }
 
