@@ -4,10 +4,6 @@ import availableServers from "@/app/api/payment/available-servers"
 import validatorRestAmount from "./validatorRestAmount"
 
 const checkRestAmount = async () => {
-  const ethUSDRatio = await getUSDAmountForETH()
-
-  const servers = await availableServers()
-
   const inactiveValidators = await prisma.validator.findMany({
     where: {
       purchaseTime: null,
