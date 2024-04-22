@@ -17,8 +17,8 @@ const ViewValidatorStatus = ({ status }: { status: number }) => {
     (Validator & {
       validatorType: any
       restAmount: number
-      paiedSumAmount: number
-      mePaiedAmount: number
+      paidSumAmount: number
+      mepaidAmount: number
     })[]
   >({
     queryKey: ["Validator-nodess"],
@@ -39,7 +39,7 @@ const ViewValidatorStatus = ({ status }: { status: number }) => {
               <TableHead>#</TableHead>
               <TableHead>Name</TableHead>
               <TableHead>Full Amount</TableHead>
-              <TableHead>You Paied Amount</TableHead>
+              <TableHead>You paid Amount</TableHead>
               {status !== 1 && <TableHead>Rest Amount</TableHead>}
               {status === 1 && <TableHead>Start Date:</TableHead>}
             </TableRow>
@@ -72,7 +72,7 @@ const ViewValidatorStatus = ({ status }: { status: number }) => {
                     {item.validatorType.priceUnit}
                   </TableCell>
                   <TableCell className="text-[16px] font-[600] text-white max-md:min-w-[130px]">
-                    {item.mePaiedAmount}
+                    {item.mepaidAmount}
                     {` `}
                     {item.validatorType.priceUnit}
                   </TableCell>

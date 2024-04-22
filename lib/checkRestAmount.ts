@@ -1,8 +1,12 @@
 import prisma from "@/prisma"
 import getUSDAmountForETH from "@/lib/getUSDAmountForETH"
+import availableServers from "@/app/api/payment/available-servers"
+import validatorRestAmount from "./validatorRestAmount"
 
 const checkRestAmount = async () => {
-  const ethUSDRatio = await getUSDAmountForETH(1)
+  const ethUSDRatio = await getUSDAmountForETH()
+
+  const servers = await availableServers()
 
   const inactiveValidators = await prisma.validator.findMany({
     where: {
@@ -13,25 +17,8 @@ const checkRestAmount = async () => {
     },
   })
 
-  inactiveValidators.map(async (item: any) => {
-    const sumCreditUSD = await prisma.payment.aggregate({
-      where: {
-        validatorId: item.id,
-      },
-      _sum: {
-        credit: true,
-      },
-    })
-    const sumCreditETH = Number(sumCreditUSD._sum.credit ?? 0) / ethUSDRatio
-    if (sumCreditETH >= item.validatorType.price)
-      await prisma.validator.update({
-        data: {
-          purchaseTime: new Date(),
-        },
-        where: {
-          id: item.id,
-        },
-      })
+  inactiveValidators.forEach(async (item: any) => {
+    validatorRestAmount(item)
   })
 }
 

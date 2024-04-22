@@ -27,10 +27,10 @@ export const PurchaseModal: React.FC<PurchaseModalProps> = ({
   validatorID,
   ...props
 }) => {
-  const [creditPrice, setCreditPrice] = useState<number>(0)
-  const [amount, setAmount] = useState<string>("")
-  const [errorStatus, setErrorStatus] = useState<boolean>(false)
-  const [errorMessage, setErrorMessage] = useState<string>("")
+  const [creditPrice, setCreditPrice] = useState(0)
+  const [amount, setAmount] = useState("")
+  const [errorStatus, setErrorStatus] = useState(false)
+  const [errorMessage, setErrorMessage] = useState("")
 
   const {
     data: validator,
@@ -65,13 +65,10 @@ export const PurchaseModal: React.FC<PurchaseModalProps> = ({
 
   useEffect(() => {
     if (open === false) init()
-    const calcCredit = async () => {
-      if (!isFetching)
-        setCreditPrice(
-          Math.ceil(await getUSDAmountForETH(validator.restAmount)),
-        )
-    }
-    calcCredit()
+    if (!isFetching)
+      getUSDAmountForETH().then((value) =>
+        setCreditPrice(Math.ceil(value * validator.restAmount)),
+      )
   }, [isFetching, open])
 
   const onPurchase = async () => {
@@ -115,11 +112,12 @@ export const PurchaseModal: React.FC<PurchaseModalProps> = ({
       {!isFetching && (
         <DialogContent className="bg-[#18181B] border-none rounded-[24px] p-8 w-[350px] md:w-[450px]">
           <DialogTitle className="text-white text-center font-[600] text-[28px]">
-            {"Purchase a Validator Node"}
+            Purchase a Validator Node
           </DialogTitle>
           <DialogDescription className="text-[#54597C] w-full text-center font-[500] text-[16px]">
             <div className="flex flex-col items-center gap-4">
-              {`Your Balance is ${!isBalanceFetching && (balance.balance ?? 0)} credit`}
+              Your Balance is {!isBalanceFetching && (balance.balance ?? 0)}{" "}
+              credit
             </div>
           </DialogDescription>
 

@@ -15,13 +15,13 @@ export async function GET(
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 })
   }
 
-  const ethUSDRatio = await getUSDAmountForETH(1)
-  await checkRestAmount()
   let restAmount: number = 0,
-    paiedSumAmount: number = 0,
-    mePaiedAmount: number = 0
+    paidSumAmount: number = 0,
+    mepaidAmount: number = 0
 
-  const meCreditUSD = await prisma.payment.aggregate({
+  const ethUSDRatioPromise = getUSDAmountForETH()
+
+  const meCreditPromise = prisma.payment.aggregate({
     where: {
       validatorId: Number(params.id),
       userId: session.user.id,
@@ -30,8 +30,7 @@ export async function GET(
       credit: true,
     },
   })
-  mePaiedAmount = Number(meCreditUSD._sum.credit ?? 0) / ethUSDRatio
-  const data = await prisma.validator.findUnique({
+  const dataPromise = prisma.validator.findUnique({
     where: {
       id: Number(params.id),
     },
@@ -39,6 +38,16 @@ export async function GET(
       validatorType: true,
     },
   })
+
+  const [ethUSDRatio, meCreditUSD, data] = await Promise.all([
+    ethUSDRatioPromise,
+    meCreditPromise,
+    dataPromise,
+  ])
+
+  await checkRestAmount()
+
+  mepaidAmount = Number(meCreditUSD._sum.credit ?? 0) / ethUSDRatio
 
   if (data?.purchaseTime === null) {
     const sumCreditUSD = await prisma.payment.aggregate({
@@ -49,17 +58,17 @@ export async function GET(
         credit: true,
       },
     })
-    paiedSumAmount = Number(sumCreditUSD._sum.credit ?? 0) / ethUSDRatio
-    restAmount = data!.validatorType.price - paiedSumAmount
+    paidSumAmount = Number(sumCreditUSD._sum.credit ?? 0) / ethUSDRatio
+    restAmount = data!.validatorType.price - paidSumAmount
   } else {
-    paiedSumAmount = data!.validatorType.price
+    paidSumAmount = data!.validatorType.price
     restAmount = 0
   }
 
   return NextResponse.json({
     ...data,
     restAmount,
-    paiedSumAmount,
-    mePaiedAmount,
+    paidSumAmount,
+    mepaidAmount,
   })
 }

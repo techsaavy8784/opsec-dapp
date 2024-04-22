@@ -2,6 +2,7 @@ import React from "react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import Purchase from "./purchase"
 import ViewValidatorStatus from "./show/view"
+import { ValidatorNodeFilter } from "@/lib/constants"
 
 const Validators = () => (
   <Tabs defaultValue="runnig">
@@ -11,10 +12,12 @@ const Validators = () => (
       <TabsTrigger value="purchase">Purchase Validator Nodes</TabsTrigger>
     </TabsList>
     <TabsContent value="runnig">
-      <ViewValidatorStatus status={1} />
+      <ViewValidatorStatus status={ValidatorNodeFilter.FULLY_PURCHASED_NODES} />
     </TabsContent>
     <TabsContent value="pending">
-      <ViewValidatorStatus status={2} />
+      <ViewValidatorStatus
+        status={ValidatorNodeFilter.PARTIALLY_PURCHASED_NODES}
+      />
     </TabsContent>
     <TabsContent value="purchase">
       <Purchase />

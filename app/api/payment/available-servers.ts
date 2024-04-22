@@ -1,23 +1,29 @@
 import prisma from "@/prisma"
 import { Status } from "@prisma/client"
 
-const availableServers = async (blockchainId: number) => {
-  const serverIds = await prisma.server.findMany({
-    where: {
-      NOT: [
-        {
-          nodes: {
-            some: {
-              blockchainId,
-              status: {
-                not: Status.EXPIRED,
-              },
+const availableServers = async (blockchainId?: number) => {
+  const whereCondition: any = {
+    active: true,
+  }
+
+  // If blockchainId is specified, add the condition for nodes on that blockchain
+  if (blockchainId !== undefined) {
+    whereCondition.NOT = [
+      {
+        nodes: {
+          some: {
+            blockchainId,
+            status: {
+              not: Status.EXPIRED,
             },
           },
         },
-      ],
-      active: true,
-    },
+      },
+    ]
+  }
+
+  const serverIds = await prisma.server.findMany({
+    where: whereCondition,
     include: {
       _count: {
         select: {

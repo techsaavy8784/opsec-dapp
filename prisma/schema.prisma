@@ -87,7 +87,7 @@ model Payment {
   validatorId Int?       @map("validator_id")
   userId      Int?       @map("user_id")
   node        Node?      @relation(fields: [nodeId], references: [id], onDelete: Cascade)
-  users       User?      @relation(fields: [userId], references: [id], onDelete: Restrict)
+  user        User?      @relation(fields: [userId], references: [id], onDelete: Restrict)
   validator   Validator? @relation(fields: [validatorId], references: [id], onDelete: Restrict, map: "payments_id_fkey")
 
   @@map("payments")
@@ -132,7 +132,7 @@ model Claim {
   status    Boolean  @default(false)
   lasted_at DateTime @default(now())
   amount    Int
-  users     User     @relation(fields: [userId], references: [id])
+  user      User     @relation(fields: [userId], references: [id])
 
   @@map("claims")
 }

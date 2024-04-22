@@ -14,22 +14,25 @@ import { Validator } from "@prisma/client"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Button } from "@/components/ui/button"
 import { PurchaseModal } from "@/components/validator-modal/purchase"
+import { ValidatorNodeFilter } from "@/lib/constants"
 
 const Purchase = () => {
-  const [purchaseModal, setPurchasedModal] = useState<boolean>(false)
-  const [validatorID, setValidatorID] = useState<number>(-1)
+  const [purchaseModal, setPurchasedModal] = useState(false)
+  const [validatorID, setValidatorID] = useState(-1)
 
   const { isFetching, data, refetch } = useQuery<
     (Validator & {
       validatorType: any
       restAmount: number
-      paiedSumAmount: number
-      mePaiedAmount: number
+      paidSumAmount: number
+      mepaidAmount: number
     })[]
   >({
     queryKey: ["validator-node"],
     queryFn: () =>
-      fetch(`/api/validator?status=${0}`).then((res) => res.json()),
+      fetch(`/api/validator?status=${ValidatorNodeFilter.ALL_NODES}`).then(
+        (res) => res.json(),
+      ),
   })
 
   const onExtendModal = (value: number) => {
@@ -58,7 +61,7 @@ const Purchase = () => {
               <TableHead>#</TableHead>
               <TableHead>Name</TableHead>
               <TableHead>Full Amount</TableHead>
-              <TableHead>You Paied Amount</TableHead>
+              <TableHead>You paid Amount</TableHead>
               <TableHead>Rest Amount</TableHead>
               <TableHead></TableHead>
             </TableRow>
@@ -91,7 +94,7 @@ const Purchase = () => {
                     {item.validatorType.priceUnit}
                   </TableCell>
                   <TableCell className="text-[16px] font-[600] text-white max-md:min-w-[130px]">
-                    {item.mePaiedAmount}
+                    {item.mepaidAmount}
                     {` `}
                     {item.validatorType.priceUnit}
                   </TableCell>

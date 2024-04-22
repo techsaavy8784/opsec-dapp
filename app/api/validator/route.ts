@@ -4,6 +4,7 @@ import { getServerSession } from "next-auth"
 import { NextResponse, NextRequest } from "next/server"
 import checkRestAmount from "@/lib/checkRestAmount"
 import getUSDAmountForETH from "@/lib/getUSDAmountForETH"
+import { ValidatorNodeFilter } from "@/lib/constants"
 
 export async function GET(request: NextRequest) {
   const session = await getServerSession(authOptions)
@@ -17,10 +18,10 @@ export async function GET(request: NextRequest) {
 
   await checkRestAmount()
 
-  const ratio = await getUSDAmountForETH(1)
+  const ratio = await getUSDAmountForETH()
 
   const data =
-    Number(status) === 1
+    Number(status) === ValidatorNodeFilter.FULLY_PURCHASED_NODES
       ? await prisma.validator.findMany({
           where: {
             NOT: {
@@ -31,7 +32,7 @@ export async function GET(request: NextRequest) {
             validatorType: true,
           },
         })
-      : Number(status) === 2
+      : Number(status) === ValidatorNodeFilter.PARTIALLY_PURCHASED_NODES
         ? await prisma.validator.findMany({
             where: {
               purchaseTime: null,
@@ -68,8 +69,8 @@ export async function GET(request: NextRequest) {
 
         return {
           ...item,
-          mePaiedAmount: Number(sumCreditUSD._sum.credit ?? 0) / ratio,
-          paiedSumAmount: Number(sumCreditUSD._sum.credit ?? 0) / ratio,
+          mepaidAmount: Number(sumCreditUSD._sum.credit ?? 0) / ratio,
+          paidSumAmount: Number(sumCreditUSD._sum.credit ?? 0) / ratio,
           restAmount:
             item.validatorType.price -
             Number(sumCreditUSD._sum.credit ?? 0) / ratio,
@@ -77,8 +78,8 @@ export async function GET(request: NextRequest) {
       } else
         return {
           ...item,
-          mePaiedAmount: Number(meCreditUSD._sum.credit ?? 0) / ratio,
-          paiedSumAmount: item.validatorType.price,
+          mepaidAmount: Number(meCreditUSD._sum.credit ?? 0) / ratio,
+          paidSumAmount: item.validatorType.price,
           restAmount: 0,
         }
     }),
