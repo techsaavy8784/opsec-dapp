@@ -146,6 +146,7 @@ model ValidatorType {
   rewardLockTime Int         @map("reward_lock_time")
   rewardPerMonth Int         @map("reward_per_month")
   price          Float
+  floorPrice     Float       @map("floor_price")
   priceUnit      Unit        @default(ETH) @map("price_unit")
   rewardWallet   String      @map("reward_wallet")
   validators     Validator[]

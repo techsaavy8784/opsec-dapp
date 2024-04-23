@@ -416,6 +416,9 @@
         "price": {
           "type": "number"
         },
+        "floorPrice": {
+          "type": "number"
+        },
         "priceUnit": {
           "type": "string",
           "default": "ETH",
@@ -438,6 +441,7 @@
         "rewardLockTime",
         "rewardPerMonth",
         "price",
+        "floorPrice",
         "rewardWallet"
       ]
     },
