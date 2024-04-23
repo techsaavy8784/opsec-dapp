@@ -93,7 +93,7 @@ export async function GET(request: NextRequest) {
           mepaidAmount: Number(meCreditUSD._sum.credit ?? 0) / ratio,
           paidSumAmount: item.validatorType.price,
           restAmount: 0,
-          claimed: claims && claims.length > 0 ? true : false,
+          claimed: claims && claims.length > 0,
         }
       }
     }),
