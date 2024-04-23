@@ -15,6 +15,7 @@ import { Button } from "@/components/ui/button"
 import { Validator } from "@prisma/client"
 import getUSDAmountForETH from "@/lib/getUSDAmountForETH"
 import { ReloadIcon } from "@radix-ui/react-icons"
+import { ValidatorNodeFilter } from "@/lib/constants"
 
 const Claim = () => {
   const [claimIds, setClaimIds] = useState<number[]>([])
@@ -29,7 +30,10 @@ const Claim = () => {
     })[]
   >({
     queryKey: ["Validator-nodess"],
-    queryFn: () => fetch(`/api/validator?status=1`).then((res) => res.json()),
+    queryFn: () =>
+      fetch(`/api/validator?status=${ValidatorNodeFilter.CLAIM_NODES}`).then(
+        (res) => res.json(),
+      ),
   })
 
   const handleClaimClick = useCallback(

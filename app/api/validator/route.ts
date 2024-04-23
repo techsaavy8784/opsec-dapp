@@ -5,6 +5,7 @@ import { NextResponse, NextRequest } from "next/server"
 import checkRestAmount from "@/lib/checkRestAmount"
 import getUSDAmountForETH from "@/lib/getUSDAmountForETH"
 import { ValidatorNodeFilter } from "@/lib/constants"
+import dayjs from "dayjs"
 
 export async function GET(request: NextRequest) {
   const session = await getServerSession(authOptions)
@@ -20,8 +21,9 @@ export async function GET(request: NextRequest) {
 
   const ratio = await getUSDAmountForETH()
 
-  const data =
-    Number(status) === ValidatorNodeFilter.FULLY_PURCHASED_NODES
+  let data =
+    Number(status) === ValidatorNodeFilter.FULLY_PURCHASED_NODES ||
+    Number(status) === ValidatorNodeFilter.CLAIM_NODES
       ? await prisma.validator.findMany({
           where: {
             NOT: {
@@ -46,6 +48,12 @@ export async function GET(request: NextRequest) {
               validatorType: true,
             },
           })
+  if (Number(status) === ValidatorNodeFilter.CLAIM_NODES)
+    data = data.filter((item: any) =>
+      dayjs(item.purchaseTime)
+        .add(item.validatorType.rewardLockTime)
+        .isBefore(dayjs()),
+    )
   const sendingData = await Promise.all(
     data.map(async (item: any) => {
       const meCreditUSD = await prisma.payment.aggregate({
