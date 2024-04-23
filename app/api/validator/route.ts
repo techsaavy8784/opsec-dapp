@@ -74,14 +74,20 @@ export async function GET(request: NextRequest) {
           restAmount:
             item.validatorType.price -
             Number(sumCreditUSD._sum.credit ?? 0) / ratio,
+          claimed: false,
         }
-      } else
+      } else {
+        const claims = await prisma.claim.findMany({
+          where: { userId: session.user.id, validatorId: item.id },
+        })
         return {
           ...item,
           mepaidAmount: Number(meCreditUSD._sum.credit ?? 0) / ratio,
           paidSumAmount: item.validatorType.price,
           restAmount: 0,
+          claimed: claims && claims.length > 0 ? true : false,
         }
+      }
     }),
   )
 

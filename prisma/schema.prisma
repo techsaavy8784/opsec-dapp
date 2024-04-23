@@ -126,13 +126,16 @@ model Credit {
 }
 
 model Claim {
-  id        Int      @id @default(autoincrement())
-  userId    Int      @map("user_id")
-  address   String
-  status    Boolean  @default(false)
-  lasted_at DateTime @default(now())
-  amount    Int
-  user      User     @relation(fields: [userId], references: [id])
+  id          Int         @id @default(autoincrement())
+  address     String
+  status      Boolean     @default(false)
+  lasted_at   DateTime    @default(now())
+  amount      Float
+  userId      Int         @map("user_id")
+  validatorId Int?        @map("validator_id")
+
+  user        User        @relation(fields: [userId], references: [id])
+  validator   Validator?  @relation(fields: [validatorId], references: [id])
 
   @@map("claims")
 }
@@ -158,6 +161,7 @@ model Validator {
   payments      Payment[]
   server        Server?       @relation(fields: [serverId], references: [id], onDelete: Restrict)
   validatorType ValidatorType @relation(fields: [typeId], references: [id])
+  claims        Claim[]
 
   @@map("validators")
 }

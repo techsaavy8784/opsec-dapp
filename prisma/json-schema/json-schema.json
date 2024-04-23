@@ -242,7 +242,7 @@
             }
           ]
         },
-        "users": {
+        "user": {
           "anyOf": [
             {
               "$ref": "#/definitions/User"
@@ -376,16 +376,26 @@
           "format": "date-time"
         },
         "amount": {
-          "type": "integer"
+          "type": "number"
         },
-        "users": {
+        "user": {
           "$ref": "#/definitions/User"
+        },
+        "validator": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/Validator"
+            },
+            {
+              "type": "null"
+            }
+          ]
         }
       },
       "required": [
-        "userId",
         "address",
-        "amount"
+        "amount",
+        "userId"
       ]
     },
     "ValidatorType": {
@@ -437,12 +447,6 @@
         "id": {
           "type": "integer"
         },
-        "typeId": {
-          "type": "integer"
-        },
-        "serverId": {
-          "type": "integer"
-        },
         "purchaseTime": {
           "type": [
             "string",
@@ -468,6 +472,12 @@
         },
         "validatorType": {
           "$ref": "#/definitions/ValidatorType"
+        },
+        "claims": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Claim"
+          }
         }
       },
       "required": [

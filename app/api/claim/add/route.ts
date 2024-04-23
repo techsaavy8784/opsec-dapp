@@ -10,12 +10,13 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 })
   }
 
-  const { amount } = await request.json()
+  const { amount, validatorId } = await request.json()
   let oldAmount = 0
 
   const data = await prisma.claim.findFirst({
     where: {
       userId: session.user.id,
+      validatorId,
     },
   })
 
@@ -33,6 +34,7 @@ export async function POST(request: NextRequest) {
       address: session.user.address,
       lasted_at: new Date(),
       amount: oldAmount + amount,
+      validatorId,
     },
   })
 
