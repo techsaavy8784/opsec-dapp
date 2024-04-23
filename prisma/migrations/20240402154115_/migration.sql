@@ -45,6 +45,7 @@ CREATE TABLE "validator_types" (
     "price" DOUBLE PRECISION NOT NULL,
     "price_unit" "Unit" NOT NULL DEFAULT 'ETH',
     "reward_wallet" TEXT NOT NULL,
+    "floor_price" DOUBLE PRECISION NOT NULL
 
     CONSTRAINT "validator_types_pkey" PRIMARY KEY ("id")
 );

@@ -28,6 +28,7 @@ export const PurchaseModal: React.FC<PurchaseModalProps> = ({
   ...props
 }) => {
   const [creditPrice, setCreditPrice] = useState(0)
+  const [creditFloorPrice, setCreditFloorPrice] = useState(0)
   const [amount, setAmount] = useState("")
   const [errorStatus, setErrorStatus] = useState(false)
   const [errorMessage, setErrorMessage] = useState("")
@@ -66,9 +67,12 @@ export const PurchaseModal: React.FC<PurchaseModalProps> = ({
   useEffect(() => {
     if (open === false) init()
     if (!isFetching)
-      getUSDAmountForETH().then((value) =>
-        setCreditPrice(Math.ceil(value * validator.restAmount)),
-      )
+      getUSDAmountForETH().then((value) => {
+        setCreditPrice(Math.ceil(value * validator.restAmount))
+        setCreditFloorPrice(
+          Math.ceil(value * validator.validatorType.floorPrice),
+        )
+      })
   }, [isFetching, open])
 
   const onPurchase = async () => {
@@ -86,11 +90,26 @@ export const PurchaseModal: React.FC<PurchaseModalProps> = ({
       .catch((err) => alert(err))
   }
 
+  const onChangeAmount = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setAmount(e.target.value)
+    setErrorStatus(false)
+    setErrorMessage("")
+  }
+
   const checkError = async () => {
     if (amount !== "") {
-      if (creditPrice < Number(amount) || balance.balance < Number(amount)) {
+      if (!(amount.match(/^\d+$/) !== null)) {
         setErrorStatus(true)
-        setErrorMessage("Exceed the amount")
+        setErrorMessage("Must input the number for amount!")
+        return true
+      }
+      if (
+        creditPrice < Number(amount) ||
+        balance.balance < Number(amount) ||
+        creditFloorPrice > Number(amount)
+      ) {
+        setErrorStatus(true)
+        setErrorMessage("Input the amount again")
         return true
       } else if (Number(amount) === 0) {
         setErrorStatus(true)
@@ -98,6 +117,7 @@ export const PurchaseModal: React.FC<PurchaseModalProps> = ({
         return true
       } else {
         setErrorStatus(false)
+        setErrorMessage("")
         return false
       }
     } else {
@@ -129,7 +149,7 @@ export const PurchaseModal: React.FC<PurchaseModalProps> = ({
             value={amount}
             id="amount"
             placeholder="Amount"
-            onChange={(e) => setAmount(e.target.value)}
+            onChange={onChangeAmount}
           />
           {errorStatus && (
             <Alert variant="destructive">

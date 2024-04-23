@@ -242,7 +242,7 @@
             }
           ]
         },
-        "users": {
+        "user": {
           "anyOf": [
             {
               "$ref": "#/definitions/User"
@@ -378,7 +378,7 @@
         "amount": {
           "type": "integer"
         },
-        "users": {
+        "user": {
           "$ref": "#/definitions/User"
         }
       },
@@ -406,6 +406,9 @@
         "price": {
           "type": "number"
         },
+        "floorPrice": {
+          "type": "number"
+        },
         "priceUnit": {
           "type": "string",
           "default": "ETH",
@@ -428,6 +431,7 @@
         "rewardLockTime",
         "rewardPerMonth",
         "price",
+        "floorPrice",
         "rewardWallet"
       ]
     },
@@ -435,12 +439,6 @@
       "type": "object",
       "properties": {
         "id": {
-          "type": "integer"
-        },
-        "typeId": {
-          "type": "integer"
-        },
-        "serverId": {
           "type": "integer"
         },
         "purchaseTime": {
