@@ -2,7 +2,7 @@ import prisma from "@/prisma"
 import { authOptions } from "@/lib/auth"
 import { getServerSession } from "next-auth"
 import { NextResponse, NextRequest } from "next/server"
-import getUSDAmountForETH from "@/lib/getUSDAmountForETH"
+import getPriceETH from "@/lib/getPriceETH"
 import availableServers from "@/app/api/payment/available-servers"
 
 export async function POST(request: NextRequest) {
@@ -43,7 +43,7 @@ export async function POST(request: NextRequest) {
 
   if (
     Number(totalAmountForValidator._sum.credit ?? 0) + amount >=
-    Math.ceil((await getUSDAmountForETH()) * validator!.validatorType!.price)
+    Math.ceil((await getPriceETH()) * validator!.validatorType!.price)
   )
     await prisma.validator.update({
       where: {

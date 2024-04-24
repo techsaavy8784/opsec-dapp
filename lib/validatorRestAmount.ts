@@ -1,9 +1,9 @@
 import prisma from "@/prisma"
-import getUSDAmountForETH from "@/lib/getUSDAmountForETH"
+import getPriceETH from "@/lib/getPriceETH"
 import availableServers from "@/app/api/payment/available-servers"
 
 const validatorRestAmount = async (item: any) => {
-  const ethUSDRatioPromise = getUSDAmountForETH()
+  const ethUSDRatioPromise = getPriceETH()
 
   const serversPromise = availableServers()
 

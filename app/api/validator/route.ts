@@ -3,7 +3,7 @@ import { authOptions } from "@/lib/auth"
 import { getServerSession } from "next-auth"
 import { NextResponse, NextRequest } from "next/server"
 import checkRestAmount from "@/lib/checkRestAmount"
-import getUSDAmountForETH from "@/lib/getUSDAmountForETH"
+import getPriceETH from "@/lib/getPriceETH"
 import { ValidatorNodeFilter } from "@/lib/constants"
 
 export async function GET(request: NextRequest) {
@@ -18,7 +18,7 @@ export async function GET(request: NextRequest) {
 
   await checkRestAmount()
 
-  const ratio = await getUSDAmountForETH()
+  const ratio = await getPriceETH()
 
   const data =
     Number(status) === ValidatorNodeFilter.FULLY_PURCHASED_NODES

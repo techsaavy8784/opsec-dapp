@@ -38,7 +38,7 @@ const options = {
 // Create an LRU cache with a TTL of 5 minutes (300 seconds)
 const cache = new LRUCache(options)
 
-async function getUSDAmountForETH() {
+async function getPriceETH() {
   const cachedRatio = cache.get("eth_usd_ratio")
   if (cachedRatio !== undefined) {
     return cachedRatio
@@ -62,4 +62,4 @@ async function getUSDAmountForETH() {
   }
 }
 
-export default getUSDAmountForETH
+export default getPriceETH
