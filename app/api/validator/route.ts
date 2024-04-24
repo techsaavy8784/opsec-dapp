@@ -51,9 +51,10 @@ export async function GET(request: NextRequest) {
   if (Number(status) === ValidatorNodeFilter.CLAIM_NODES)
     data = data.filter((item: any) =>
       dayjs(item.purchaseTime)
-        .add(item.validatorType.rewardLockTime)
+        .add(item.validatorType.rewardLockTime, "day")
         .isBefore(dayjs()),
     )
+  const now = dayjs()
   const sendingData = await Promise.all(
     data.map(async (item: any) => {
       const meCreditUSD = await prisma.payment.aggregate({
@@ -88,12 +89,22 @@ export async function GET(request: NextRequest) {
         const claims = await prisma.claim.findMany({
           where: { userId: session.user.id, validatorId: item.id },
         })
+        const lockTime = dayjs(item.purchaseTime).add(
+          item.validatorType.rewardLockTime,
+          "day",
+        )
+        const diff = now.diff(lockTime, "month")
+        const claim = claims.find(
+          (claim) =>
+            dayjs(claim.lasted_at).diff(lockTime, "month") === diff - 1,
+        )
         return {
           ...item,
           mepaidAmount: Number(meCreditUSD._sum.credit ?? 0) / ratio,
           paidSumAmount: item.validatorType.price,
           restAmount: 0,
           claimed: claims && claims.length > 0,
+          claim,
         }
       }
     }),

@@ -16,6 +16,7 @@ import { Validator } from "@prisma/client"
 import getUSDAmountForETH from "@/lib/getUSDAmountForETH"
 import { ReloadIcon } from "@radix-ui/react-icons"
 import { ValidatorNodeFilter } from "@/lib/constants"
+import dayjs from "dayjs"
 
 const Claim = () => {
   const [claimIds, setClaimIds] = useState<number[]>([])
@@ -27,6 +28,7 @@ const Claim = () => {
       paidSumAmount: number
       mepaidAmount: number
       claimed: boolean
+      claim: any
     })[]
   >({
     queryKey: ["Validator-nodess"],
@@ -37,22 +39,16 @@ const Claim = () => {
   })
 
   const handleClaimClick = useCallback(
-    async (index: number, id: number) => {
+    async (id: number, amount: number) => {
       if (!data || data.length === 0) return
 
       setClaimIds((prev) => prev.concat(id))
 
-      const validator = data[index]
       const ethPrice = await getUSDAmountForETH()
-      const amount =
-        ((validator.mepaidAmount / validator.paidSumAmount) *
-          validator.validatorType.rewardPerMonth *
-          (validator.validatorType.rewardLockTime / 30)) /
-        ethPrice
       await fetch("/api/claim/add", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ amount, validatorId: id }),
+        body: JSON.stringify({ amount: amount / ethPrice, validatorId: id }),
       })
 
       refetch()
@@ -91,10 +87,22 @@ const Claim = () => {
               </TableRow>
             ) : (
               data.map((item, key) => {
+                const rewardPercent = item.mepaidAmount / item.paidSumAmount
+                const lockTime = dayjs(item.purchaseTime).add(
+                  item.validatorType.rewardLockTime,
+                  "day",
+                )
+                const now = dayjs()
+                const rewardPeriod =
+                  item.validatorType.rewardLockTime / 30 +
+                  now.diff(lockTime, "month") -
+                  (item.claim
+                    ? now.diff(dayjs(item.claim.lasted_at), "month")
+                    : 0)
                 const claimableAmount =
-                  (item.mepaidAmount / item.paidSumAmount) *
+                  rewardPercent *
                   item.validatorType.rewardPerMonth *
-                  (item.validatorType.rewardLockTime / 30)
+                  rewardPeriod
                 const claimPending = claimIds.some(
                   (claimId) => claimId === item.id,
                 )
@@ -124,7 +132,9 @@ const Claim = () => {
                         "Claimed"
                       ) : (
                         <Button
-                          onClick={() => handleClaimClick(key, item.id)}
+                          onClick={() =>
+                            handleClaimClick(item.id, claimableAmount)
+                          }
                           disabled={claimPending}
                         >
                           {claimPending && (
