@@ -69,7 +69,7 @@ export async function GET(request: NextRequest) {
 
         return {
           ...item,
-          mepaidAmount: Number(sumCreditUSD._sum.credit ?? 0) / ratio,
+          mepaidAmount: Number(meCreditUSD._sum.credit ?? 0) / ratio,
           paidSumAmount: Number(sumCreditUSD._sum.credit ?? 0) / ratio,
           restAmount:
             item.validatorType.price -
