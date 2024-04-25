@@ -8,6 +8,7 @@ import { Claim } from "@prisma/client"
 import { useQuery } from "@tanstack/react-query"
 import { useEffect, useState } from "react"
 import { CovalentClient } from "@covalenthq/client-sdk"
+import getAllHoldersOpSecBalance from "@/lib/getAllHoldersOpSecBalance"
 const client = new CovalentClient(
   process.env.NEXT_PUBLIC_COVALENT_API_KEY as string,
 )
@@ -47,16 +48,9 @@ const ClaimF: React.FC = () => {
     const holdersAllBalance = async () => {
       try {
         let sum: number = 0
+
         setIsLoadingForOpSecAll(true)
-        for await (const resp of client.BalanceService.getTokenHoldersV2ForTokenAddress(
-          "eth-mainnet",
-          process.env.NEXT_PUBLIC_OPSEC_TOKEN_ADDRESS as `0x${string}`,
-          { pageSize: 1000 },
-        )) {
-          sum =
-            sum +
-            Number(formatUnits(resp.balance as bigint, resp.contract_decimals))
-        }
+        sum = await getAllHoldersOpSecBalance()
 
         setOpsecAllBalance(sum)
         setIsLoadingForOpSecAll(false)

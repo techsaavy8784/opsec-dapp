@@ -24,9 +24,6 @@ ALTER TABLE "stakings" ADD CONSTRAINT "stakings_user_id_fkey" FOREIGN KEY ("user
 CREATE TABLE "claims" (
     "id" SERIAL NOT NULL,
     "user_id" INTEGER NOT NULL,
-    "address" TEXT NOT NULL,
-    "status" BOOLEAN NOT NULL DEFAULT false,
-    "lasted_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "amount" INTEGER NOT NULL,
 
     CONSTRAINT "claims_pkey" PRIMARY KEY ("id")
@@ -45,7 +42,7 @@ CREATE TABLE "validator_types" (
     "price" DOUBLE PRECISION NOT NULL,
     "price_unit" "Unit" NOT NULL DEFAULT 'ETH',
     "reward_wallet" TEXT NOT NULL,
-    "floor_price" DOUBLE PRECISION NOT NULL
+    "floor_price" DOUBLE PRECISION NOT NULL,
 
     CONSTRAINT "validator_types_pkey" PRIMARY KEY ("id")
 );
@@ -59,6 +56,16 @@ CREATE TABLE "validators" (
     CONSTRAINT "validators_pkey" PRIMARY KEY ("id")
 );
 
+CREATE TABLE "rewards" (
+    "id" SERIAL NOT NULL,
+    "user_id" INTEGER NOT NULL,
+    "tax_reward" INTEGER NULL,
+    "reflection_reward" INTEGER NULL,
+    "validator_reward_withdraw_time" TIMESTAMP(3) NULL,
+
+    CONSTRAINT "rewards_pkey" PRIMARY KEY ("id")
+);
+
 ALTER TABLE "payments" ADD COLUMN     "validator_id" INTEGER;
 ALTER TABLE "payments" ADD COLUMN     "user_id" INTEGER;
 -- AddForeignKey
@@ -67,4 +74,4 @@ ALTER TABLE "validators" ADD CONSTRAINT "validators_server_id_fkey" FOREIGN KEY 
 ALTER TABLE "payments" ADD CONSTRAINT "payments_validator_id_fkey" FOREIGN KEY ("validator_id") REFERENCES "validators"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 ALTER TABLE "payments" ADD CONSTRAINT "payments_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
-
+ALTER TABLE "rewards" ADD CONSTRAINT "rewards_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE RESTRICT ON UPDATE CASCADE;

@@ -11,10 +11,7 @@
           "type": "string"
         },
         "password": {
-          "type": [
-            "string",
-            "null"
-          ]
+          "type": ["string", "null"]
         },
         "balance": {
           "type": "integer",
@@ -44,6 +41,12 @@
             "$ref": "#/definitions/Payment"
           }
         },
+        "Reward": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Reward"
+          }
+        },
         "Staking": {
           "type": "array",
           "items": {
@@ -51,9 +54,7 @@
           }
         }
       },
-      "required": [
-        "address"
-      ]
+      "required": ["address"]
     },
     "Node": {
       "type": "object",
@@ -62,21 +63,12 @@
           "type": "integer"
         },
         "wallet": {
-          "type": [
-            "string",
-            "null"
-          ]
+          "type": ["string", "null"]
         },
         "status": {
           "type": "string",
           "default": "CREATED",
-          "enum": [
-            "CREATED",
-            "INSTALLING",
-            "LIVE",
-            "FAILED",
-            "EXPIRED"
-          ]
+          "enum": ["CREATED", "INSTALLING", "LIVE", "FAILED", "EXPIRED"]
         },
         "createdAt": {
           "type": "string",
@@ -108,11 +100,7 @@
           }
         }
       },
-      "required": [
-        "userId",
-        "serverId",
-        "blockchainId"
-      ]
+      "required": ["userId", "serverId", "blockchainId"]
     },
     "Staking": {
       "type": "object",
@@ -131,10 +119,7 @@
           "$ref": "#/definitions/User"
         }
       },
-      "required": [
-        "userId",
-        "stakeId"
-      ]
+      "required": ["userId", "stakeId"]
     },
     "NodeHistory": {
       "type": "object",
@@ -143,29 +128,18 @@
           "type": "integer"
         },
         "message": {
-          "type": [
-            "string",
-            "null"
-          ]
+          "type": ["string", "null"]
         },
         "status": {
           "type": "string",
           "default": "CREATED",
-          "enum": [
-            "CREATED",
-            "INSTALLING",
-            "LIVE",
-            "FAILED",
-            "EXPIRED"
-          ]
+          "enum": ["CREATED", "INSTALLING", "LIVE", "FAILED", "EXPIRED"]
         },
         "node": {
           "$ref": "#/definitions/Node"
         }
       },
-      "required": [
-        "nodeId"
-      ]
+      "required": ["nodeId"]
     },
     "Server": {
       "type": "object",
@@ -205,9 +179,7 @@
           }
         }
       },
-      "required": [
-        "active"
-      ]
+      "required": ["active"]
     },
     "Payment": {
       "type": "object",
@@ -227,10 +199,7 @@
           "format": "date-time"
         },
         "stakeId": {
-          "type": [
-            "string",
-            "null"
-          ]
+          "type": ["string", "null"]
         },
         "node": {
           "anyOf": [
@@ -263,9 +232,7 @@
           ]
         }
       },
-      "required": [
-        "credit"
-      ]
+      "required": ["credit"]
     },
     "TxVerifier": {
       "type": "object",
@@ -277,20 +244,10 @@
           "type": "string"
         },
         "tx": {
-          "type": [
-            "number",
-            "string",
-            "boolean",
-            "object",
-            "array",
-            "null"
-          ]
+          "type": ["number", "string", "boolean", "object", "array", "null"]
         }
       },
-      "required": [
-        "verifier",
-        "tx"
-      ]
+      "required": ["verifier", "tx"]
     },
     "Blockchain": {
       "type": "object",
@@ -326,11 +283,7 @@
           }
         }
       },
-      "required": [
-        "name",
-        "url",
-        "price"
-      ]
+      "required": ["name", "url", "price"]
     },
     "Credit": {
       "type": "object",
@@ -352,28 +305,13 @@
           "$ref": "#/definitions/User"
         }
       },
-      "required": [
-        "tx",
-        "credits",
-        "userId"
-      ]
+      "required": ["tx", "credits", "userId"]
     },
     "Claim": {
       "type": "object",
       "properties": {
         "id": {
           "type": "integer"
-        },
-        "address": {
-          "type": "string"
-        },
-        "status": {
-          "type": "boolean",
-          "default": false
-        },
-        "lasted_at": {
-          "type": "string",
-          "format": "date-time"
         },
         "amount": {
           "type": "number"
@@ -392,11 +330,7 @@
           ]
         }
       },
-      "required": [
-        "address",
-        "amount",
-        "userId"
-      ]
+      "required": ["userId", "amount"]
     },
     "ValidatorType": {
       "type": "object",
@@ -416,18 +350,16 @@
         "price": {
           "type": "number"
         },
-        "floorPrice": {
-          "type": "number"
-        },
         "priceUnit": {
           "type": "string",
           "default": "ETH",
-          "enum": [
-            "ETH"
-          ]
+          "enum": ["ETH"]
         },
         "rewardWallet": {
           "type": "string"
+        },
+        "floorPrice": {
+          "type": "number"
         },
         "validators": {
           "type": "array",
@@ -441,8 +373,8 @@
         "rewardLockTime",
         "rewardPerMonth",
         "price",
-        "floorPrice",
-        "rewardWallet"
+        "rewardWallet",
+        "floorPrice"
       ]
     },
     "Validator": {
@@ -452,10 +384,7 @@
           "type": "integer"
         },
         "purchaseTime": {
-          "type": [
-            "string",
-            "null"
-          ],
+          "type": ["string", "null"],
           "format": "date-time"
         },
         "payments": {
@@ -484,9 +413,29 @@
           }
         }
       },
-      "required": [
-        "typeId"
-      ]
+      "required": ["typeId"]
+    },
+    "Reward": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer"
+        },
+        "taxReward": {
+          "type": ["integer", "null"]
+        },
+        "reflectionReward": {
+          "type": ["integer", "null"]
+        },
+        "validatorRewardWithdrawTime": {
+          "type": ["string", "null"],
+          "format": "date-time"
+        },
+        "user": {
+          "$ref": "#/definitions/User"
+        }
+      },
+      "required": ["userId"]
     }
   },
   "type": "object",
@@ -526,6 +475,9 @@
     },
     "validator": {
       "$ref": "#/definitions/Validator"
+    },
+    "reward": {
+      "$ref": "#/definitions/Reward"
     }
   }
 }

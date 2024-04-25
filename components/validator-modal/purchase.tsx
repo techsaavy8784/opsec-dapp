@@ -12,13 +12,18 @@ import { useQuery } from "@tanstack/react-query"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import getUSDAmountForETH from "@/lib/getUSDAmountForETH"
+import getPriceETH from "@/lib/getPriceETH"
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
+import { useForm, SubmitHandler } from "react-hook-form"
 
 interface PurchaseModalProps extends DialogProps {
   open: boolean
   onOpenChange: () => void
   validatorID: number
+}
+
+type FormValues = {
+  amount: number
 }
 
 export const PurchaseModal: React.FC<PurchaseModalProps> = ({
@@ -29,9 +34,12 @@ export const PurchaseModal: React.FC<PurchaseModalProps> = ({
 }) => {
   const [creditPrice, setCreditPrice] = useState(0)
   const [creditFloorPrice, setCreditFloorPrice] = useState(0)
-  const [amount, setAmount] = useState("")
-  const [errorStatus, setErrorStatus] = useState(false)
-  const [errorMessage, setErrorMessage] = useState("")
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<FormValues>()
 
   const {
     data: validator,
@@ -53,10 +61,7 @@ export const PurchaseModal: React.FC<PurchaseModalProps> = ({
   })
 
   const init = () => {
-    setAmount("")
     setCreditPrice(0)
-    setErrorStatus(false)
-    setErrorMessage("")
   }
 
   useEffect(() => {
@@ -67,7 +72,7 @@ export const PurchaseModal: React.FC<PurchaseModalProps> = ({
   useEffect(() => {
     if (open === false) init()
     if (!isFetching)
-      getUSDAmountForETH().then((value) => {
+      getPriceETH().then((value) => {
         setCreditPrice(Math.ceil(value * validator.restAmount))
         setCreditFloorPrice(
           Math.ceil(value * validator.validatorType.floorPrice),
@@ -75,56 +80,18 @@ export const PurchaseModal: React.FC<PurchaseModalProps> = ({
       })
   }, [isFetching, open])
 
-  const onPurchase = async () => {
-    if (await checkError()) return
+  const onSubmit: SubmitHandler<FormValues> = (data) => {
     fetch("/api/validator/add/purchase", {
       method: "POST",
       body: JSON.stringify({
         validatorId: Number(validatorID),
-        amount: Number(amount),
+        amount: Number(data.amount),
       }),
     })
       .then((res) => {
         onOpenChange()
       })
       .catch((err) => alert(err))
-  }
-
-  const onChangeAmount = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setAmount(e.target.value)
-    setErrorStatus(false)
-    setErrorMessage("")
-  }
-
-  const checkError = async () => {
-    if (amount !== "") {
-      if (!(amount.match(/^\d+$/) !== null)) {
-        setErrorStatus(true)
-        setErrorMessage("Must input the number for amount!")
-        return true
-      }
-      if (
-        creditPrice < Number(amount) ||
-        balance.balance < Number(amount) ||
-        creditFloorPrice > Number(amount)
-      ) {
-        setErrorStatus(true)
-        setErrorMessage("Input the amount again")
-        return true
-      } else if (Number(amount) === 0) {
-        setErrorStatus(true)
-        setErrorMessage("Input the amount")
-        return true
-      } else {
-        setErrorStatus(false)
-        setErrorMessage("")
-        return false
-      }
-    } else {
-      setErrorStatus(true)
-      setErrorMessage("Input the amount")
-      return true
-    }
   }
 
   return (
@@ -140,24 +107,52 @@ export const PurchaseModal: React.FC<PurchaseModalProps> = ({
               credit
             </div>
           </DialogDescription>
-
-          <Label htmlFor="amount">
-            Price: {creditPrice} credit ({validator.restAmount}{" "}
-            {validator.validatorType.priceUnit})
-          </Label>
-          <Input
-            value={amount}
-            id="amount"
-            placeholder="Amount"
-            onChange={onChangeAmount}
-          />
-          {errorStatus && (
-            <Alert variant="destructive">
-              <AlertTitle>Error</AlertTitle>
-              <AlertDescription>{errorMessage}</AlertDescription>
-            </Alert>
-          )}
-          <Button onClick={() => onPurchase()}>Purchase</Button>
+          <form onSubmit={handleSubmit(onSubmit)}>
+            <Label htmlFor="amount">
+              Price: {creditPrice} credit ({validator.restAmount}{" "}
+              {validator.validatorType.priceUnit})
+            </Label>
+            <Input
+              id="amount"
+              placeholder="Amount"
+              {...register("amount", {
+                required: true,
+                pattern: /^\d+$/,
+                validate: {
+                  validAmount: (value) =>
+                    value > 0 &&
+                    value <= creditPrice &&
+                    value <= balance.balance &&
+                    value >= creditFloorPrice,
+                },
+              })}
+            />
+            {errors.amount && (
+              <Alert className="mt-3" variant="destructive">
+                {errors.amount.type === "required" && (
+                  <>
+                    <AlertTitle>Error</AlertTitle>
+                    <AlertDescription>Amount is required</AlertDescription>
+                  </>
+                )}
+                {errors.amount.type === "pattern" && (
+                  <>
+                    <AlertTitle>Error</AlertTitle>
+                    <AlertDescription>Amount must be a number</AlertDescription>
+                  </>
+                )}
+                {errors.amount.type === "validAmount" && (
+                  <>
+                    <AlertTitle>Error</AlertTitle>
+                    <AlertDescription>Input the amount again</AlertDescription>
+                  </>
+                )}
+              </Alert>
+            )}
+            <Button className="w-full mt-3" type="submit">
+              Purchase
+            </Button>
+          </form>
         </DialogContent>
       )}
     </Dialog>
