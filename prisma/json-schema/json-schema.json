@@ -44,6 +44,12 @@
             "$ref": "#/definitions/Payment"
           }
         },
+        "Reward": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Reward"
+          }
+        },
         "Staking": {
           "type": "array",
           "items": {
@@ -364,17 +370,6 @@
         "id": {
           "type": "integer"
         },
-        "address": {
-          "type": "string"
-        },
-        "status": {
-          "type": "boolean",
-          "default": false
-        },
-        "lasted_at": {
-          "type": "string",
-          "format": "date-time"
-        },
         "amount": {
           "type": "integer"
         },
@@ -384,7 +379,6 @@
       },
       "required": [
         "userId",
-        "address",
         "amount"
       ]
     },
@@ -406,9 +400,6 @@
         "price": {
           "type": "number"
         },
-        "floorPrice": {
-          "type": "number"
-        },
         "priceUnit": {
           "type": "string",
           "default": "ETH",
@@ -418,6 +409,9 @@
         },
         "rewardWallet": {
           "type": "string"
+        },
+        "floorPrice": {
+          "type": "number"
         },
         "validators": {
           "type": "array",
@@ -431,8 +425,8 @@
         "rewardLockTime",
         "rewardPerMonth",
         "price",
-        "floorPrice",
-        "rewardWallet"
+        "rewardWallet",
+        "floorPrice"
       ]
     },
     "Validator": {
@@ -470,6 +464,39 @@
       },
       "required": [
         "typeId"
+      ]
+    },
+    "Reward": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer"
+        },
+        "taxReward": {
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "reflectionReward": {
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "validatorRewardWithdrawTime": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time"
+        },
+        "user": {
+          "$ref": "#/definitions/User"
+        }
+      },
+      "required": [
+        "userId"
       ]
     }
   },
@@ -510,6 +537,9 @@
     },
     "validator": {
       "$ref": "#/definitions/Validator"
+    },
+    "reward": {
+      "$ref": "#/definitions/Reward"
     }
   }
 }

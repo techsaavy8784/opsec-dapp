@@ -6,17 +6,17 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 })
   }
 
-  const { address } = await request.json()
+  // const { address } = await request.json()
 
-  await prisma.claim.updateMany({
-    data: {
-      amount: 0,
-      status: false,
-    },
-    where: {
-      address: address,
-    },
-  })
+  // await prisma.claim.updateMany({
+  //   data: {
+  //     amount: 0,
+  //     status: false,
+  //   },
+  //   where: {
+  //     address: address,
+  //   },
+  // })
 
   return NextResponse.json("success", { status: 201 })
 }

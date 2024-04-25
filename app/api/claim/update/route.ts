@@ -7,24 +7,24 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 })
   }
 
-  const { userId } = await request.json()
+  // const { userId } = await request.json()
 
-  const data: Claim | null = await prisma.claim.findFirst({
-    where: {
-      userId: Number(userId),
-    },
-  })
+  // const data: Claim | null = await prisma.claim.findFirst({
+  //   where: {
+  //     userId: Number(userId),
+  //   },
+  // })
 
-  if (data !== null) {
-    await prisma.claim.update({
-      data: {
-        status: true,
-      },
-      where: {
-        id: data.id,
-      },
-    })
-  }
+  // if (data !== null) {
+  //   await prisma.claim.update({
+  //     data: {
+  //       status: true,
+  //     },
+  //     where: {
+  //       id: data.id,
+  //     },
+  //   })
+  // }
 
   return NextResponse.json("success", { status: 201 })
 }

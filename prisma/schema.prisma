@@ -22,6 +22,7 @@ model User {
   credits  Credit[]
   nodes    Node[]
   payments Payment[]
+  Reward   Reward[]
   Staking  Staking[]
 
   @@map("users")
@@ -126,13 +127,10 @@ model Credit {
 }
 
 model Claim {
-  id        Int      @id @default(autoincrement())
-  userId    Int      @map("user_id")
-  address   String
-  status    Boolean  @default(false)
-  lasted_at DateTime @default(now())
-  amount    Int
-  user      User     @relation(fields: [userId], references: [id])
+  id     Int  @id @default(autoincrement())
+  userId Int  @map("user_id")
+  amount Int
+  user   User @relation(fields: [userId], references: [id])
 
   @@map("claims")
 }
@@ -143,9 +141,9 @@ model ValidatorType {
   rewardLockTime Int         @map("reward_lock_time")
   rewardPerMonth Int         @map("reward_per_month")
   price          Float
-  floorPrice     Float       @map("floor_price")
   priceUnit      Unit        @default(ETH) @map("price_unit")
   rewardWallet   String      @map("reward_wallet")
+  floorPrice     Float       @map("floor_price")
   validators     Validator[]
 
   @@map("validator_types")
@@ -161,6 +159,17 @@ model Validator {
   validatorType ValidatorType @relation(fields: [typeId], references: [id])
 
   @@map("validators")
+}
+
+model Reward {
+  id                             Int       @id @default(autoincrement())
+  userId                         Int       @map("user_id")
+  taxReward                      Int?      @map("tax_reward")
+  reflectionReward               Int?      @map("reflection_reward")
+  validatorRewardWithdrawTime    DateTime? @map("validator_reward_withdraw_time")
+  user                           User      @relation(fields: [userId], references: [id])
+
+  @@map("rewards")
 }
 
 enum Status {
