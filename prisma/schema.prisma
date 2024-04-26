@@ -157,7 +157,6 @@ model Validator {
   payments      Payment[]
   server        Server?       @relation(fields: [serverId], references: [id], onDelete: Restrict)
   validatorType ValidatorType @relation(fields: [typeId], references: [id])
-  claims        Claim[]
 
   @@map("validators")
 }

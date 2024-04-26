@@ -11,7 +11,10 @@
           "type": "string"
         },
         "password": {
-          "type": ["string", "null"]
+          "type": [
+            "string",
+            "null"
+          ]
         },
         "balance": {
           "type": "integer",
@@ -54,7 +57,9 @@
           }
         }
       },
-      "required": ["address"]
+      "required": [
+        "address"
+      ]
     },
     "Node": {
       "type": "object",
@@ -63,12 +68,21 @@
           "type": "integer"
         },
         "wallet": {
-          "type": ["string", "null"]
+          "type": [
+            "string",
+            "null"
+          ]
         },
         "status": {
           "type": "string",
           "default": "CREATED",
-          "enum": ["CREATED", "INSTALLING", "LIVE", "FAILED", "EXPIRED"]
+          "enum": [
+            "CREATED",
+            "INSTALLING",
+            "LIVE",
+            "FAILED",
+            "EXPIRED"
+          ]
         },
         "createdAt": {
           "type": "string",
@@ -100,7 +114,11 @@
           }
         }
       },
-      "required": ["userId", "serverId", "blockchainId"]
+      "required": [
+        "userId",
+        "serverId",
+        "blockchainId"
+      ]
     },
     "Staking": {
       "type": "object",
@@ -119,7 +137,10 @@
           "$ref": "#/definitions/User"
         }
       },
-      "required": ["userId", "stakeId"]
+      "required": [
+        "userId",
+        "stakeId"
+      ]
     },
     "NodeHistory": {
       "type": "object",
@@ -128,18 +149,29 @@
           "type": "integer"
         },
         "message": {
-          "type": ["string", "null"]
+          "type": [
+            "string",
+            "null"
+          ]
         },
         "status": {
           "type": "string",
           "default": "CREATED",
-          "enum": ["CREATED", "INSTALLING", "LIVE", "FAILED", "EXPIRED"]
+          "enum": [
+            "CREATED",
+            "INSTALLING",
+            "LIVE",
+            "FAILED",
+            "EXPIRED"
+          ]
         },
         "node": {
           "$ref": "#/definitions/Node"
         }
       },
-      "required": ["nodeId"]
+      "required": [
+        "nodeId"
+      ]
     },
     "Server": {
       "type": "object",
@@ -179,7 +211,9 @@
           }
         }
       },
-      "required": ["active"]
+      "required": [
+        "active"
+      ]
     },
     "Payment": {
       "type": "object",
@@ -199,7 +233,10 @@
           "format": "date-time"
         },
         "stakeId": {
-          "type": ["string", "null"]
+          "type": [
+            "string",
+            "null"
+          ]
         },
         "node": {
           "anyOf": [
@@ -232,7 +269,9 @@
           ]
         }
       },
-      "required": ["credit"]
+      "required": [
+        "credit"
+      ]
     },
     "TxVerifier": {
       "type": "object",
@@ -244,10 +283,20 @@
           "type": "string"
         },
         "tx": {
-          "type": ["number", "string", "boolean", "object", "array", "null"]
+          "type": [
+            "number",
+            "string",
+            "boolean",
+            "object",
+            "array",
+            "null"
+          ]
         }
       },
-      "required": ["verifier", "tx"]
+      "required": [
+        "verifier",
+        "tx"
+      ]
     },
     "Blockchain": {
       "type": "object",
@@ -283,7 +332,11 @@
           }
         }
       },
-      "required": ["name", "url", "price"]
+      "required": [
+        "name",
+        "url",
+        "price"
+      ]
     },
     "Credit": {
       "type": "object",
@@ -305,7 +358,11 @@
           "$ref": "#/definitions/User"
         }
       },
-      "required": ["tx", "credits", "userId"]
+      "required": [
+        "tx",
+        "credits",
+        "userId"
+      ]
     },
     "Claim": {
       "type": "object",
@@ -314,23 +371,16 @@
           "type": "integer"
         },
         "amount": {
-          "type": "number"
+          "type": "integer"
         },
         "user": {
           "$ref": "#/definitions/User"
-        },
-        "validator": {
-          "anyOf": [
-            {
-              "$ref": "#/definitions/Validator"
-            },
-            {
-              "type": "null"
-            }
-          ]
         }
       },
-      "required": ["userId", "amount"]
+      "required": [
+        "userId",
+        "amount"
+      ]
     },
     "ValidatorType": {
       "type": "object",
@@ -353,7 +403,9 @@
         "priceUnit": {
           "type": "string",
           "default": "ETH",
-          "enum": ["ETH"]
+          "enum": [
+            "ETH"
+          ]
         },
         "rewardWallet": {
           "type": "string"
@@ -384,7 +436,10 @@
           "type": "integer"
         },
         "purchaseTime": {
-          "type": ["string", "null"],
+          "type": [
+            "string",
+            "null"
+          ],
           "format": "date-time"
         },
         "payments": {
@@ -405,15 +460,11 @@
         },
         "validatorType": {
           "$ref": "#/definitions/ValidatorType"
-        },
-        "claims": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/Claim"
-          }
         }
       },
-      "required": ["typeId"]
+      "required": [
+        "typeId"
+      ]
     },
     "Reward": {
       "type": "object",
@@ -422,20 +473,31 @@
           "type": "integer"
         },
         "taxReward": {
-          "type": ["integer", "null"]
+          "type": [
+            "integer",
+            "null"
+          ]
         },
         "reflectionReward": {
-          "type": ["integer", "null"]
+          "type": [
+            "integer",
+            "null"
+          ]
         },
         "validatorRewardWithdrawTime": {
-          "type": ["string", "null"],
+          "type": [
+            "string",
+            "null"
+          ],
           "format": "date-time"
         },
         "user": {
           "$ref": "#/definitions/User"
         }
       },
-      "required": ["userId"]
+      "required": [
+        "userId"
+      ]
     }
   },
   "type": "object",
