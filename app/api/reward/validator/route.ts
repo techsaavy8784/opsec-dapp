@@ -31,7 +31,7 @@ export async function GET(request: NextRequest) {
   )
 
   const totalReward = rewardInfos.reduce(
-    (total, item) => (total += item.rewardAmount),
+    (total, item) => total + item.rewardAmount,
     0,
   )
 
