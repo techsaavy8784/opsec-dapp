@@ -5,7 +5,7 @@ const getValidatorReward = async (
   userId: number,
   validatorId: number,
   now: Dayjs,
-  withdrawTime?: Dayjs,
+  withdrawTime?: Dayjs | null,
 ) => {
   const meCreditUSD = await prisma.payment.aggregate({
     where: {
@@ -42,11 +42,7 @@ const getValidatorReward = async (
       (Number(meCreditUSD._sum) / Number(sumCreditUSD._sum))
   }
 
-  return {
-    rewardAmount,
-    paidSumAmount: sumCreditUSD._sum || 0,
-    mepaidAmount: meCreditUSD._sum || 0,
-  }
+  return { rewardAmount }
 }
 
 export default getValidatorReward
