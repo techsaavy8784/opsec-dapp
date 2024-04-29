@@ -3,7 +3,7 @@ import { authOptions } from "@/lib/auth"
 import { getServerSession } from "next-auth"
 import { NextResponse, NextRequest } from "next/server"
 import dayjs from "dayjs"
-import getValidatorReward from "@/lib/getValidatorReawrd"
+import getValidatorReward from "@/lib/getValidatorReward"
 
 export async function GET(request: NextRequest) {
   const session = await getServerSession(authOptions)
@@ -30,15 +30,12 @@ export async function GET(request: NextRequest) {
     ),
   )
 
-  const totalReward = rewardInfos.reduce(
-    (total, item) => total + item.rewardAmount,
-    0,
-  )
+  const totalReward = rewardInfos.reduce((total, item) => total + item, 0)
 
   validators = validators
     .map((validator, index) => ({
       ...validator,
-      ...rewardInfos[index],
+      rewardAmount: rewardInfos[index],
     }))
     .filter((validator) => validator.rewardAmount > 0)
 

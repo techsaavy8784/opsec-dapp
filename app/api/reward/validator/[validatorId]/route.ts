@@ -3,7 +3,7 @@ import { getServerSession } from "next-auth"
 import { NextResponse, NextRequest } from "next/server"
 import prisma from "@/prisma"
 import { authOptions } from "@/lib/auth"
-import getValidatorReward from "@/lib/getValidatorReawrd"
+import getValidatorReward from "@/lib/getValidatorReward"
 
 export async function GET(
   request: NextRequest,
@@ -24,7 +24,7 @@ export async function GET(
     ? dayjs(reward.validatorRewardWithdrawTime)
     : undefined
 
-  const { rewardAmount } = await getValidatorReward(
+  const rewardAmount = await getValidatorReward(
     session.user.id,
     params.validatorId,
     now,

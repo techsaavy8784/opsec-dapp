@@ -26,8 +26,7 @@ const getValidatorReward = async (
 
   let rewardAmount = 0
 
-  if (!validator || !meCreditUSD._sum || !sumCreditUSD._sum)
-    return { rewardAmount, paidSumAmount: 0, mepaidAmount: 0 }
+  if (!validator || !meCreditUSD._sum || !sumCreditUSD._sum) return rewardAmount
 
   const lockTime = dayjs(validator.purchaseTime).add(
     validator.validatorType.rewardLockTime,
@@ -42,7 +41,7 @@ const getValidatorReward = async (
       (Number(meCreditUSD._sum) / Number(sumCreditUSD._sum))
   }
 
-  return { rewardAmount }
+  return rewardAmount
 }
 
 export default getValidatorReward
