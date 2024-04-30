@@ -1,5 +1,6 @@
 "use client"
 
+import { useMemo } from "react"
 import { ReloadIcon } from "@radix-ui/react-icons"
 import { useQuery, useMutation } from "@tanstack/react-query"
 import { Validator } from "@prisma/client"
@@ -19,19 +20,30 @@ import { ValidatorNodeFilter } from "@/lib/constants"
 const Claim = () => {
   const { toast } = useToast()
 
-  const { data, refetch, isFetching } = useQuery<{
-    totalReward: number
-    validators: Validator &
-      {
-        validatorType: any
-        rewardAmount: number
-      }[]
-  }>({
+  const {
+    data: validators,
+    refetch: refetchValidators,
+    isFetching: isFetchingValidators,
+  } = useQuery<
+    (Validator & {
+      validatorType: any
+      rewardAmount: number
+    })[]
+  >({
     queryKey: ["validator-nodes-claim"],
     queryFn: () =>
       fetch(`/api/validators?status=${ValidatorNodeFilter.CLAIM_NODES}`).then(
         (res) => res.json(),
       ),
+  })
+
+  const {
+    data: totalReward,
+    refetch: refetchTotalReward,
+    isFetching: isFetchingTotalReward,
+  } = useQuery<number>({
+    queryKey: ["validators-reward-total"],
+    queryFn: () => fetch("api/reward/validator").then((res) => res.json()),
   })
 
   const { mutate: claim, isPending: isClaiming } = useMutation({
@@ -42,14 +54,20 @@ const Claim = () => {
       }).then((response) => {
         if (response.ok) toast({ title: "Reward claimed" })
         else toast({ title: "An error occurred" })
-        refetch()
+        refetchValidators()
+        refetchTotalReward()
       }),
   })
+
+  const isFetching = useMemo(
+    () => isFetchingValidators || isFetchingTotalReward,
+    [isFetchingValidators, isFetchingTotalReward],
+  )
 
   return (
     <>
       <div className="w-full flex flex-row justify-between">
-        <p className="my-3">Total Claimable Amount: {data?.totalReward || 0}</p>
+        <p className="my-3">Total Claimable Amount: {totalReward || 0}</p>
         <Button size="sm" onClick={() => claim()} disabled={isClaiming}>
           {isClaiming && <ReloadIcon className="mr-2 animate-spin" />}
           Claim
@@ -72,14 +90,14 @@ const Claim = () => {
                   <Skeleton className="rounded-lg w-full h-[64px] mr-2 block"></Skeleton>
                 </TableCell>
               </TableRow>
-            ) : !data || data.validators.length === 0 ? (
+            ) : !validators || validators.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={4} className="text-center">
                   No Data
                 </TableCell>
               </TableRow>
             ) : (
-              data.validators.map((item, key) => (
+              validators.map((item, key) => (
                 <TableRow className="border-b-none" key={key}>
                   <TableCell className="text-[16px] font-[600] text-white">
                     {key + 1}

@@ -24,8 +24,6 @@ const getValidatorsWithReward = async (userId: number) => {
     ),
   )
 
-  const totalReward = rewardInfos.reduce((total, item) => total + item, 0)
-
   validators = validators
     .map((validator, index) => ({
       ...validator,
@@ -33,7 +31,7 @@ const getValidatorsWithReward = async (userId: number) => {
     }))
     .filter((validator) => validator.rewardAmount > 0)
 
-  return NextResponse.json({ totalReward, validators })
+  return validators
 }
 
 export async function GET(request: NextRequest) {
