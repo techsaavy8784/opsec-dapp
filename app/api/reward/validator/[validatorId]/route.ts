@@ -19,7 +19,6 @@ export async function GET(
     where: { userId: session.user.id },
   })
 
-  const now = dayjs()
   const withdrawTime = reward
     ? dayjs(reward.validatorRewardWithdrawTime)
     : undefined
@@ -27,7 +26,6 @@ export async function GET(
   const rewardAmount = await getValidatorReward(
     session.user.id,
     params.validatorId,
-    now,
     withdrawTime,
   )
 

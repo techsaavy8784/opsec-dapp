@@ -4,9 +4,10 @@ import prisma from "@/prisma"
 const getValidatorReward = async (
   userId: number,
   validatorId: number,
-  now: Dayjs,
   withdrawTime?: Dayjs | null,
 ) => {
+  const now = dayjs()
+
   const meCreditUSD = await prisma.payment.aggregate({
     where: {
       userId: userId,

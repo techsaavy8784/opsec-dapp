@@ -21,12 +21,11 @@ export async function GET(request: NextRequest) {
     where: { userId: session.user.id },
   })
 
-  const now = dayjs()
   const withdrawTime = reward && dayjs(reward.validatorRewardWithdrawTime)
 
   const rewardInfos = await Promise.all(
     validators.map(async (validator) =>
-      getValidatorReward(session.user.id, validator.id, now, withdrawTime),
+      getValidatorReward(session.user.id, validator.id, withdrawTime),
     ),
   )
 

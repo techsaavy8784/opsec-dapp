@@ -16,12 +16,11 @@ const getValidatorsWithReward = async (userId: number) => {
 
   const reward = await prisma.reward.findFirst({ where: { userId } })
 
-  const now = dayjs()
   const withdrawTime = reward && dayjs(reward.validatorRewardWithdrawTime)
 
   const rewardInfos = await Promise.all(
     validators.map(async (validator) =>
-      getValidatorReward(userId, validator.id, now, withdrawTime),
+      getValidatorReward(userId, validator.id, withdrawTime),
     ),
   )
 
