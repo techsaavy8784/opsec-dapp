@@ -12,7 +12,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 })
   }
 
-  let validators = await prisma.validator.findMany({
+  const validators = await prisma.validator.findMany({
     where: { NOT: { purchaseTime: null } },
     include: { validatorType: true },
   })
@@ -32,12 +32,5 @@ export async function GET(request: NextRequest) {
 
   const totalReward = rewardInfos.reduce((total, item) => total + item, 0)
 
-  validators = validators
-    .map((validator, index) => ({
-      ...validator,
-      rewardAmount: rewardInfos[index],
-    }))
-    .filter((validator) => validator.rewardAmount > 0)
-
-  return NextResponse.json({ totalReward, validators })
+  return NextResponse.json({ totalReward })
 }

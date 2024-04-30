@@ -14,6 +14,7 @@ import {
 import { Skeleton } from "@/components/ui/skeleton"
 import { Button } from "@/components/ui/button"
 import { useToast } from "@/components/ui/use-toast"
+import { ValidatorNodeFilter } from "@/lib/constants"
 
 const Claim = () => {
   const { toast } = useToast()
@@ -27,7 +28,10 @@ const Claim = () => {
       }[]
   }>({
     queryKey: ["validator-nodes-claim"],
-    queryFn: () => fetch(`/api/reward/validator`).then((res) => res.json()),
+    queryFn: () =>
+      fetch(`/api/validators?status=${ValidatorNodeFilter.CLAIM_NODES}`).then(
+        (res) => res.json(),
+      ),
   })
 
   const { mutate: claim, isPending: isClaiming } = useMutation({
