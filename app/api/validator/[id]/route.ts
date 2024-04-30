@@ -45,8 +45,6 @@ export async function GET(
     dataPromise,
   ])
 
-  await checkRestAmount()
-
   mepaidAmount = Number(meCreditUSD._sum.credit ?? 0) / ethUSDRatio
 
   if (data?.purchaseTime === null) {
