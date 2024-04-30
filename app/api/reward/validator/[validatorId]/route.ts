@@ -29,5 +29,5 @@ export async function GET(
     withdrawTime,
   )
 
-  return NextResponse.json({ rewardAmount })
+  return NextResponse.json(rewardAmount)
 }
