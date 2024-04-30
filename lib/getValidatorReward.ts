@@ -29,13 +29,15 @@ const getValidatorReward = async (
 
   if (!validator || !meCreditUSD._sum || !sumCreditUSD._sum) return rewardAmount
 
-  const lockTime = dayjs(validator.purchaseTime).add(
+  const purchaseTime = dayjs(validator.purchaseTime)
+  const lockTime = purchaseTime.add(
     validator.validatorType.rewardLockTime,
     "day",
   )
+
   if (now.isAfter(lockTime)) {
-    let rewardPeriod = now.diff(lockTime, "month")
-    if (withdrawTime) rewardPeriod -= withdrawTime.diff(lockTime, "month")
+    let rewardPeriod = now.diff(purchaseTime, "month")
+    if (withdrawTime) rewardPeriod -= withdrawTime.diff(purchaseTime, "month")
     rewardAmount =
       validator.validatorType.rewardPerMonth *
       rewardPeriod *
