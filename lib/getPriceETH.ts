@@ -1,6 +1,6 @@
 import cache from "./lruCache"
 
-const getPriceETH = (): number => {
+const getPriceETH = async (): Promise<number> => {
   const cachedRatio = cache.get("eth_usd_ratio")
 
   if (cachedRatio !== undefined) {
