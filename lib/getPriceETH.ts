@@ -1,18 +1,17 @@
-import axios from "axios"
 import cache from "./lruCache"
 
-async function getPriceETH() {
+const getPriceETH = (): number => {
   const cachedRatio = cache.get("eth_usd_ratio")
 
   if (cachedRatio !== undefined) {
     return cachedRatio
   }
   try {
-    const response = await axios.get(
+    const response = await fetch(
       "https://api.coinbase.com/v2/prices/ETH-USD/spot",
-    )
+    ).then((res) => res.json())
 
-    const usdSpotPrice = response.data.data.amount
+    const usdSpotPrice = response.data.amount
 
     cache.set("eth_usd_ratio", usdSpotPrice)
 

@@ -1,5 +1,7 @@
 import { NextResponse, NextRequest } from "next/server"
-import checkRestAmount from "@/lib/checkRestAmount"
+import prisma from "@/prisma"
+import getPriceETH from "@/lib/getPriceETH"
+import availableServers from "@/app/api/payment/available-servers"
 
 export async function POST(request: NextRequest) {
   if (
@@ -8,7 +10,51 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 })
   }
 
-  await checkRestAmount()
+  const inactiveValidators = await prisma.validator.findMany({
+    where: {
+      purchaseTime: null,
+    },
+    include: {
+      validatorType: true,
+    },
+  })
+
+  const ethUSDRatio = await getPriceETH()
+  const servers = await availableServers()
+
+  for (const item of inactiveValidators) {
+    const creditSumUsd = await prisma.payment.aggregate({
+      where: {
+        validatorId: item.id,
+      },
+      _sum: {
+        credit: true,
+      },
+    })
+
+    const creditSumEth = Number(creditSumUsd._sum.credit ?? 0) / ethUSDRatio
+
+    if (creditSumEth >= item.validatorType.price) {
+      const server = servers.pop()
+
+      if (!server) {
+        return NextResponse.json(
+          { message: "Servers unavailable for validators" },
+          { status: 500 },
+        )
+      }
+
+      await prisma.validator.update({
+        data: {
+          purchaseTime: new Date(),
+          serverId: server.id,
+        },
+        where: {
+          id: item.id,
+        },
+      })
+    }
+  }
 
   return NextResponse.json({ status: 200 })
 }

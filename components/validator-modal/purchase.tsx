@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useEffect, useState } from "react"
+import React from "react"
 import { DialogProps } from "@radix-ui/react-dialog"
 import {
   Dialog,
@@ -18,8 +18,8 @@ import { useForm, SubmitHandler } from "react-hook-form"
 
 interface PurchaseModalProps extends DialogProps {
   open: boolean
-  onOpenChange: () => void
-  validatorID: number
+  onPurchase: () => void
+  validatorId: number
 }
 
 type FormValues = {
@@ -28,69 +28,48 @@ type FormValues = {
 
 export const PurchaseModal: React.FC<PurchaseModalProps> = ({
   open,
+  onPurchase,
+  validatorId,
   onOpenChange,
-  validatorID,
   ...props
 }) => {
-  const [creditPrice, setCreditPrice] = useState(0)
-  const [creditFloorPrice, setCreditFloorPrice] = useState(0)
-
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm<FormValues>()
 
-  const {
-    data: validator,
-    isFetching,
-    refetch,
-  } = useQuery({
-    queryKey: ["validator-by-ID"],
+  const { data: validator, isFetching } = useQuery({
+    queryKey: ["validator", validatorId],
     queryFn: () =>
-      fetch(`/api/validator/${validatorID}`).then((res) => res.json()),
+      fetch(`/api/validator/${validatorId}`).then((res) => res.json()),
   })
 
-  const {
-    data: balance,
-    isFetching: isBalanceFetching,
-    refetch: balanceRefetch,
-  } = useQuery({
-    queryKey: ["get-user-balance"],
+  const { data: balance } = useQuery({
+    queryKey: ["credits/balance"],
     queryFn: () => fetch("/api/credits/balance").then((res) => res.json()),
   })
 
-  const init = () => {
-    setCreditPrice(0)
-  }
+  const { data: ethPrice } = useQuery({
+    queryKey: ["ethprice"],
+    queryFn: () => getPriceETH(),
+  })
 
-  useEffect(() => {
-    refetch()
-    balanceRefetch()
-  }, [validatorID])
+  const creditPrice = Math.ceil((ethPrice ?? 0) * validator.restAmount)
 
-  useEffect(() => {
-    if (open === false) init()
-    if (!isFetching)
-      getPriceETH().then((value) => {
-        setCreditPrice(Math.ceil(value * validator.restAmount))
-        setCreditFloorPrice(
-          Math.ceil(value * validator.validatorType.floorPrice),
-        )
-      })
-  }, [isFetching, open])
+  const creditFloorPrice = Math.ceil(
+    (ethPrice ?? 0) * validator.validatorType.floorPrice,
+  )
 
   const onSubmit: SubmitHandler<FormValues> = (data) => {
     fetch("/api/validator/add/purchase", {
       method: "POST",
       body: JSON.stringify({
-        validatorId: Number(validatorID),
+        validatorId: Number(validatorId),
         amount: Number(data.amount),
       }),
     })
-      .then((res) => {
-        onOpenChange()
-      })
+      .then(() => onPurchase())
       .catch((err) => alert(err))
   }
 
@@ -103,8 +82,7 @@ export const PurchaseModal: React.FC<PurchaseModalProps> = ({
           </DialogTitle>
           <DialogDescription className="text-[#54597C] w-full text-center font-[500] text-[16px]">
             <div className="flex flex-col items-center gap-4">
-              Your Balance is {!isBalanceFetching && (balance.balance ?? 0)}{" "}
-              credit
+              Your credit balance is {balance?.balance ?? 0}
             </div>
           </DialogDescription>
           <form onSubmit={handleSubmit(onSubmit)}>

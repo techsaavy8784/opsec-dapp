@@ -47,7 +47,7 @@ const getValidatorReward = async (
     rewardAmount =
       validator.validatorType.rewardPerMonth *
       rewardPeriod *
-      (Number(meCreditUSD._sum) / Number(sumCreditUSD._sum))
+      (Number(meCreditUSD._sum.credit) / Number(sumCreditUSD._sum.credit))
   }
 
   return rewardAmount

@@ -2,7 +2,6 @@ import prisma from "@/prisma"
 import { authOptions } from "@/lib/auth"
 import { getServerSession } from "next-auth"
 import { NextResponse, NextRequest } from "next/server"
-import checkRestAmount from "@/lib/checkRestAmount"
 import getPriceETH from "@/lib/getPriceETH"
 
 export async function GET(
@@ -18,8 +17,6 @@ export async function GET(
   let restAmount: number = 0,
     paidSumAmount: number = 0,
     mepaidAmount: number = 0
-
-  const ethUSDRatioPromise = getPriceETH()
 
   const meCreditPromise = prisma.payment.aggregate({
     where: {
@@ -40,7 +37,7 @@ export async function GET(
   })
 
   const [ethUSDRatio, meCreditUSD, data] = await Promise.all([
-    ethUSDRatioPromise,
+    getPriceETH(),
     meCreditPromise,
     dataPromise,
   ])

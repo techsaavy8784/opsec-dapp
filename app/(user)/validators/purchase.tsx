@@ -1,6 +1,6 @@
 "use client"
 
-import React, { useEffect, useState } from "react"
+import React, { useState } from "react"
 import { useQuery } from "@tanstack/react-query"
 import {
   Table,
@@ -10,19 +10,18 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table"
-import { Validator } from "@prisma/client"
+import { Validator, ValidatorType } from "@prisma/client"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Button } from "@/components/ui/button"
 import { PurchaseModal } from "@/components/validator-modal/purchase"
 import { ValidatorNodeFilter } from "@/lib/constants"
 
 const Purchase = () => {
-  const [purchaseModal, setPurchasedModal] = useState(false)
-  const [validatorID, setValidatorID] = useState(-1)
+  const [validatorId, setValidatorId] = useState(0)
 
   const { isFetching, data, refetch } = useQuery<
     (Validator & {
-      validatorType: any
+      validatorType: ValidatorType
       restAmount: number
       paidSumAmount: number
       mepaidAmount: number
@@ -35,22 +34,13 @@ const Purchase = () => {
       ),
   })
 
-  const onExtendModal = (value: number) => {
-    setValidatorID(value)
-    setPurchasedModal(true)
-  }
-
-  useEffect(() => {
-    if (!purchaseModal) refetch()
-  }, [purchaseModal])
-
   return (
     <div className="pt-5">
-      {validatorID !== -1 && (
+      {validatorId !== -1 && (
         <PurchaseModal
-          open={purchaseModal}
-          onOpenChange={() => setPurchasedModal((prev) => !prev)}
-          validatorID={validatorID}
+          open={validatorId > 0}
+          onPurchase={() => refetch()}
+          validatorId={validatorId}
         />
       )}
       <p className="my-3">Pending Validator Nodes</p>
@@ -104,8 +94,8 @@ const Purchase = () => {
                     {item.validatorType.priceUnit}
                   </TableCell>
                   <TableCell className="text-[16px] font-[600] text-white max-md:min-w-[130px]">
-                    <Button onClick={() => onExtendModal(item.id)}>
-                      Purchase Node
+                    <Button onClick={() => setValidatorId(item.id)}>
+                      Purchase
                     </Button>
                   </TableCell>
                 </TableRow>

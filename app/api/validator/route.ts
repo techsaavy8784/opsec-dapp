@@ -2,7 +2,6 @@ import prisma from "@/prisma"
 import { authOptions } from "@/lib/auth"
 import { getServerSession } from "next-auth"
 import { NextResponse, NextRequest } from "next/server"
-import checkRestAmount from "@/lib/checkRestAmount"
 import getPriceETH from "@/lib/getPriceETH"
 import { ValidatorNodeFilter } from "@/lib/constants"
 import dayjs from "dayjs"
@@ -49,36 +48,25 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(result)
   }
 
-  await checkRestAmount()
-
   const ratio = await getPriceETH()
 
-  const data =
-    Number(status) === ValidatorNodeFilter.FULLY_PURCHASED_NODES
-      ? await prisma.validator.findMany({
-          where: {
+  const data = await prisma.validator.findMany({
+    where:
+      Number(status) === ValidatorNodeFilter.FULLY_PURCHASED_NODES
+        ? {
             NOT: {
               purchaseTime: null,
             },
-          },
-          include: {
-            validatorType: true,
-          },
-        })
-      : Number(status) === ValidatorNodeFilter.PARTIALLY_PURCHASED_NODES
-        ? await prisma.validator.findMany({
-            where: {
+          }
+        : Number(status) === ValidatorNodeFilter.PARTIALLY_PURCHASED_NODES
+          ? {
               purchaseTime: null,
-            },
-            include: {
-              validatorType: true,
-            },
-          })
-        : await prisma.validator.findMany({
-            include: {
-              validatorType: true,
-            },
-          })
+            }
+          : undefined,
+    include: {
+      validatorType: true,
+    },
+  })
 
   const sendingData = await Promise.all(
     data.map(async (item: any) => {
