@@ -34,7 +34,10 @@ const Purchase = () => {
     <div className="pt-5">
       <PurchaseModal
         onOpenChange={() => setValidatorId(0)}
-        onPurchase={() => refetch()}
+        onPurchase={() => {
+          refetch()
+          setValidatorId(0)
+        }}
         validator={data?.find((item) => item.id === validatorId)}
       />
       <p className="my-3">Pending Validator Nodes</p>

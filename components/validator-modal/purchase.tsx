@@ -8,14 +8,14 @@ import {
   DialogTitle,
   DialogDescription,
 } from "@/components/ui/dialog"
-import { useQuery } from "@tanstack/react-query"
+import { ReloadIcon } from "@radix-ui/react-icons"
+import { useMutation, useQuery } from "@tanstack/react-query"
+import { useForm } from "react-hook-form"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Validator, ValidatorType } from "@prisma/client"
 import getPriceETH from "@/lib/getPriceETH"
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert"
-import { useForm, SubmitHandler } from "react-hook-form"
 
 export type ValidatorData = Validator & {
   validatorType: ValidatorType
@@ -50,6 +50,19 @@ export const PurchaseModal: React.FC<PurchaseModalProps> = ({
     queryFn: () => fetch("/api/credits/balance").then((res) => res.json()),
   })
 
+  const { isPending, mutate } = useMutation({
+    mutationFn: (amount: number) =>
+      fetch("/api/validator/add/purchase", {
+        method: "POST",
+        body: JSON.stringify({
+          validatorId: Number(validator?.id),
+          amount: Number(amount),
+        }),
+      }),
+
+    onSuccess: () => onPurchase(),
+  })
+
   const { data: ethPrice } = useQuery({
     queryKey: ["ethprice"],
     queryFn: () => getPriceETH(),
@@ -63,18 +76,6 @@ export const PurchaseModal: React.FC<PurchaseModalProps> = ({
     (ethPrice ?? 0) * (validator?.validatorType.floorPrice ?? 0),
   )
 
-  const onSubmit: SubmitHandler<FormValues> = (data) => {
-    fetch("/api/validator/add/purchase", {
-      method: "POST",
-      body: JSON.stringify({
-        validatorId: Number(validator?.id),
-        amount: Number(data.amount),
-      }),
-    })
-      .then(() => onPurchase())
-      .catch((err) => alert(err))
-  }
-
   return (
     <Dialog {...props} open={!!validator} onOpenChange={onOpenChange}>
       <DialogContent className="bg-[#18181B] border-none rounded-[24px] p-8 w-[350px] md:w-[450px]">
@@ -86,7 +87,10 @@ export const PurchaseModal: React.FC<PurchaseModalProps> = ({
             Your credit balance is {balance?.balance ?? 0}
           </div>
         </DialogDescription>
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-2">
+        <form
+          onSubmit={handleSubmit((data) => mutate(data.amount))}
+          className="space-y-2"
+        >
           <Label htmlFor="amount">
             Price: {priceInCredit} credit ({validator?.restAmount}{" "}
             {validator?.validatorType.priceUnit})
@@ -98,37 +102,26 @@ export const PurchaseModal: React.FC<PurchaseModalProps> = ({
               required: true,
               pattern: /^\d+$/,
               validate: {
+                underBalance: (value) => value <= balance.balance,
                 validAmount: (value) =>
                   value > 0 &&
                   value <= priceInCredit &&
-                  value <= balance.balance &&
                   value >= creditFloorPrice,
               },
             })}
           />
           {errors.amount && (
-            <Alert className="mt-3" variant="destructive">
-              {errors.amount.type === "required" && (
-                <>
-                  <AlertTitle>Error</AlertTitle>
-                  <AlertDescription>Amount is required</AlertDescription>
-                </>
-              )}
-              {errors.amount.type === "pattern" && (
-                <>
-                  <AlertTitle>Error</AlertTitle>
-                  <AlertDescription>Amount must be a number</AlertDescription>
-                </>
-              )}
-              {errors.amount.type === "validAmount" && (
-                <>
-                  <AlertTitle>Error</AlertTitle>
-                  <AlertDescription>Input the amount again</AlertDescription>
-                </>
-              )}
-            </Alert>
+            <small className="block text-red-700">
+              {errors.amount.type === "required" && "Amount is required"}
+              {errors.amount.type === "pattern" && "Amount must be a number"}
+              {errors.amount.type === "validAmount" &&
+                `Amount should be between ${creditFloorPrice} and ${priceInCredit}`}
+              {errors.amount.type === "underBalance" &&
+                "Insufficient credit balance"}
+            </small>
           )}
-          <Button className="w-full mt-3" type="submit">
+          <Button className="w-full mt-3" type="submit" disabled={isPending}>
+            {isPending && <ReloadIcon className="w-4 h-4 mr-2 animate-spin" />}
             Purchase
           </Button>
         </form>
