@@ -24,7 +24,11 @@ export async function POST(request: NextRequest) {
 
     await prisma.reward.update({
       where: { id: reward.id },
-      data: { validatorRewardWithdrawTime: new Date() },
+      data: {
+        taxReward: 0,
+        reflectionReward: 0,
+        validatorRewardWithdrawTime: new Date(),
+      },
     })
   } else {
     await prisma.reward.create({
