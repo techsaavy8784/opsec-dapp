@@ -3,47 +3,27 @@
 import { useMemo } from "react"
 import { ReloadIcon } from "@radix-ui/react-icons"
 import { useQuery, useMutation } from "@tanstack/react-query"
-import { Validator } from "@prisma/client"
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@/components/ui/table"
-import { Skeleton } from "@/components/ui/skeleton"
 import { Button } from "@/components/ui/button"
 import { useToast } from "@/components/ui/use-toast"
-import { ValidatorNodeFilter } from "@/lib/constants"
 
 const Claim = () => {
   const { toast } = useToast()
 
-  const {
-    data: validators,
-    refetch: refetchValidators,
-    isFetching: isFetchingValidators,
-  } = useQuery<
-    (Validator & {
-      validatorType: any
-      rewardAmount: number
-    })[]
-  >({
-    queryKey: ["validator", "status", ValidatorNodeFilter.CLAIM_NODES],
-    queryFn: () =>
-      fetch(`/api/validator?status=${ValidatorNodeFilter.CLAIM_NODES}`).then(
-        (res) => res.json(),
-      ),
-  })
+  const { data: validatorReward, refetch: refetchValidatorReward } =
+    useQuery<number>({
+      queryKey: ["reward-validator"],
+      queryFn: () => fetch("/api/reward/validator").then((res) => res.json()),
+    })
 
-  const {
-    data: totalReward,
-    refetch: refetchTotalReward,
-    isFetching: isFetchingTotalReward,
-  } = useQuery<number>({
-    queryKey: ["validator"],
-    queryFn: () => fetch("/api/reward/validator").then((res) => res.json()),
+  const { data: reflectionReward, refetch: refetchReflectionReward } =
+    useQuery<number>({
+      queryKey: ["reward-reflection"],
+      queryFn: () => fetch("/api/reward/reflection").then((res) => res.json()),
+    })
+
+  const { data: taxReward, refetch: refetchTaxReward } = useQuery<number>({
+    queryKey: ["tax-reward"],
+    queryFn: () => fetch("/api/reward/tax").then((res) => res.json()),
   })
 
   const { mutate: claim, isPending: isClaiming } = useMutation({
@@ -54,70 +34,30 @@ const Claim = () => {
       }).then((response) => {
         if (response.ok) toast({ title: "Reward claimed" })
         else toast({ title: "An error occurred" })
-        refetchValidators()
-        refetchTotalReward()
+        refetchValidatorReward()
+        refetchReflectionReward()
+        refetchTaxReward()
       }),
   })
 
-  const isFetching = useMemo(
-    () => isFetchingValidators || isFetchingTotalReward,
-    [isFetchingValidators, isFetchingTotalReward],
+  const totalReward = useMemo(
+    () => (validatorReward || 0) + (reflectionReward || 0) + (taxReward || 0),
+    [reflectionReward, taxReward, validatorReward],
   )
 
   return (
     <>
+      <div className="w-full flex flex-row justify-between my-3">
+        <p>Validator Reward: {validatorReward || 0}</p>
+        <p>Reflection Reward: {reflectionReward || 0}</p>
+        <p>Tax Reward: {taxReward || 0}</p>
+      </div>
       <div className="w-full flex flex-row justify-between">
         <p className="my-3">Total Claimable Amount: {totalReward || 0}</p>
         <Button size="sm" onClick={() => claim()} disabled={isClaiming}>
           {isClaiming && <ReloadIcon className="mr-2 animate-spin" />}
           Claim
         </Button>
-      </div>
-      <div className="border border-[#FFFFFF33] rounded-[16px]">
-        <Table>
-          <TableHeader>
-            <TableRow className="border-b-[#FFFFFF4D]">
-              <TableHead>#</TableHead>
-              <TableHead>Name</TableHead>
-              <TableHead>Full Amount</TableHead>
-              <TableHead>Claimable Amount</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {isFetching ? (
-              <TableRow>
-                <TableCell colSpan={4}>
-                  <Skeleton className="rounded-lg w-full h-[64px] mr-2 block"></Skeleton>
-                </TableCell>
-              </TableRow>
-            ) : !validators || validators.length === 0 ? (
-              <TableRow>
-                <TableCell colSpan={4} className="text-center">
-                  No Data
-                </TableCell>
-              </TableRow>
-            ) : (
-              validators.map((item, key) => (
-                <TableRow className="border-b-none" key={key}>
-                  <TableCell className="text-[16px] font-[600] text-white">
-                    {key + 1}
-                  </TableCell>
-                  <TableCell className="text-[16px] font-[600] text-white max-md:min-w-[130px]">
-                    {item.validatorType.name}
-                  </TableCell>
-                  <TableCell className="text-[16px] font-[600] text-white max-md:min-w-[130px]">
-                    {item.validatorType.price}
-                    {` `}
-                    {item.validatorType.priceUnit}
-                  </TableCell>
-                  <TableCell className="text-[16px] font-[600] text-white max-md:min-w-[130px]">
-                    {item.rewardAmount} USD
-                  </TableCell>
-                </TableRow>
-              ))
-            )}
-          </TableBody>
-        </Table>
       </div>
     </>
   )
