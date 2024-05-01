@@ -42,7 +42,9 @@ export const PurchaseModal: React.FC<PurchaseModalProps> = ({
   const { data: validator, isFetching } = useQuery({
     queryKey: ["validator", validatorId],
     queryFn: () =>
-      fetch(`/api/validator/${validatorId}`).then((res) => res.json()),
+      open
+        ? fetch(`/api/validator/${validatorId}`).then((res) => res.json())
+        : undefined,
   })
 
   const { data: balance } = useQuery({
@@ -89,8 +91,8 @@ export const PurchaseModal: React.FC<PurchaseModalProps> = ({
           </DialogDescription>
           <form onSubmit={handleSubmit(onSubmit)}>
             <Label htmlFor="amount">
-              Price: {priceInCredit} credit ({validator.restAmount}{" "}
-              {validator.validatorType.priceUnit})
+              Price: {priceInCredit} credit ({validator?.restAmount}{" "}
+              {validator?.validatorType.priceUnit})
             </Label>
             <Input
               id="amount"

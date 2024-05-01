@@ -36,13 +36,11 @@ const Purchase = () => {
 
   return (
     <div className="pt-5">
-      {validatorId !== -1 && (
-        <PurchaseModal
-          open={validatorId > 0}
-          onPurchase={() => refetch()}
-          validatorId={validatorId}
-        />
-      )}
+      <PurchaseModal
+        open={validatorId > 0}
+        onPurchase={() => refetch()}
+        validatorId={validatorId}
+      />
       <p className="my-3">Pending Validator Nodes</p>
       <div className="border border-[#FFFFFF33] rounded-[16px]">
         <Table>
