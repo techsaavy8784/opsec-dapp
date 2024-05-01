@@ -13,20 +13,16 @@ import {
 import { Validator, ValidatorType } from "@prisma/client"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Button } from "@/components/ui/button"
-import { PurchaseModal } from "@/components/validator-modal/purchase"
+import {
+  PurchaseModal,
+  ValidatorData,
+} from "@/components/validator-modal/purchase"
 import { ValidatorNodeFilter } from "@/lib/constants"
 
 const Purchase = () => {
   const [validatorId, setValidatorId] = useState(0)
 
-  const { isFetching, data, refetch } = useQuery<
-    (Validator & {
-      validatorType: ValidatorType
-      restAmount: number
-      paidSumAmount: number
-      mepaidAmount: number
-    })[]
-  >({
+  const { isFetching, data, refetch } = useQuery<ValidatorData[]>({
     queryKey: ["validator", "status", ValidatorNodeFilter.ALL_NODES],
     queryFn: () =>
       fetch(`/api/validator?status=${ValidatorNodeFilter.ALL_NODES}`).then(
@@ -37,9 +33,9 @@ const Purchase = () => {
   return (
     <div className="pt-5">
       <PurchaseModal
-        open={validatorId > 0}
+        onOpenChange={() => setValidatorId(0)}
         onPurchase={() => refetch()}
-        validatorId={validatorId}
+        validator={data?.find((item) => item.id === validatorId)}
       />
       <p className="my-3">Pending Validator Nodes</p>
       <div className="border border-[#FFFFFF33] rounded-[16px]">
