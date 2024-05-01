@@ -21,41 +21,35 @@ export async function POST(request: NextRequest) {
 
   if (reward) {
     totalReward += (reward.taxReward || 0) + (reward.reflectionReward || 0)
-
-    await prisma.reward.update({
-      where: { id: reward.id },
-      data: {
-        taxReward: 0,
-        reflectionReward: 0,
-        validatorRewardWithdrawTime: new Date(),
-      },
-    })
-  } else {
-    await prisma.reward.create({
-      data: {
-        userId: session.user.id,
-        validatorRewardWithdrawTime: new Date(),
-      },
-    })
   }
+
+  await prisma.reward.upsert({
+    where: { id: reward?.id },
+    update: {
+      taxReward: 0,
+      reflectionReward: 0,
+      validatorRewardWithdrawTime: new Date(),
+    },
+    create: {
+      userId: session.user.id,
+      validatorRewardWithdrawTime: new Date(),
+    },
+  })
 
   const claim = await prisma.claim.findFirst({
     where: { userId: session.user.id },
   })
 
-  if (claim) {
-    await prisma.claim.update({
-      where: { id: claim.id },
-      data: { amount: claim.amount + totalReward },
-    })
-  } else {
-    await prisma.claim.create({
-      data: {
-        userId: session.user.id,
-        amount: totalReward,
-      },
-    })
-  }
+  await prisma.claim.upsert({
+    where: { id: claim?.id },
+    update: {
+      amount: (claim?.amount || 0) + totalReward,
+    },
+    create: {
+      userId: session.user.id,
+      amount: totalReward,
+    },
+  })
 
   return NextResponse.json({ status: 201 })
 }
