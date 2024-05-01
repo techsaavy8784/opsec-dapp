@@ -26,6 +26,7 @@ const ViewValidatorStatus: React.FC<ViewValidatorStatusProsp> = ({
       restAmount: number
       paidSumAmount: number
       mepaidAmount: number
+      rewardAmount: number
     })[]
   >({
     queryKey: ["Validator", "status", status],
@@ -46,7 +47,7 @@ const ViewValidatorStatus: React.FC<ViewValidatorStatusProsp> = ({
               <TableHead>You paid</TableHead>
               <TableHead>
                 {status === ValidatorNodeFilter.FULLY_PURCHASED_NODES
-                  ? "Start date"
+                  ? "Reward"
                   : "Rest price"}
               </TableHead>
             </TableRow>
@@ -83,18 +84,16 @@ const ViewValidatorStatus: React.FC<ViewValidatorStatusProsp> = ({
                     {` `}
                     {item.validatorType.priceUnit}
                   </TableCell>
-                  {status !== 1 && (
+                  {status !== ValidatorNodeFilter.FULLY_PURCHASED_NODES && (
                     <TableCell className="text-[16px] font-[600] text-white max-md:min-w-[130px]">
                       {item.restAmount}
                       {` `}
                       {item.validatorType.priceUnit}
                     </TableCell>
                   )}
-                  {status === 1 && (
+                  {status === ValidatorNodeFilter.FULLY_PURCHASED_NODES && (
                     <TableCell className="text-[16px] font-[600] text-white max-md:min-w-[130px]">
-                      {item.purchaseTime !== null
-                        ? item.purchaseTime.toString()
-                        : ""}
+                      {item.rewardAmount}
                     </TableCell>
                   )}
                 </TableRow>

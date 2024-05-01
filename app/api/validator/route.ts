@@ -96,13 +96,16 @@ export async function GET(request: NextRequest) {
           restAmount:
             item.validatorType.price -
             Number(sumCreditUSD._sum.credit ?? 0) / ratio,
+          rewardAmount: 0,
         }
       } else {
+        const rewardAmount = await getValidatorReward(session.user.id, item.id)
         return {
           ...item,
           mepaidAmount: Number(meCreditUSD._sum.credit ?? 0) / ratio,
           paidSumAmount: item.validatorType.price,
           restAmount: 0,
+          rewardAmount,
         }
       }
     }),
