@@ -42,8 +42,8 @@ const Claim = () => {
     refetch: refetchTotalReward,
     isFetching: isFetchingTotalReward,
   } = useQuery<number>({
-    queryKey: ["validators-reward-total"],
-    queryFn: () => fetch("api/reward/validator").then((res) => res.json()),
+    queryKey: ["validator"],
+    queryFn: () => fetch("/api/reward/validator").then((res) => res.json()),
   })
 
   const { mutate: claim, isPending: isClaiming } = useMutation({
