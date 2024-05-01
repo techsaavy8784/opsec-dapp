@@ -10,17 +10,18 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 })
   }
 
-  const inactiveValidators = await prisma.validator.findMany({
-    where: {
-      purchaseTime: null,
-    },
-    include: {
-      validatorType: true,
-    },
-  })
-
-  const ethUSDRatio = await getPriceETH()
-  const servers = await availableServers()
+  const [inactiveValidators, ethUSDRatio, servers] = await Promise.all([
+    prisma.validator.findMany({
+      where: {
+        purchaseTime: null,
+      },
+      include: {
+        validatorType: true,
+      },
+    }),
+    getPriceETH(),
+    availableServers(),
+  ])
 
   for (const item of inactiveValidators) {
     const creditSumUsd = await prisma.payment.aggregate({
