@@ -10,10 +10,17 @@ import {
 } from "@/components/ui/table"
 import { Skeleton } from "@/components/ui/skeleton"
 import { Validator } from "@prisma/client"
-import { useEffect } from "react"
+import React, { useEffect } from "react"
+import { ValidatorNodeFilter } from "@/lib/constants"
 
-const ViewValidatorStatus = ({ status }: { status: number }) => {
-  const { data, refetch, isFetching } = useQuery<
+interface ViewValidatorStatusProsp {
+  status: ValidatorNodeFilter
+}
+
+const ViewValidatorStatus: React.FC<ViewValidatorStatusProsp> = ({
+  status,
+}) => {
+  const { data, isFetching } = useQuery<
     (Validator & {
       validatorType: any
       restAmount: number
@@ -21,14 +28,11 @@ const ViewValidatorStatus = ({ status }: { status: number }) => {
       mepaidAmount: number
     })[]
   >({
-    queryKey: ["Validator-nodess"],
+    queryKey: ["Validator", "status", status],
     queryFn: () =>
       fetch(`/api/validator?status=${status}`).then((res) => res.json()),
   })
 
-  useEffect(() => {
-    refetch()
-  }, [status])
   return (
     <>
       <p className="my-3">Pending Validator Nodes</p>
@@ -38,10 +42,13 @@ const ViewValidatorStatus = ({ status }: { status: number }) => {
             <TableRow className="border-b-[#FFFFFF4D]">
               <TableHead>#</TableHead>
               <TableHead>Name</TableHead>
-              <TableHead>Full Amount</TableHead>
-              <TableHead>You paid Amount</TableHead>
-              {status !== 1 && <TableHead>Rest Amount</TableHead>}
-              {status === 1 && <TableHead>Start Date:</TableHead>}
+              <TableHead>Price</TableHead>
+              <TableHead>You paid</TableHead>
+              <TableHead>
+                {status === ValidatorNodeFilter.FULLY_PURCHASED_NODES
+                  ? "Start date"
+                  : "Rest price"}
+              </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>

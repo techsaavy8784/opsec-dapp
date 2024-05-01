@@ -27,7 +27,7 @@ const Purchase = () => {
       mepaidAmount: number
     })[]
   >({
-    queryKey: ["validator-node"],
+    queryKey: ["validator", "status", ValidatorNodeFilter.ALL_NODES],
     queryFn: () =>
       fetch(`/api/validator?status=${ValidatorNodeFilter.ALL_NODES}`).then(
         (res) => res.json(),
@@ -50,9 +50,9 @@ const Purchase = () => {
             <TableRow className="border-b-[#FFFFFF4D]">
               <TableHead>#</TableHead>
               <TableHead>Name</TableHead>
-              <TableHead>Full Amount</TableHead>
-              <TableHead>You paid Amount</TableHead>
-              <TableHead>Rest Amount</TableHead>
+              <TableHead>Price</TableHead>
+              <TableHead>You paid</TableHead>
+              <TableHead>Rest price</TableHead>
               <TableHead></TableHead>
             </TableRow>
           </TableHeader>

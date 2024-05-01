@@ -30,7 +30,7 @@ const Claim = () => {
       rewardAmount: number
     })[]
   >({
-    queryKey: ["validator-nodes-claim"],
+    queryKey: ["validator", "status", ValidatorNodeFilter.CLAIM_NODES],
     queryFn: () =>
       fetch(`/api/validators?status=${ValidatorNodeFilter.CLAIM_NODES}`).then(
         (res) => res.json(),

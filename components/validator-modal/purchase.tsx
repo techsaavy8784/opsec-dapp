@@ -55,10 +55,12 @@ export const PurchaseModal: React.FC<PurchaseModalProps> = ({
     queryFn: () => getPriceETH(),
   })
 
-  const creditPrice = Math.ceil((ethPrice ?? 0) * validator.restAmount)
+  const priceInCredit = Math.ceil(
+    (ethPrice ?? 0) * (validator?.restAmount ?? 0),
+  )
 
   const creditFloorPrice = Math.ceil(
-    (ethPrice ?? 0) * validator.validatorType.floorPrice,
+    (ethPrice ?? 0) * (validator?.validatorType.floorPrice ?? 0),
   )
 
   const onSubmit: SubmitHandler<FormValues> = (data) => {
@@ -87,7 +89,7 @@ export const PurchaseModal: React.FC<PurchaseModalProps> = ({
           </DialogDescription>
           <form onSubmit={handleSubmit(onSubmit)}>
             <Label htmlFor="amount">
-              Price: {creditPrice} credit ({validator.restAmount}{" "}
+              Price: {priceInCredit} credit ({validator.restAmount}{" "}
               {validator.validatorType.priceUnit})
             </Label>
             <Input
@@ -99,7 +101,7 @@ export const PurchaseModal: React.FC<PurchaseModalProps> = ({
                 validate: {
                   validAmount: (value) =>
                     value > 0 &&
-                    value <= creditPrice &&
+                    value <= priceInCredit &&
                     value <= balance.balance &&
                     value >= creditFloorPrice,
                 },
