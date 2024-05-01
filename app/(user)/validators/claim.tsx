@@ -22,7 +22,7 @@ const Claim = () => {
     })
 
   const { data: taxReward, refetch: refetchTaxReward } = useQuery<number>({
-    queryKey: ["tax-reward"],
+    queryKey: ["reward-tax"],
     queryFn: () => fetch("/api/reward/tax").then((res) => res.json()),
   })
 
