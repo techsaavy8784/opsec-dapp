@@ -15,7 +15,7 @@ const getValidatorTotalReward = async (userId: number) => {
   const withdrawTime = reward && dayjs(reward.validatorRewardWithdrawTime)
 
   const rewardInfos = await Promise.all(
-    validators.map(async (validator) =>
+    validators.map((validator) =>
       getValidatorReward(userId, validator.id, withdrawTime),
     ),
   )
