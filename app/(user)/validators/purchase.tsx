@@ -99,7 +99,10 @@ const Purchase = () => {
                     {item.validatorType.priceUnit}
                   </TableCell>
                   <TableCell className="text-[16px] font-[600] text-white max-md:min-w-[130px]">
-                    <Button onClick={() => setValidatorId(item.id)}>
+                    <Button
+                      onClick={() => setValidatorId(item.id)}
+                      disabled={item.restAmount === 0}
+                    >
                       Purchase
                     </Button>
                   </TableCell>
