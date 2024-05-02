@@ -6,7 +6,7 @@ import ValidatorList from "./validator-list"
 
 const Validators = () => (
   <Tabs defaultValue="runnig">
-    <TabsList className="grid w-full grid-cols-4">
+    <TabsList className="grid w-full grid-cols-3">
       <TabsTrigger value="runnig">Running</TabsTrigger>
       <TabsTrigger value="purchase">Purchase</TabsTrigger>
       <TabsTrigger value="claim">Claim Rewards</TabsTrigger>
