@@ -1,7 +1,5 @@
-import dayjs from "dayjs"
 import { getServerSession } from "next-auth"
 import { NextResponse, NextRequest } from "next/server"
-import prisma from "@/prisma"
 import { authOptions } from "@/lib/auth"
 import getValidatorReward from "@/lib/getValidatorReward"
 
@@ -15,18 +13,9 @@ export async function GET(
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 })
   }
 
-  const reward = await prisma.reward.findFirst({
-    where: { userId: session.user.id },
-  })
-
-  const withdrawTime = reward
-    ? dayjs(reward.validatorRewardWithdrawTime)
-    : undefined
-
   const rewardAmount = await getValidatorReward(
     session.user.id,
     params.validatorId,
-    withdrawTime,
   )
 
   return NextResponse.json(rewardAmount)

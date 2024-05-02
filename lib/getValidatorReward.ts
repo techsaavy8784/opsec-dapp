@@ -1,29 +1,39 @@
-import dayjs, { Dayjs } from "dayjs"
+import dayjs from "dayjs"
 import prisma from "@/prisma"
 
-const getValidatorReward = async (
-  userId: number,
-  validatorId: number,
-  withdrawTime?: Dayjs | null,
-) => {
+const getValidatorReward = async (userId: number, validatorId: number) => {
   const now = dayjs()
 
-  const meCreditUSD = await prisma.payment.aggregate({
-    where: {
-      userId: userId,
-      validatorId: validatorId,
-    },
-    _sum: { credit: true },
-  })
-  const sumCreditUSD = await prisma.payment.aggregate({
-    where: { validatorId: validatorId },
-    _sum: { credit: true },
-  })
+  const [meCreditUSD, sumCreditUSD, validator, withdrawTime] =
+    await Promise.all([
+      prisma.payment.aggregate({
+        where: {
+          userId,
+          validatorId,
+        },
+        _sum: { credit: true },
+      }),
 
-  const validator = await prisma.validator.findUnique({
-    where: { id: validatorId, NOT: { purchaseTime: null } },
-    include: { validatorType: true },
-  })
+      prisma.payment.aggregate({
+        where: { validatorId },
+        _sum: { credit: true },
+      }),
+
+      prisma.validator.findUnique({
+        where: { id: validatorId, NOT: { purchaseTime: null } },
+        include: { validatorType: true },
+      }),
+
+      prisma.reward
+        .findFirst({
+          where: { userId },
+        })
+        .then((res) =>
+          res?.validatorRewardWithdrawTime
+            ? dayjs(res.validatorRewardWithdrawTime)
+            : undefined,
+        ),
+    ])
 
   let rewardAmount = 0
 
@@ -32,6 +42,7 @@ const getValidatorReward = async (
   }
 
   const purchaseTime = dayjs(validator.purchaseTime)
+
   const lockTime = purchaseTime.add(
     validator.validatorType.rewardLockTime,
     "day",

@@ -22,6 +22,7 @@ export type ValidatorData = Validator & {
   restAmount: number
   paidSumAmount: number
   mepaidAmount: number
+  rewardAmount?: number
 }
 
 interface PurchaseModalProps extends DialogProps {
@@ -120,10 +121,14 @@ export const PurchaseModal: React.FC<PurchaseModalProps> = ({
                 "Insufficient credit balance"}
             </small>
           )}
-          <Button className="w-full mt-3" type="submit" disabled={isPending}>
-            {isPending && <ReloadIcon className="w-4 h-4 mr-2 animate-spin" />}
-            Purchase
-          </Button>
+          <div className="text-center">
+            <Button type="submit" disabled={isPending}>
+              {isPending && (
+                <ReloadIcon className="w-4 h-4 mr-2 animate-spin" />
+              )}
+              Purchase
+            </Button>
+          </div>
         </form>
       </DialogContent>
     </Dialog>

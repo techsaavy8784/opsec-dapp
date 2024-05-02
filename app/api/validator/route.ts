@@ -3,35 +3,8 @@ import { authOptions } from "@/lib/auth"
 import { getServerSession } from "next-auth"
 import { NextResponse, NextRequest } from "next/server"
 import getPriceETH from "@/lib/getPriceETH"
-import { ValidatorNodeFilter } from "@/lib/constants"
-import dayjs from "dayjs"
+import { ValidatorStatus } from "@/lib/constants"
 import getValidatorReward from "@/lib/getValidatorReward"
-
-const getValidatorsWithReward = async (userId: number) => {
-  let validators = await prisma.validator.findMany({
-    where: { NOT: { purchaseTime: null } },
-    include: { validatorType: true },
-  })
-
-  const reward = await prisma.reward.findFirst({ where: { userId } })
-
-  const withdrawTime = reward && dayjs(reward.validatorRewardWithdrawTime)
-
-  const rewardInfos = await Promise.all(
-    validators.map(async (validator) =>
-      getValidatorReward(userId, validator.id, withdrawTime),
-    ),
-  )
-
-  validators = validators
-    .map((validator, index) => ({
-      ...validator,
-      rewardAmount: rewardInfos[index],
-    }))
-    .filter((validator) => validator.rewardAmount > 0)
-
-  return validators
-}
 
 export async function GET(request: NextRequest) {
   const session = await getServerSession(authOptions)
@@ -40,72 +13,76 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 })
   }
 
-  const url = request.nextUrl
-  const status = String(url.searchParams.get("status"))
+  const status = String(request.nextUrl.searchParams.get("status"))
 
-  if (Number(status) === ValidatorNodeFilter.CLAIM_NODES) {
-    const result = await getValidatorsWithReward(session.user.id)
-    return NextResponse.json(result)
-  }
-
-  const ratio = await getPriceETH()
-
-  const data = await prisma.validator.findMany({
-    where:
-      Number(status) === ValidatorNodeFilter.FULLY_PURCHASED_NODES
-        ? {
-            NOT: {
+  const [validators, ratio] = await Promise.all([
+    prisma.validator.findMany({
+      where:
+        status === ValidatorStatus.RUNNING
+          ? {
+              NOT: {
+                purchaseTime: null,
+              },
+            }
+          : {
               purchaseTime: null,
             },
-          }
-        : Number(status) === ValidatorNodeFilter.PARTIALLY_PURCHASED_NODES
-          ? {
-              purchaseTime: null,
-            }
-          : undefined,
-    include: {
-      validatorType: true,
-    },
-  })
+      include: {
+        validatorType: true,
+      },
+    }),
+    getPriceETH(),
+  ])
 
-  const sendingData = await Promise.all(
-    data.map(async (item: any) => {
-      const meCreditUSD = await prisma.payment.aggregate({
-        where: {
-          validatorId: item.id,
-          userId: session.user.id,
-        },
-        _sum: {
-          credit: true,
-        },
-      })
-      if (item.purchaseTime === null) {
-        const sumCreditUSD = await prisma.payment.aggregate({
+  const userId = session.user.id
+
+  const data = await Promise.all(
+    validators.map(async (validator) => {
+      const [meCreditUSD, sumCreditUSD] = await Promise.all([
+        prisma.payment.aggregate({
           where: {
-            validatorId: item.id,
+            validatorId: validator.id,
+            userId,
           },
           _sum: {
             credit: true,
           },
-        })
+        }),
 
+        prisma.payment.aggregate({
+          where: {
+            validatorId: validator.id,
+          },
+          _sum: {
+            credit: true,
+          },
+        }),
+      ])
+
+      if (validator.purchaseTime === null) {
         const restAmount =
-          item.validatorType.price -
+          validator.validatorType.price -
           Number(sumCreditUSD._sum.credit ?? 0) / ratio
 
         return {
-          ...item,
+          ...validator,
           mepaidAmount: Number(meCreditUSD._sum.credit ?? 0) / ratio,
-          paidSumAmount: Number(sumCreditUSD._sum.credit ?? 0) / ratio,
+          paidSumAmount: Math.max(
+            validator.validatorType.price,
+            Number(sumCreditUSD._sum.credit ?? 0) / ratio,
+          ),
           restAmount: Math.max(restAmount, 0),
           rewardAmount: 0,
         }
       } else {
-        const rewardAmount = await getValidatorReward(session.user.id, item.id)
+        const rewardAmount = await getValidatorReward(
+          session.user.id,
+          validator.id,
+        )
         return {
-          ...item,
+          ...validator,
           mepaidAmount: Number(meCreditUSD._sum.credit ?? 0) / ratio,
-          paidSumAmount: item.validatorType.price,
+          paidSumAmount: Number(sumCreditUSD._sum.credit ?? 0) / ratio,
           restAmount: 0,
           rewardAmount,
         }
@@ -113,5 +90,5 @@ export async function GET(request: NextRequest) {
     }),
   )
 
-  return NextResponse.json(sendingData)
+  return NextResponse.json(data)
 }

@@ -1,6 +1,5 @@
 "use client"
 
-import { useMemo } from "react"
 import { ReloadIcon } from "@radix-ui/react-icons"
 import { useQuery, useMutation } from "@tanstack/react-query"
 import { Button } from "@/components/ui/button"
@@ -32,8 +31,8 @@ const Claim = () => {
         method: "POST",
         headers: { "Content-Type": "application/json" },
       }).then((response) => {
-        if (response.ok) toast({ title: "Reward claimed" })
-        else toast({ title: "An error occurred" })
+        toast({ title: response.ok ? "Reward claimed" : "An error occured" })
+
         refetchValidatorReward()
         refetchReflectionReward()
         refetchTaxReward()
@@ -44,7 +43,7 @@ const Claim = () => {
     (validatorReward ?? 0) + (reflectionReward ?? 0) + (taxReward ?? 0)
 
   return (
-    <div className="space-y-4 mt-8">
+    <div className="space-y-4">
       <div className="flex gap-4">
         <p className="w-1/2 text-right text-gray-400">Validator Reward</p>
         <p>{validatorReward ?? 0}</p>

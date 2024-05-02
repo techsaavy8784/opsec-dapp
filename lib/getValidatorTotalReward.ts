@@ -1,4 +1,3 @@
-import dayjs from "dayjs"
 import prisma from "@/prisma"
 import getValidatorReward from "./getValidatorReward"
 
@@ -8,16 +7,8 @@ const getValidatorTotalReward = async (userId: number) => {
     include: { validatorType: true },
   })
 
-  const reward = await prisma.reward.findFirst({
-    where: { userId: userId },
-  })
-
-  const withdrawTime = reward && dayjs(reward.validatorRewardWithdrawTime)
-
   const rewardInfos = await Promise.all(
-    validators.map((validator) =>
-      getValidatorReward(userId, validator.id, withdrawTime),
-    ),
+    validators.map((validator) => getValidatorReward(userId, validator.id)),
   )
 
   const totalReward = rewardInfos.reduce((total, item) => total + item, 0)
