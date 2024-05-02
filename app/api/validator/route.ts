@@ -89,13 +89,15 @@ export async function GET(request: NextRequest) {
           },
         })
 
+        const restAmount =
+          item.validatorType.price -
+          Number(sumCreditUSD._sum.credit ?? 0) / ratio
+
         return {
           ...item,
           mepaidAmount: Number(meCreditUSD._sum.credit ?? 0) / ratio,
           paidSumAmount: Number(sumCreditUSD._sum.credit ?? 0) / ratio,
-          restAmount:
-            item.validatorType.price -
-            Number(sumCreditUSD._sum.credit ?? 0) / ratio,
+          restAmount: Math.max(restAmount, 0),
           rewardAmount: 0,
         }
       } else {

@@ -24,7 +24,7 @@ export async function POST(request: NextRequest) {
   }
 
   await prisma.reward.upsert({
-    where: { id: reward?.id },
+    where: { id: reward?.id ?? 0 },
     update: {
       taxReward: 0,
       reflectionReward: 0,
@@ -41,7 +41,7 @@ export async function POST(request: NextRequest) {
   })
 
   await prisma.claim.upsert({
-    where: { id: claim?.id },
+    where: { id: claim?.id ?? 0 },
     update: {
       amount: (claim?.amount || 0) + totalReward,
     },

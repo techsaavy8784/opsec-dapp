@@ -40,26 +40,38 @@ const Claim = () => {
       }),
   })
 
-  const totalReward = useMemo(
-    () => (validatorReward || 0) + (reflectionReward || 0) + (taxReward || 0),
-    [reflectionReward, taxReward, validatorReward],
-  )
+  const totalReward =
+    (validatorReward ?? 0) + (reflectionReward ?? 0) + (taxReward ?? 0)
 
   return (
-    <>
-      <div className="w-full flex flex-row justify-between my-3">
-        <p>Validator Reward: {validatorReward || 0}</p>
-        <p>Reflection Reward: {reflectionReward || 0}</p>
-        <p>Tax Reward: {taxReward || 0}</p>
+    <div className="space-y-4 mt-8">
+      <div className="flex gap-4">
+        <p className="w-1/2 text-right text-gray-400">Validator Reward</p>
+        <p>{validatorReward ?? 0}</p>
       </div>
-      <div className="w-full flex flex-row justify-between">
-        <p className="my-3">Total Claimable Amount: {totalReward || 0}</p>
-        <Button size="sm" onClick={() => claim()} disabled={isClaiming}>
+      <div className="flex gap-4">
+        <p className="w-1/2 text-right text-gray-400">Reflection Reward</p>
+        <p>{reflectionReward ?? 0}</p>
+      </div>
+      <div className="flex gap-4">
+        <p className="w-1/2 text-right text-gray-400">Tax Reward</p>
+        <p>{taxReward ?? 0}</p>
+      </div>
+      <div className="flex gap-4">
+        <p className="w-1/2 text-right text-gray-400">Total Claimable Amount</p>
+        <p>{totalReward}</p>
+      </div>
+      <div className="text-center">
+        <Button
+          size="sm"
+          onClick={() => claim()}
+          disabled={isClaiming || totalReward === 0}
+        >
           {isClaiming && <ReloadIcon className="mr-2 animate-spin" />}
           Claim
         </Button>
       </div>
-    </>
+    </div>
   )
 }
 export default Claim

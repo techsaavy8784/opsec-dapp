@@ -14,9 +14,9 @@ export async function GET(
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 })
   }
 
-  let restAmount: number = 0,
-    paidSumAmount: number = 0,
-    mepaidAmount: number = 0
+  let restAmount = 0,
+    paidSumAmount = 0,
+    mepaidAmount = 0
 
   const meCreditPromise = prisma.payment.aggregate({
     where: {
@@ -54,7 +54,7 @@ export async function GET(
       },
     })
     paidSumAmount = Number(sumCreditUSD._sum.credit ?? 0) / ethUSDRatio
-    restAmount = data!.validatorType.price - paidSumAmount
+    restAmount = Math.max(data!.validatorType.price - paidSumAmount, 0)
   } else {
     paidSumAmount = data!.validatorType.price
     restAmount = 0
