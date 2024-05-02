@@ -41,6 +41,20 @@ export async function POST(request: NextRequest) {
     ],
   )
 
+  if (!validator) {
+    return NextResponse.json(
+      { message: "Invalid validator id" },
+      { status: 400 },
+    )
+  }
+
+  if (validator.purchaseTime !== null) {
+    return NextResponse.json(
+      { message: "Validator is already purchased & running" },
+      { status: 400 },
+    )
+  }
+
   if (
     Number(totalAmountForValidator._sum.credit ?? 0) + amount >=
     Math.ceil((await getPriceETH()) * validator!.validatorType!.price)
