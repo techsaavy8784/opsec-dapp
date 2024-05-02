@@ -32,7 +32,7 @@ export async function POST(request: NextRequest) {
       }),
       prisma.payment.aggregate({
         where: {
-          validatorId: validatorId,
+          validatorId,
         },
         _sum: {
           credit: true,
@@ -55,10 +55,12 @@ export async function POST(request: NextRequest) {
     )
   }
 
+  const ethPrice = await getPriceETH()
+
   if (
     Number(totalAmountForValidator._sum.credit ?? 0) + amount >=
-    Math.ceil((await getPriceETH()) * validator!.validatorType!.price)
-  )
+    ethPrice * validator!.validatorType!.price
+  ) {
     await prisma.validator.update({
       where: {
         id: validatorId,
@@ -68,6 +70,7 @@ export async function POST(request: NextRequest) {
         serverId: servers[Math.floor(Math.random() * servers.length)].id,
       },
     })
+  }
 
   await prisma.payment.create({
     data: {
