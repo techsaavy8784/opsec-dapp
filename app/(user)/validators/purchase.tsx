@@ -85,13 +85,7 @@ const Purchase = () => {
                     {item.validatorType.priceUnit}
                   </TableCell>
                   <TableCell className="text-[16px] font-[600] text-white max-md:min-w-[130px] text-right">
-                    {item.mepaidAmount > 0 &&
-                      Math.round(
-                        Math.min(
-                          (100 * item.mepaidAmount) / item.paidSumAmount,
-                          100,
-                        ),
-                      )}
+                    {item.mepaidAmount > 0 && item.ownership * 100}
                   </TableCell>
                   <TableCell className="text-[16px] font-[600] text-white max-md:min-w-[130px] text-right">
                     {item.restAmount}

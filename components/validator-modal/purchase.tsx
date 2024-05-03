@@ -20,7 +20,7 @@ import getPriceETH from "@/lib/getPriceETH"
 export type ValidatorData = Validator & {
   validatorType: ValidatorType
   restAmount: number
-  paidSumAmount: number
+  ownership: number
   mepaidAmount: number
   rewardAmount?: number
 }

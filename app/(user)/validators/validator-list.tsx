@@ -69,12 +69,7 @@ const ValidatorList = () => {
                   {item.validatorType.priceUnit}
                 </TableCell>
                 <TableCell className="text-[16px] font-[600] text-white max-md:min-w-[130px] text-right">
-                  {Math.round(
-                    Math.min(
-                      (100 * item.mepaidAmount) / item.paidSumAmount,
-                      100,
-                    ),
-                  )}
+                  {item.ownership * 100}
                 </TableCell>
                 <TableCell className="text-[16px] font-[600] text-white max-md:min-w-[130px] text-right">
                   {item.rewardAmount}

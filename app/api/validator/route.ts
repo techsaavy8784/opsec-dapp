@@ -59,17 +59,18 @@ export async function GET(request: NextRequest) {
         }),
       ])
 
+      const mepaidAmount = Number(meCreditUSD._sum.credit ?? 0) / ratio
+      const sum = Number(sumCreditUSD._sum.credit ?? 0) / ratio
+
       if (validator.purchaseTime === null) {
-        const restAmount =
-          validator.validatorType.price -
-          Number(sumCreditUSD._sum.credit ?? 0) / ratio
+        const restAmount = validator.validatorType.price - sum
 
         return {
           ...validator,
-          mepaidAmount: Number(meCreditUSD._sum.credit ?? 0) / ratio,
-          paidSumAmount: Math.max(
-            validator.validatorType.price,
-            Number(sumCreditUSD._sum.credit ?? 0) / ratio,
+          mepaidAmount,
+          ownership: Math.min(
+            mepaidAmount / Math.max(validator.validatorType.price, sum),
+            1,
           ),
           restAmount: Math.max(restAmount, 0),
           rewardAmount: 0,
@@ -81,8 +82,8 @@ export async function GET(request: NextRequest) {
         )
         return {
           ...validator,
-          mepaidAmount: Number(meCreditUSD._sum.credit ?? 0) / ratio,
-          paidSumAmount: Number(sumCreditUSD._sum.credit ?? 0) / ratio,
+          mepaidAmount,
+          ownership: mepaidAmount / sum,
           restAmount: 0,
           rewardAmount,
         }
