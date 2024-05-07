@@ -5,6 +5,7 @@ import { Providers } from "./providers"
 import { Toaster } from "@/components/ui/toaster"
 import "@rainbow-me/rainbowkit/styles.css"
 import "./globals.css"
+import TermsAndConditionsProvider from "./terms-conditions-providers"
 
 export const metadata: Metadata = {
   title: "Opsec Cloudverse",
@@ -30,6 +31,7 @@ const RootLayout: React.FC<LayoutProps> = ({ children }) => (
   <html lang="en">
     <body className={`${gilroy.className} bg-black dark`}>
       <Providers>
+        <TermsAndConditionsProvider />
         {children}
         <Toaster />
       </Providers>
