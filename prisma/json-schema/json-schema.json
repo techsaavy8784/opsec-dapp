@@ -314,7 +314,7 @@
           "type": "string"
         },
         "price": {
-          "type": "number"
+          "type": "integer"
         },
         "hasWallet": {
           "type": "boolean",
@@ -352,7 +352,7 @@
         },
         "floorPrice": {
           "type": [
-            "number",
+            "integer",
             "null"
           ]
         },

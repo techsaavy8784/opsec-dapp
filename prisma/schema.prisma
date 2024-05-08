@@ -105,14 +105,14 @@ model Blockchain {
   name            String
   description     String    @default("")
   url             String
-  price           Float
+  price           Int
   hasWallet       Boolean   @default(false) @map("has_wallet")
   launchedAt      DateTime  @default(now()) @map("launched_at")
   payType         PAY_TYPE  @default(FULL) @map("pay_type")
   rewardWallet    String?   @map("reward_wallet")
   rewardLockTime  Int?      @map("reward_lock_time")
   rewardPerMonth  Int?      @map("reward_per_month")
-  floorPrice      Float?    @map("floor_price")
+  floorPrice      Int?    @map("floor_price")
   Node        Node[]
 
   @@map("blockchains")
