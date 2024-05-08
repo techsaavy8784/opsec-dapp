@@ -38,7 +38,7 @@ model Node {
   blockchainId Int          @map("blockchain_id")
   nodeHistory  NodeHistory?
   blockchain   Blockchain   @relation(fields: [blockchainId], references: [id])
-  server       Server       @relation(fields: [serverId], references: [id])
+  server       Server?       @relation(fields: [serverId], references: [id])
   user         User         @relation(fields: [userId], references: [id])
   payments     Payment[]
 
@@ -66,14 +66,14 @@ model NodeHistory {
 }
 
 model Server {
-  id         Int         @id @default(autoincrement())
-  host       String      @default("")
-  port       Int         @default(22)
-  username   String      @default("")
-  password   String      @default("")
-  active     Boolean
-  nodes      Node[]
-  validators Validator[]
+  id          Int         @id @default(autoincrement())
+  type        SERVER_TYPE @default(MULTI_NODE)
+  host        String      @default("")
+  port        Int         @default(22)
+  username    String      @default("")
+  password    String      @default("")
+  active      Boolean
+  nodes       Node[]
 
   @@map("servers")
 }
@@ -85,11 +85,9 @@ model Payment {
   credit      Int
   date        DateTime   @default(now())
   stakeId     String?    @map("stake_id")
-  validatorId Int?       @map("validator_id")
   userId      Int?       @map("user_id")
   node        Node?      @relation(fields: [nodeId], references: [id], onDelete: Cascade)
   user        User?      @relation(fields: [userId], references: [id], onDelete: Restrict)
-  validator   Validator? @relation(fields: [validatorId], references: [id], onDelete: Restrict, map: "payments_id_fkey")
 
   @@map("payments")
 }
@@ -103,13 +101,18 @@ model TxVerifier {
 }
 
 model Blockchain {
-  id          Int      @id @default(autoincrement())
-  name        String
-  description String   @default("")
-  url         String
-  price       Float
-  hasWallet   Boolean  @default(false) @map("has_wallet")
-  launchedAt  DateTime @default(now()) @map("launched_at")
+  id              Int       @id @default(autoincrement())
+  name            String
+  description     String    @default("")
+  url             String
+  price           Int
+  hasWallet       Boolean   @default(false) @map("has_wallet")
+  launchedAt      DateTime  @default(now()) @map("launched_at")
+  payType         PAY_TYPE  @default(FULL) @map("pay_type")
+  rewardWallet    String?   @map("reward_wallet")
+  rewardLockTime  Int?      @map("reward_lock_time")
+  rewardPerMonth  Int?      @map("reward_per_month")
+  floorPrice      Int?    @map("floor_price")
   Node        Node[]
 
   @@map("blockchains")
@@ -135,32 +138,6 @@ model Claim {
   @@map("claims")
 }
 
-model ValidatorType {
-  id             Int         @id @default(autoincrement())
-  name           String
-  rewardLockTime Int         @map("reward_lock_time")
-  rewardPerMonth Int         @map("reward_per_month")
-  price          Float
-  priceUnit      Unit        @default(ETH) @map("price_unit")
-  rewardWallet   String      @map("reward_wallet")
-  floorPrice     Float       @map("floor_price")
-  validators     Validator[]
-
-  @@map("validator_types")
-}
-
-model Validator {
-  id            Int           @id @default(autoincrement())
-  typeId        Int           @map("type_id")
-  serverId      Int?          @map("server_id")
-  purchaseTime  DateTime?     @map("purchase_time")
-  payments      Payment[]
-  server        Server?       @relation(fields: [serverId], references: [id], onDelete: Restrict)
-  validatorType ValidatorType @relation(fields: [typeId], references: [id])
-
-  @@map("validators")
-}
-
 model Reward {
   id                             Int       @id @default(autoincrement())
   userId                         Int       @map("user_id")
@@ -182,4 +159,14 @@ enum Status {
 
 enum Unit {
   ETH
+}
+
+enum SERVER_TYPE {
+  MULTI_NODE
+  SINGLE_NODE
+}
+
+enum PAY_TYPE {
+  FULL
+  PARTIAL
 }
