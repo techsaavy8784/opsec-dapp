@@ -38,7 +38,7 @@ model Node {
   blockchainId Int          @map("blockchain_id")
   nodeHistory  NodeHistory?
   blockchain   Blockchain   @relation(fields: [blockchainId], references: [id])
-  server       Server?       @relation(fields: [serverId], references: [id])
+  server       Server       @relation(fields: [serverId], references: [id])
   user         User         @relation(fields: [userId], references: [id])
   payments     Payment[]
 
@@ -66,28 +66,28 @@ model NodeHistory {
 }
 
 model Server {
-  id          Int         @id @default(autoincrement())
-  type        SERVER_TYPE @default(MULTI_NODE)
-  host        String      @default("")
-  port        Int         @default(22)
-  username    String      @default("")
-  password    String      @default("")
-  active      Boolean
-  nodes       Node[]
+  id       Int         @id @default(autoincrement())
+  host     String      @default("")
+  port     Int         @default(22)
+  username String      @default("")
+  password String      @default("")
+  active   Boolean
+  type     SERVER_TYPE @default(MULTI_NODE)
+  nodes    Node[]
 
   @@map("servers")
 }
 
 model Payment {
-  id          Int        @id @default(autoincrement())
-  duration    Int        @default(0)
-  nodeId      Int?       @map("node_id")
-  credit      Int
-  date        DateTime   @default(now())
-  stakeId     String?    @map("stake_id")
-  userId      Int?       @map("user_id")
-  node        Node?      @relation(fields: [nodeId], references: [id], onDelete: Cascade)
-  user        User?      @relation(fields: [userId], references: [id], onDelete: Restrict)
+  id       Int      @id @default(autoincrement())
+  duration Int      @default(0)
+  nodeId   Int?     @map("node_id")
+  credit   Int
+  date     DateTime @default(now())
+  stakeId  String?  @map("stake_id")
+  userId   Int?     @map("user_id")
+  node     Node?    @relation(fields: [nodeId], references: [id], onDelete: Cascade)
+  user     User?    @relation(fields: [userId], references: [id], onDelete: Restrict)
 
   @@map("payments")
 }
@@ -101,19 +101,19 @@ model TxVerifier {
 }
 
 model Blockchain {
-  id              Int       @id @default(autoincrement())
-  name            String
-  description     String    @default("")
-  url             String
-  price           Int
-  hasWallet       Boolean   @default(false) @map("has_wallet")
-  launchedAt      DateTime  @default(now()) @map("launched_at")
-  payType         PAY_TYPE  @default(FULL) @map("pay_type")
-  rewardWallet    String?   @map("reward_wallet")
-  rewardLockTime  Int?      @map("reward_lock_time")
-  rewardPerMonth  Int?      @map("reward_per_month")
-  floorPrice      Int?    @map("floor_price")
-  Node        Node[]
+  id             Int      @id @default(autoincrement())
+  name           String
+  description    String   @default("")
+  url            String
+  price          Int
+  hasWallet      Boolean  @default(false) @map("has_wallet")
+  launchedAt     DateTime @default(now()) @map("launched_at")
+  floorPrice     Int?     @map("floor_price")
+  payType        PAY_TYPE @default(FULL) @map("pay_type")
+  rewardLockTime Int?     @map("reward_lock_time")
+  rewardPerMonth Int?     @map("reward_per_month")
+  rewardWallet   String?  @map("reward_wallet")
+  Node           Node[]
 
   @@map("blockchains")
 }
@@ -139,12 +139,12 @@ model Claim {
 }
 
 model Reward {
-  id                             Int       @id @default(autoincrement())
-  userId                         Int       @map("user_id")
-  taxReward                      Int?      @map("tax_reward")
-  reflectionReward               Int?      @map("reflection_reward")
-  validatorRewardWithdrawTime    DateTime? @map("validator_reward_withdraw_time")
-  user                           User      @relation(fields: [userId], references: [id])
+  id                          Int       @id @default(autoincrement())
+  userId                      Int       @map("user_id")
+  taxReward                   Int?      @map("tax_reward")
+  reflectionReward            Int?      @map("reflection_reward")
+  validatorRewardWithdrawTime DateTime? @map("validator_reward_withdraw_time")
+  user                        User      @relation(fields: [userId], references: [id])
 
   @@map("rewards")
 }

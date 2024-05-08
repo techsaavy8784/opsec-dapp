@@ -102,14 +102,7 @@
           "$ref": "#/definitions/Blockchain"
         },
         "server": {
-          "anyOf": [
-            {
-              "$ref": "#/definitions/Server"
-            },
-            {
-              "type": "null"
-            }
-          ]
+          "$ref": "#/definitions/Server"
         },
         "user": {
           "$ref": "#/definitions/User"
@@ -186,14 +179,6 @@
         "id": {
           "type": "integer"
         },
-        "type": {
-          "type": "string",
-          "default": "MULTI_NODE",
-          "enum": [
-            "MULTI_NODE",
-            "SINGLE_NODE"
-          ]
-        },
         "host": {
           "type": "string",
           "default": ""
@@ -212,6 +197,14 @@
         },
         "active": {
           "type": "boolean"
+        },
+        "type": {
+          "type": "string",
+          "default": "MULTI_NODE",
+          "enum": [
+            "MULTI_NODE",
+            "SINGLE_NODE"
+          ]
         },
         "nodes": {
           "type": "array",
@@ -324,18 +317,18 @@
           "type": "string",
           "format": "date-time"
         },
+        "floorPrice": {
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
         "payType": {
           "type": "string",
           "default": "FULL",
           "enum": [
             "FULL",
             "PARTIAL"
-          ]
-        },
-        "rewardWallet": {
-          "type": [
-            "string",
-            "null"
           ]
         },
         "rewardLockTime": {
@@ -350,9 +343,9 @@
             "null"
           ]
         },
-        "floorPrice": {
+        "rewardWallet": {
           "type": [
-            "integer",
+            "string",
             "null"
           ]
         },

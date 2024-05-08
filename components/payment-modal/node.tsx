@@ -12,12 +12,14 @@ import {
 import Image from "next/image"
 import { Input } from "../ui/input"
 import { Button } from "../ui/button"
+import { Slider } from "@/components/ui/slider"
 import { ReloadIcon } from "@radix-ui/react-icons"
 import { useMutation, useQuery } from "@tanstack/react-query"
 import { useToast } from "../ui/use-toast"
 import clsx from "clsx"
 import subscriptions from "@/app/api/payment/subscriptions"
 import { useRouter } from "next/navigation"
+import { ChainType } from "@/lib/constants"
 
 interface PaymentModalProps extends DialogProps {
   open: boolean
@@ -37,6 +39,8 @@ export const NodePaymentModal: React.FC<PaymentModalProps> = ({
   const [walletAddr, setWalletAddr] = useState("")
 
   const [plan, setPlan] = useState(0)
+
+  const [amount, setAmount] = useState(0)
 
   const { toast } = useToast()
 
@@ -104,35 +108,41 @@ export const NodePaymentModal: React.FC<PaymentModalProps> = ({
                 height={64}
                 className="mt-10 mb-4"
               />
-              <div className="flex w-full gap-2 flex-column">
-                {subscriptions.map(([month, priceMultiplier], key) => (
-                  <div
-                    key={month}
-                    onClick={() => setPlan(key)}
-                    className={clsx(
-                      "border-[#F44336] w-1/3 border-solid border-2 p-3 cursor-pointer hover:border-red-700",
-                      plan === key ? "border-green-400" : null,
-                    )}
-                  >
-                    <p className="text-6xl">{month}</p>
-                    <p>{key > 0 ? "Months" : "Month"}</p>
-                    <p>{chain.price * priceMultiplier} credits</p>
-                    {key > 0 && (
-                      <small>
-                        Saves&nbsp;
-                        {chain.price * month - chain.price * priceMultiplier}
-                        &nbsp;credits
-                      </small>
-                    )}
+              {chain.payType === ChainType.FULL && (
+                <>
+                  <div className="flex w-full gap-2 flex-column">
+                    {subscriptions.map(([month, priceMultiplier], key) => (
+                      <div
+                        key={month}
+                        onClick={() => setPlan(key)}
+                        className={clsx(
+                          "border-[#F44336] w-1/3 border-solid border-2 p-3 cursor-pointer hover:border-red-700",
+                          plan === key ? "border-green-400" : null,
+                        )}
+                      >
+                        <p className="text-6xl">{month}</p>
+                        <p>{key > 0 ? "Months" : "Month"}</p>
+                        <p>{chain.price * priceMultiplier} credits</p>
+                        {key > 0 && (
+                          <small>
+                            Saves&nbsp;
+                            {chain.price * month -
+                              chain.price * priceMultiplier}
+                            &nbsp;credits
+                          </small>
+                        )}
+                      </div>
+                    ))}
                   </div>
-                ))}
-              </div>
-              <p className="text-[#F44336] mb-10">
-                <strong>1x</strong> {chain.name}{" "}
-                <span className="text-zinc-500">node for</span>{" "}
-                <strong>{chain.price}</strong>{" "}
-                <span className="text-zinc-500">credits</span>
-              </p>
+
+                  <p className="text-[#F44336] mb-10">
+                    <strong>1x</strong> {chain.name}{" "}
+                    <span className="text-zinc-500">node for</span>{" "}
+                    <strong>{chain.price}</strong>{" "}
+                    <span className="text-zinc-500">credits</span>
+                  </p>
+                </>
+              )}
             </div>
           </DialogDescription>
 
@@ -143,7 +153,8 @@ export const NodePaymentModal: React.FC<PaymentModalProps> = ({
           )}
 
           <form className="flex flex-col items-center justify-center gap-8 px-8">
-            {chain.hasWallet &&
+            {chain.payType === ChainType.FULL &&
+              chain.hasWallet &&
               nodeId === undefined &&
               insufficientBalance == false && (
                 <>
@@ -173,21 +184,59 @@ export const NodePaymentModal: React.FC<PaymentModalProps> = ({
                 </>
               )}
 
-            <Button
-              type="button"
-              onClick={() => purchase(walletAddr)}
-              variant="custom"
-              disabled={
-                isPaying ||
-                insufficientBalance ||
-                (chain.hasWallet && !walletAddr)
+            {chain.payType === ChainType.PARTIAL && (
+              <>
+                <Slider
+                  value={[amount]}
+                  min={1}
+                  max={chain.price}
+                  step={1}
+                  className="my-4"
+                  onValueChange={([value]) => setAmount(value)}
+                />
+                <p className="text-[#F44336]">
+                  <strong>Chain Price: </strong>
+                  <span className="text-zinc-500">{chain.price}</span>
+                </p>
+                <p className="text-[#F44336]">
+                  <strong>%Ownership: </strong>
+                  <span className="text-zinc-500">
+                    {Math.floor((amount * 100) / chain.price)}
+                    {" %"}
+                  </span>
+                </p>
+              </>
+            )}
 
-                // (chain.hasWallet && !/^0x[0-9a-fA-F]{40}$/.test(walletAddr))
-              }
-            >
-              {isPaying && <ReloadIcon className="mr-2 animate-spin" />}
-              {nodeId === undefined ? "Purchase" : "Extend Subscription"}
-            </Button>
+            {chain.payType === ChainType.FULL && (
+              <Button
+                type="button"
+                onClick={() => purchase(walletAddr)}
+                variant="custom"
+                disabled={
+                  isPaying ||
+                  insufficientBalance ||
+                  (chain.hasWallet && !walletAddr)
+
+                  // (chain.hasWallet && !/^0x[0-9a-fA-F]{40}$/.test(walletAddr))
+                }
+              >
+                {isPaying && <ReloadIcon className="mr-2 animate-spin" />}
+                {nodeId === undefined ? "Purchase" : "Extend Subscription"}
+              </Button>
+            )}
+
+            {chain.payType === ChainType.PARTIAL && (
+              <Button
+                type="button"
+                onClick={() => {}}
+                variant="custom"
+                disabled={false}
+              >
+                {isPaying && <ReloadIcon className="mr-2 animate-spin" />}
+                Purchase
+              </Button>
+            )}
           </form>
         </DialogContent>
       )}

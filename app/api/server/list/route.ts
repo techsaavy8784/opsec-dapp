@@ -48,6 +48,7 @@ export async function GET() {
       description: chain.description,
       price: chain.price,
       hasWallet: chain.hasWallet,
+      payType: chain.payType,
       disabled,
     }
   })
