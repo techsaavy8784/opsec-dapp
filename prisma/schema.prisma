@@ -29,18 +29,18 @@ model User {
 }
 
 model Node {
-  id           Int          @id @default(autoincrement())
-  userId       Int          @map("user_id")
-  user         User         @relation(fields: [userId], references: [id])
-  serverId     Int          @map("server_id")
-  server       Server?      @relation(fields: [serverId], references: [id])
+  id           Int           @id @default(autoincrement())
+  userId       Int           @map("user_id")
+  user         User          @relation(fields: [userId], references: [id])
+  serverId     Int           @map("server_id")
+  server       Server?       @relation(fields: [serverId], references: [id])
   wallet       String?
-  status       Status       @default(CREATED)
-  createdAt    DateTime     @default(now()) @map("created_at")
-  nodeHistory  NodeHistory?
+  status       Status        @default(CREATED)
+  createdAt    DateTime      @default(now()) @map("created_at")
+  nodeHistory  NodeHistory[]
   payments     Payment[]
-  blockchainId Int          @map("blockchain_id")
-  blockchain   Blockchain   @relation(fields: [blockchainId], references: [id])
+  blockchainId Int           @map("blockchain_id")
+  blockchain   Blockchain    @relation(fields: [blockchainId], references: [id])
 
   @@map("nodes")
 }
@@ -67,13 +67,13 @@ model NodeHistory {
 
 model Server {
   id       Int         @id @default(autoincrement())
-  type     SERVER_TYPE @default(MULTI_NODE)
   host     String      @default("")
   port     Int         @default(22)
   username String      @default("")
   password String      @default("")
   active   Boolean
   nodes    Node[]
+  type     SERVER_TYPE @default(MULTI_NODE)
 
   @@map("servers")
 }
@@ -108,12 +108,12 @@ model Blockchain {
   price          Int
   hasWallet      Boolean  @default(false) @map("has_wallet")
   launchedAt     DateTime @default(now()) @map("launched_at")
+  Node           Node[]
   payType        PAY_TYPE @default(FULL) @map("pay_type")
   rewardWallet   String?  @map("reward_wallet")
   rewardLockTime Int?     @map("reward_lock_time")
   rewardPerMonth Int?     @map("reward_per_month")
   floorPrice     Int?     @map("floor_price")
-  Node           Node[]
 
   @@map("blockchains")
 }
@@ -121,8 +121,8 @@ model Blockchain {
 model Credit {
   id      Int      @id @default(autoincrement())
   tx      String
-  user    User     @relation(fields: [userId], references: [id])
   credits Int
+  user    User     @relation(fields: [userId], references: [id])
   userId  Int      @map("user_id")
   date    DateTime @default(now())
 
@@ -155,10 +155,6 @@ enum Status {
   LIVE
   FAILED
   EXPIRED
-}
-
-enum Unit {
-  ETH
 }
 
 enum SERVER_TYPE {
