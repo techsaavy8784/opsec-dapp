@@ -36,15 +36,13 @@ export async function GET() {
   const chainsAll = await prisma.blockchain.findMany()
 
   const chains = chainsAll.map((chain) => {
-    const chainServers = servers.filter((server) =>
-      server.nodes.some((node) => node.blockchainId === chain.id),
-    )
-
-    // disabled if all possible servers have a node of this type
-    const disabled =
-      chain.payType === PAY_TYPE.PARTIAL
-        ? false
-        : chainServers.length === servers.length
+    let disabled = false
+    if (chain.payType === PAY_TYPE.FULL) {
+      const chainServers = servers.filter((server) =>
+        server.nodes.some((node) => node.blockchainId === chain.id),
+      )
+      disabled = chainServers.length === servers.length
+    }
 
     return {
       id: chain.id,
