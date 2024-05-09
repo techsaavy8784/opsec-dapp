@@ -170,7 +170,7 @@ const Node: React.FC<NodeProps> = ({ params: { id } }) => {
         </div>
       </div>
 
-      {data.server && (
+      {!data.server && (
         <h1 className="text-[#fff] text-center sm:w-1/2 m-auto pb-4">
           Waiting for admin to activate on server
         </h1>
