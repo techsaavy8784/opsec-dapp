@@ -356,7 +356,7 @@
             "null"
           ]
         },
-        "Node": {
+        "nodes": {
           "type": "array",
           "items": {
             "$ref": "#/definitions/Node"

@@ -38,7 +38,7 @@ model Node {
   blockchainId Int          @map("blockchain_id")
   nodeHistory  NodeHistory?
   blockchain   Blockchain   @relation(fields: [blockchainId], references: [id])
-  server       Server?       @relation(fields: [serverId], references: [id])
+  server       Server?      @relation(fields: [serverId], references: [id])
   user         User         @relation(fields: [userId], references: [id])
   payments     Payment[]
 
@@ -112,8 +112,8 @@ model Blockchain {
   rewardWallet    String?   @map("reward_wallet")
   rewardLockTime  Int?      @map("reward_lock_time")
   rewardPerMonth  Int?      @map("reward_per_month")
-  floorPrice      Int?    @map("floor_price")
-  Node        Node[]
+  floorPrice      Int?      @map("floor_price")
+  nodes           Node[]
 
   @@map("blockchains")
 }
