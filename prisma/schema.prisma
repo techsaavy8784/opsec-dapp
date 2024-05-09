@@ -32,7 +32,7 @@ model Node {
   id           Int           @id @default(autoincrement())
   userId       Int           @map("user_id")
   user         User          @relation(fields: [userId], references: [id])
-  serverId     Int           @map("server_id")
+  serverId     Int?          @map("server_id")
   server       Server?       @relation(fields: [serverId], references: [id])
   wallet       String?
   status       Status        @default(CREATED)
