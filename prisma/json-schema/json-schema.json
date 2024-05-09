@@ -20,10 +20,10 @@
           "type": "integer",
           "default": 0
         },
-        "Claim": {
+        "nodes": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/Claim"
+            "$ref": "#/definitions/Node"
           }
         },
         "credits": {
@@ -32,10 +32,10 @@
             "$ref": "#/definitions/Credit"
           }
         },
-        "nodes": {
+        "stakings": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/Node"
+            "$ref": "#/definitions/Staking"
           }
         },
         "payments": {
@@ -50,10 +50,10 @@
             "$ref": "#/definitions/Reward"
           }
         },
-        "Staking": {
+        "claims": {
           "type": "array",
           "items": {
-            "$ref": "#/definitions/Staking"
+            "$ref": "#/definitions/Claim"
           }
         }
       },
@@ -66,6 +66,19 @@
       "properties": {
         "id": {
           "type": "integer"
+        },
+        "user": {
+          "$ref": "#/definitions/User"
+        },
+        "server": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/Server"
+            },
+            {
+              "type": "null"
+            }
+          ]
         },
         "wallet": {
           "type": [
@@ -89,41 +102,23 @@
           "format": "date-time"
         },
         "nodeHistory": {
-          "anyOf": [
-            {
-              "$ref": "#/definitions/NodeHistory"
-            },
-            {
-              "type": "null"
-            }
-          ]
-        },
-        "blockchain": {
-          "$ref": "#/definitions/Blockchain"
-        },
-        "server": {
-          "anyOf": [
-            {
-              "$ref": "#/definitions/Server"
-            },
-            {
-              "type": "null"
-            }
-          ]
-        },
-        "user": {
-          "$ref": "#/definitions/User"
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/NodeHistory"
+          }
         },
         "payments": {
           "type": "array",
           "items": {
             "$ref": "#/definitions/Payment"
           }
+        },
+        "blockchain": {
+          "$ref": "#/definitions/Blockchain"
         }
       },
       "required": [
         "userId",
-        "serverId",
         "blockchainId"
       ]
     },
@@ -133,15 +128,15 @@
         "id": {
           "type": "integer"
         },
+        "user": {
+          "$ref": "#/definitions/User"
+        },
         "stakeId": {
           "type": "string"
         },
         "createdAt": {
           "type": "string",
           "format": "date-time"
-        },
-        "user": {
-          "$ref": "#/definitions/User"
         }
       },
       "required": [
@@ -154,6 +149,9 @@
       "properties": {
         "id": {
           "type": "integer"
+        },
+        "node": {
+          "$ref": "#/definitions/Node"
         },
         "message": {
           "type": [
@@ -171,9 +169,6 @@
             "FAILED",
             "EXPIRED"
           ]
-        },
-        "node": {
-          "$ref": "#/definitions/Node"
         }
       },
       "required": [
@@ -185,14 +180,6 @@
       "properties": {
         "id": {
           "type": "integer"
-        },
-        "type": {
-          "type": "string",
-          "default": "MULTI_NODE",
-          "enum": [
-            "MULTI_NODE",
-            "SINGLE_NODE"
-          ]
         },
         "host": {
           "type": "string",
@@ -218,6 +205,14 @@
           "items": {
             "$ref": "#/definitions/Node"
           }
+        },
+        "type": {
+          "type": "string",
+          "default": "MULTI_NODE",
+          "enum": [
+            "MULTI_NODE",
+            "SINGLE_NODE"
+          ]
         }
       },
       "required": [
@@ -234,12 +229,11 @@
           "type": "integer",
           "default": 0
         },
+        "node": {
+          "$ref": "#/definitions/Node"
+        },
         "credit": {
           "type": "integer"
-        },
-        "date": {
-          "type": "string",
-          "format": "date-time"
         },
         "stakeId": {
           "type": [
@@ -247,15 +241,9 @@
             "null"
           ]
         },
-        "node": {
-          "anyOf": [
-            {
-              "$ref": "#/definitions/Node"
-            },
-            {
-              "type": "null"
-            }
-          ]
+        "date": {
+          "type": "string",
+          "format": "date-time"
         },
         "user": {
           "anyOf": [
@@ -269,6 +257,7 @@
         }
       },
       "required": [
+        "nodeId",
         "credit"
       ]
     },
@@ -324,6 +313,12 @@
           "type": "string",
           "format": "date-time"
         },
+        "Node": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Node"
+          }
+        },
         "payType": {
           "type": "string",
           "default": "FULL",
@@ -355,12 +350,6 @@
             "integer",
             "null"
           ]
-        },
-        "nodes": {
-          "type": "array",
-          "items": {
-            "$ref": "#/definitions/Node"
-          }
         }
       },
       "required": [
@@ -381,12 +370,12 @@
         "credits": {
           "type": "integer"
         },
+        "user": {
+          "$ref": "#/definitions/User"
+        },
         "date": {
           "type": "string",
           "format": "date-time"
-        },
-        "user": {
-          "$ref": "#/definitions/User"
         }
       },
       "required": [
