@@ -3,9 +3,11 @@
 import React, { useState } from "react"
 import { useQuery } from "@tanstack/react-query"
 import { NodeCard } from "@/components/node-card"
-import { NodePaymentModal } from "@/components/payment-modal/node"
+import { NodePaymentModal } from "@/components/payment-modal/full-paid-node"
+import { PartialNodePaymentModal } from "@/components/payment-modal/partial-paid-node"
 import { Blockchain } from "@prisma/client"
 import { Skeleton } from "@/components/ui/skeleton"
+import { PAY_TYPE } from "@prisma/client"
 
 const Nodes: React.FC = () => {
   const [chain, setChain] = useState<Blockchain>()
@@ -51,12 +53,19 @@ const Nodes: React.FC = () => {
             key={chain.id}
             name={chain.name}
             description={chain.description}
+            payType={chain.payType}
             onBuy={() => setChain(chain)}
             disabled={chain.disabled}
           />
         ))}
         <NodePaymentModal
-          open={!!chain}
+          open={!!chain && chain.payType === PAY_TYPE.FULL}
+          chain={chain}
+          onOpenChange={() => setChain(undefined)}
+          onPurchaseComplete={() => refetch()}
+        />
+        <PartialNodePaymentModal
+          open={!!chain && chain.payType === PAY_TYPE.PARTIAL}
           chain={chain}
           onOpenChange={() => setChain(undefined)}
           onPurchaseComplete={() => refetch()}

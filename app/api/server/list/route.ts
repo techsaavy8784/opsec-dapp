@@ -1,5 +1,6 @@
 import { authOptions } from "@/lib/auth"
 import prisma from "@/prisma"
+import { PAY_TYPE } from "@prisma/client"
 import { getServerSession } from "next-auth"
 import { NextResponse } from "next/server"
 
@@ -35,19 +36,22 @@ export async function GET() {
   const chainsAll = await prisma.blockchain.findMany()
 
   const chains = chainsAll.map((chain) => {
-    const chainServers = servers.filter((server) =>
-      server.nodes.some((node) => node.blockchainId === chain.id),
-    )
-
-    // disabled if all possible servers have a node of this type
-    const disabled = chainServers.length === servers.length
+    let disabled = false
+    if (chain.payType === PAY_TYPE.FULL) {
+      const chainServers = servers.filter((server) =>
+        server.nodes.some((node) => node.blockchainId === chain.id),
+      )
+      disabled = chainServers.length === servers.length
+    }
 
     return {
       id: chain.id,
       name: chain.name,
       description: chain.description,
       price: chain.price,
+      floorPrice: chain.floorPrice,
       hasWallet: chain.hasWallet,
+      payType: chain.payType,
       disabled,
     }
   })

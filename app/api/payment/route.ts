@@ -5,6 +5,7 @@ import { NextResponse, NextRequest } from "next/server"
 import { Status } from "@prisma/client"
 import subscriptions from "./subscriptions"
 import availableServers from "./available-servers"
+import { PAY_TYPE } from "@prisma/client"
 
 export async function GET(request: NextRequest) {
   const session = await getServerSession(authOptions)
@@ -55,6 +56,10 @@ export async function PUT(request: NextRequest) {
     return NextResponse.json("Node doesn't exist", { status: 404 })
   }
 
+  if (node.blockchain.payType === PAY_TYPE.PARTIAL) {
+    return NextResponse.json("Partial Node can not extend", { status: 400 })
+  }
+
   const user = await prisma.user.findFirst({
     where: {
       id: session.user.id,
@@ -62,7 +67,6 @@ export async function PUT(request: NextRequest) {
   })
 
   const [months, priceMultiplier] = subscriptions[plan]
-
   const amount = node.blockchain.price * priceMultiplier
 
   if (amount > user!.balance) {
@@ -100,7 +104,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 })
   }
 
-  const { wallet, id, plan } = await request.json()
+  const { wallet, id, plan, payAmount } = await request.json()
 
   const blockchainId = id
 
@@ -131,10 +135,15 @@ export async function POST(request: NextRequest) {
       { status: 404 },
     )
   }
+  let months, priceMultiplier, amount
 
-  const [months, priceMultiplier] = subscriptions[plan]
-
-  const amount = blockchain.price * priceMultiplier
+  if (blockchain.payType === PAY_TYPE.FULL) {
+    [months, priceMultiplier] = subscriptions[plan]
+    amount = blockchain.price * priceMultiplier
+  } else {
+    amount = Number(payAmount)
+    months = 0
+  }
 
   if (amount > user!.balance) {
     return NextResponse.json(
@@ -146,9 +155,12 @@ export async function POST(request: NextRequest) {
   const node = await prisma.node.create({
     data: {
       wallet,
-      serverId: servers[Math.floor(Math.random() * servers.length)].id,
       userId: session.user.id,
       blockchainId,
+      serverId:
+        blockchain.payType === PAY_TYPE.FULL
+          ? servers[Math.floor(Math.random() * servers.length)].id
+          : null,
     },
   })
 
