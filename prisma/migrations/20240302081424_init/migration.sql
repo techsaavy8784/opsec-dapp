@@ -15,7 +15,7 @@ CREATE TABLE "users" (
 CREATE TABLE "nodes" (
     "id" SERIAL NOT NULL,
     "user_id" INTEGER NOT NULL,
-    "server_id" INTEGER NOT NULL,
+    "server_id" INTEGER,
     "wallet" TEXT,
     "status" "Status" NOT NULL DEFAULT 'CREATED',
     "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,

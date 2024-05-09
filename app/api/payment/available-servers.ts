@@ -1,13 +1,22 @@
 import prisma from "@/prisma"
 import { Status } from "@prisma/client"
+import { SERVER_TYPE, PAY_TYPE } from "@prisma/client"
 
-const availableServers = async (blockchainId?: number) => {
+const availableServers = async (blockchainId: number) => {
+  const blockchain = await prisma.blockchain.findUnique({
+    where: {
+      id: blockchainId,
+    },
+  })
   const whereCondition: any = {
     active: true,
+    type:
+      blockchain?.payType === PAY_TYPE.FULL
+        ? SERVER_TYPE.MULTI_NODE
+        : SERVER_TYPE.SINGLE_NODE,
   }
 
-  // If blockchainId is specified, add the condition for nodes on that blockchain
-  if (blockchainId !== undefined) {
+  if (blockchain?.payType === PAY_TYPE.FULL) {
     whereCondition.NOT = [
       {
         nodes: {
@@ -20,8 +29,11 @@ const availableServers = async (blockchainId?: number) => {
         },
       },
     ]
+  } else {
+    whereCondition.nodes = {
+      none: {},
+    }
   }
-
   const serverIds = await prisma.server.findMany({
     where: whereCondition,
     include: {

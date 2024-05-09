@@ -30,40 +30,6 @@ const options: NextAdminOptions = {
         display: ["id", "wallet"],
       },
     },
-    ValidatorType: {
-      edit: {
-        display: [
-          "id",
-          "name",
-          "rewardLockTime",
-          "rewardPerMonth",
-          "price",
-          "floorPrice",
-          "priceUnit",
-          "rewardWallet",
-        ],
-      },
-      list: {
-        display: [
-          "id",
-          "name",
-          "rewardLockTime",
-          "rewardPerMonth",
-          "price",
-          "floorPrice",
-          "priceUnit",
-          "rewardWallet",
-        ],
-      },
-    },
-    Validator: {
-      edit: {
-        display: ["id", "typeId", "serverId", "purchaseTime"],
-      },
-      list: {
-        display: ["id", "typeId", "serverId", "purchaseTime"],
-      },
-    },
   },
 }
 
