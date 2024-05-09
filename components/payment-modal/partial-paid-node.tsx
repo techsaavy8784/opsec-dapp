@@ -34,8 +34,6 @@ export const PartialNodePaymentModal: React.FC<PaymentModalProps> = ({
 
   const { toast } = useToast()
 
-  const router = useRouter()
-
   const { data: balance, refetch: refetchBalance } = useQuery({
     queryKey: ["credits/balance"],
     queryFn: () => fetch("/api/credits/balance").then((res) => res.json()),
