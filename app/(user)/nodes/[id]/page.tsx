@@ -11,6 +11,7 @@ import { NodePaymentModal } from "@/components/payment-modal/node"
 import { Button } from "@/components/ui/button"
 import { ExtendStakingModal } from "@/components/extend-staking-modal"
 import usePollStatus from "@/hooks/usePollStatus"
+import { PAY_TYPE } from "@prisma/client"
 
 interface NodeProps {
   params: {
@@ -93,6 +94,26 @@ const Node: React.FC<NodeProps> = ({ params: { id } }) => {
             {daysTillExpiration}
           </h1>
         </div>
+        {data.blockchain.payType === PAY_TYPE.PARTIAL && (
+          <>
+            <div className="flex items-center justify-between">
+              <h1 className="text-[14px] font-[500] text-[#52525B]">
+                Ownership
+              </h1>
+              <h1 className="text-[14px] font-[500] text-[#fff]">
+                {data.ownership * 100} %
+              </h1>
+            </div>
+            <div className="flex items-center justify-between">
+              <h1 className="text-[14px] font-[500] text-[#52525B]">
+                Reward Amount
+              </h1>
+              <h1 className="text-[14px] font-[500] text-[#fff]">
+                {data.reward}
+              </h1>
+            </div>
+          </>
+        )}
         <div className="flex items-center justify-between">
           <h1 className="text-[14px] font-[500] text-[#52525B]">Status</h1>
           <div className="flex items-center gap-1">
