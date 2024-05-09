@@ -2,10 +2,12 @@
 
 import React, { useEffect } from "react"
 import { useQuery } from "@tanstack/react-query"
-import { Skeleton } from "@/components/ui/skeleton"
-import { NodeType } from "../page"
+import { PAY_TYPE } from "@prisma/client"
 import usePollStatus from "@/hooks/usePollStatus"
-import { NodeDetailCard } from "@/components/node-detail"
+import { NodeType } from "@/app/(user)/nodes/page"
+import { Skeleton } from "@/components/ui/skeleton"
+import { FullNode } from "@/components/node-detail/FullNode"
+import { PartialNode } from "@/components/node-detail/PartialNode"
 
 interface NodeProps {
   params: {
@@ -37,7 +39,16 @@ const Node: React.FC<NodeProps> = ({ params: { id } }) => {
     )
   }
 
-  return <NodeDetailCard data={data} refetch={refetch} />
+  return (
+    <>
+      {data.blockchain.payType === PAY_TYPE.FULL && (
+        <FullNode node={data} refetch={refetch} />
+      )}
+      {data.blockchain.payType === PAY_TYPE.PARTIAL && (
+        <PartialNode node={data} />
+      )}
+    </>
+  )
 }
 
 export default Node

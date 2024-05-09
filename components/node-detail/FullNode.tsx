@@ -12,30 +12,30 @@ import { NodeType } from "@/app/(user)/nodes/page"
 const uptimeDayCount = 90
 
 type Props = {
-  data: NodeType
+  node: NodeType
   refetch: () => void
 }
 
-export const FullNode: React.FC<Props> = ({ data, refetch }) => {
+export const FullNode: React.FC<Props> = ({ node, refetch }) => {
   const [modal, setModal] = useState(false)
 
   const daysTillExpiration = Math.max(
     0,
-    data.payments.reduce((sum, item) => (sum += item.duration), 0) -
-      daysPassedSince(data.createdAt),
+    node.payments.reduce((sum, item) => (sum += item.duration), 0) -
+      daysPassedSince(node.createdAt),
   )
 
   const soonExpired =
     daysTillExpiration < Number(process.env.NEXT_PUBLIC_NODE_EXPIRE_WARN_DAYS)
 
-  const stakeId = data.payments.find(
+  const stakeId = node.payments.find(
     (payment) => payment.stakeId !== null,
   )?.stakeId
 
   return (
     <div className="w-full space-y-2">
       <Image
-        src={`/icons/blockchain/${data.blockchain.name
+        src={`/icons/blockchain/${node.blockchain.name
           .toLowerCase()
           .replace(/ /g, "-")}.png`}
         alt=""
@@ -44,13 +44,13 @@ export const FullNode: React.FC<Props> = ({ data, refetch }) => {
         className="object-contain m-auto"
       />
       <h1 className="text-[#52525B] text-center sm:w-1/2 m-auto pb-4">
-        {data.blockchain.description}
+        {node.blockchain.description}
       </h1>
       <div className="m-auto space-y-3 sm:w-1/4">
         <div className="flex items-center justify-between">
           <h1 className="text-[14px] font-[500] text-[#52525B]">Chain</h1>
           <h1 className="text-[14px] font-[500] text-[#fff]">
-            {data.blockchain.name}
+            {node.blockchain.name}
           </h1>
         </div>
         <div className="flex items-center justify-between">
@@ -76,21 +76,21 @@ export const FullNode: React.FC<Props> = ({ data, refetch }) => {
               height={18}
             />
             <h1 className="font-[600] text-[14px] text-[#10B981]">
-              {data.status.toUpperCase()}
+              {node.status.toUpperCase()}
             </h1>
           </div>
         </div>
 
-        {["Avail", "BEVM"].includes(data.blockchain.name) && (
+        {["Avail", "BEVM"].includes(node.blockchain.name) && (
           <div className="flex items-center justify-between">
             <h1 className="text-[14px] font-[500] text-[#52525B]">Telemetry</h1>
             <div className="flex items-center gap-1">
               <a
                 target="_blank"
                 href={
-                  data.blockchain.name === "Avail"
-                    ? `https://telemetry.avail.tools/#/${data.wallet}`
-                    : `https://telemetry-testnet.bevm.io/#/${data.wallet}`
+                  node.blockchain.name === "Avail"
+                    ? `https://telemetry.avail.tools/#/${node.wallet}`
+                    : `https://telemetry-testnet.bevm.io/#/${node.wallet}`
                 }
                 rel="noopener noreferrer"
                 className="font-[600] text-[14px] text-zinc-500 underline"
@@ -112,9 +112,9 @@ export const FullNode: React.FC<Props> = ({ data, refetch }) => {
             />
           ) : (
             <NodePaymentModal
-              nodeId={data.id}
+              nodeId={node.id}
               open={modal}
-              chain={data.blockchain}
+              chain={node.blockchain}
               onOpenChange={() => setModal(false)}
               onPurchaseComplete={() => refetch()}
             />
@@ -122,14 +122,14 @@ export const FullNode: React.FC<Props> = ({ data, refetch }) => {
         </div>
       </div>
 
-      {data.status === "LIVE" && (
+      {node.status === "LIVE" && (
         <>
           <div className="flex items-center justify-between pt-3">
             <h1 className="text-[14px] font-[500] text-[#52525B]">
               Activated date
             </h1>
             <h1 className="text-[14px] font-[500] text-[#fff]">
-              {formatDate(data.createdAt)}
+              {formatDate(node.createdAt)}
             </h1>
           </div>
           <h1 className="text-[14px] font-[500] text-[#52525B]">Uptime</h1>
@@ -141,7 +141,7 @@ export const FullNode: React.FC<Props> = ({ data, refetch }) => {
                   key={i}
                   className={clsx(
                     `w-[1%] h-[48px] m-[1px] rounded-[3px]`,
-                    i <= daysPassedSince(data.createdAt)
+                    i <= daysPassedSince(node.createdAt)
                       ? "bg-[#10B981]"
                       : "bg-zinc-900",
                   )}
