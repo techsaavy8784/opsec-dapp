@@ -6,8 +6,8 @@ import { PAY_TYPE } from "@prisma/client"
 import usePollStatus from "@/hooks/usePollStatus"
 import { NodeType } from "@/app/(user)/nodes/page"
 import { Skeleton } from "@/components/ui/skeleton"
-import { FullNode } from "@/components/node-detail/FullNode"
-import { PartialNode } from "@/components/node-detail/PartialNode"
+import { FullNode } from "./FullNode"
+import { PartialNode } from "./PartialNode"
 
 interface NodeProps {
   params: {
