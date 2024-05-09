@@ -78,7 +78,8 @@ export const NodePaymentModal: React.FC<PaymentModalProps> = ({
             title:
               nodeId === undefined ? "Node purchased" : "Subscription extended",
           })
-          response.json().then((res) => router.push(`/nodes/${res.nodeId}`))
+          if (chain?.payType === ChainType.FULL)
+            response.json().then((res) => router.push(`/nodes/${res.nodeId}`))
         } else {
           toast({
             title: "An error occurred",
@@ -189,7 +190,7 @@ export const NodePaymentModal: React.FC<PaymentModalProps> = ({
               <>
                 <Slider
                   value={[amount]}
-                  min={1}
+                  min={chain.floorPrice ?? 1}
                   max={chain.price}
                   step={1}
                   className="my-4"
@@ -232,7 +233,11 @@ export const NodePaymentModal: React.FC<PaymentModalProps> = ({
                 type="button"
                 onClick={() => purchase(chain.rewardWallet ?? "")}
                 variant="custom"
-                disabled={false}
+                disabled={
+                  isPaying ||
+                  insufficientBalance ||
+                  amount < (chain.floorPrice ?? 0)
+                }
               >
                 {isPaying && <ReloadIcon className="mr-2 animate-spin" />}
                 Purchase

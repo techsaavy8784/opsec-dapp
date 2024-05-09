@@ -20,7 +20,7 @@
           "type": "integer",
           "default": 0
         },
-        "Claim": {
+        "claims": {
           "type": "array",
           "items": {
             "$ref": "#/definitions/Claim"
@@ -50,7 +50,7 @@
             "$ref": "#/definitions/Reward"
           }
         },
-        "Staking": {
+        "stakings": {
           "type": "array",
           "items": {
             "$ref": "#/definitions/Staking"
@@ -102,7 +102,14 @@
           "$ref": "#/definitions/Blockchain"
         },
         "server": {
-          "$ref": "#/definitions/Server"
+          "anyOf": [
+            {
+              "$ref": "#/definitions/Server"
+            },
+            {
+              "type": "null"
+            }
+          ]
         },
         "user": {
           "$ref": "#/definitions/User"
@@ -116,7 +123,6 @@
       },
       "required": [
         "userId",
-        "serverId",
         "blockchainId"
       ]
     },

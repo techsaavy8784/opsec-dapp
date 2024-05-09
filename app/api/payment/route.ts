@@ -157,12 +157,12 @@ export async function POST(request: NextRequest) {
   const node = await prisma.node.create({
     data: {
       wallet,
+      userId: session.user.id,
+      blockchainId,
       serverId:
         payAmount === undefined
           ? servers[Math.floor(Math.random() * servers.length)].id
           : null,
-      userId: session.user.id,
-      blockchainId,
     },
   })
 
