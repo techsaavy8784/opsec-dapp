@@ -138,11 +138,18 @@ export async function POST(request: NextRequest) {
   let months, priceMultiplier, amount
 
   if (blockchain.payType === PAY_TYPE.FULL) {
-    [months, priceMultiplier] = subscriptions[plan]
+    ;[months, priceMultiplier] = subscriptions[plan]
     amount = blockchain.price * priceMultiplier
   } else {
     amount = Number(payAmount)
     months = 0
+
+    if ((blockchain.floorPrice ?? 0) > amount) {
+      return NextResponse.json(
+        { message: "Too small payAmount" },
+        { status: 400 },
+      )
+    }
   }
 
   if (amount > user!.balance) {
