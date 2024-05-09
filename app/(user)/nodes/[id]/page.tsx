@@ -94,11 +94,6 @@ const Node: React.FC<NodeProps> = ({ params: { id } }) => {
             {daysTillExpiration}
           </h1>
         </div>
-        {!data.server && (
-          <div className="flex items-center justify-between">
-            Waiting for admin to activate on server
-          </div>
-        )}
         {data.blockchain.payType === PAY_TYPE.PARTIAL && (
           <>
             <div className="flex items-center justify-between">
@@ -174,6 +169,12 @@ const Node: React.FC<NodeProps> = ({ params: { id } }) => {
           )}
         </div>
       </div>
+
+      {data.server && (
+        <h1 className="text-[#fff] text-center sm:w-1/2 m-auto pb-4">
+          Waiting for admin to activate on server
+        </h1>
+      )}
 
       {data.status === "LIVE" && (
         <>

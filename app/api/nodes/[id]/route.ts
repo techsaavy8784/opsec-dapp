@@ -19,7 +19,7 @@ export async function GET(
 
   const node = await prisma.node.findUnique({
     where: { id: nodeId, userId: session.user.id },
-    include: { payments: true, blockchain: true },
+    include: { payments: true, blockchain: true, server: true },
   })
 
   let reward = 0,
