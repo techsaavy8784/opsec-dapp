@@ -16,40 +16,46 @@ export async function GET(
   }
 
   const nodeId = Number(params.id)
+  const userId = session.user.id
 
   const node = await prisma.node.findUnique({
-    where: { id: nodeId, userId: session.user.id },
+    where: { id: nodeId },
     include: { payments: true, blockchain: true, server: true },
   })
 
-  let reward = 0,
-    ownership = 0
+  if (node?.userId !== userId) {
+    return NextResponse.json({ message: "Unauthorized" }, { status: 401 })
+  }
 
-  if (node?.blockchain.payType === PAY_TYPE.FULL) return NextResponse.json(node)
+  if (node?.blockchain.payType === PAY_TYPE.FULL) {
+    return NextResponse.json(node)
+  }
 
-  const { _sum: meCreditUSD } = await prisma.payment.aggregate({
-    where: { userId: session.user.id, nodeId: nodeId },
+  const {
+    _sum: { credit: meCreditUSD },
+  } = await prisma.payment.aggregate({
+    where: { userId, nodeId },
     _sum: { credit: true },
   })
 
   const withdrawTime = await prisma.reward
-    .findFirst({
-      where: { userId: session.user.id },
-    })
+    .findFirst({ where: { userId } })
     .then((res) =>
       res?.validatorRewardWithdrawTime
         ? dayjs(res.validatorRewardWithdrawTime)
         : undefined,
     )
 
-  if (!node || !node.blockchain || !meCreditUSD.credit)
-    return NextResponse.json({ ...node, reward, ownership })
+  if (!node || !node.blockchain || !meCreditUSD) {
+    return NextResponse.json({ ...node, reward: 0, ownership: 0 })
+  }
 
   const now = dayjs()
   const purchaseTime = dayjs(node.createdAt)
   const lockTime = purchaseTime.add(node.blockchain.rewardLockTime || 0, "day")
 
-  ownership = Number(meCreditUSD.credit) / Number(node.blockchain.price)
+  const ownership = meCreditUSD / node.blockchain.price
+  let reward = 0
 
   if (now.isAfter(lockTime)) {
     let rewardPeriod = now.diff(purchaseTime, "month")

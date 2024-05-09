@@ -2,7 +2,6 @@ import { authOptions } from "@/lib/auth"
 import prisma from "@/prisma"
 import { getServerSession } from "next-auth"
 import { NextResponse } from "next/server"
-import dayjs from "dayjs"
 import { PAY_TYPE } from "@prisma/client"
 
 export async function GET(
@@ -22,19 +21,22 @@ export async function GET(
     include: { payments: true, blockchain: true },
   })
 
-  let ownership = 0
+  if (node?.blockchain.payType === PAY_TYPE.FULL) {
+    return NextResponse.json(0)
+  }
 
-  if (node?.blockchain.payType === PAY_TYPE.FULL) return NextResponse.json(0)
-
-  const { _sum: paidCreditUSD } = await prisma.payment.aggregate({
+  const {
+    _sum: { credit: paidCreditUSD },
+  } = await prisma.payment.aggregate({
     where: { nodeId: nodeId },
     _sum: { credit: true },
   })
 
-  if (!node || !node.blockchain || !paidCreditUSD.credit)
-    return NextResponse.json(ownership)
+  if (!node?.blockchain || !paidCreditUSD) {
+    return NextResponse.json(0)
+  }
 
-  ownership = Number(paidCreditUSD.credit) / Number(node.blockchain.price)
+  const ownership = paidCreditUSD / node.blockchain.price
 
   return NextResponse.json(ownership)
 }
