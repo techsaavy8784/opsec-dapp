@@ -56,6 +56,10 @@ export async function PUT(request: NextRequest) {
     return NextResponse.json("Node doesn't exist", { status: 404 })
   }
 
+  if (node.blockchain.payType === PAY_TYPE.PARTIAL) {
+    return NextResponse.json("Partial Node can not extend", { status: 400 })
+  }
+
   const user = await prisma.user.findFirst({
     where: {
       id: session.user.id,
@@ -133,7 +137,7 @@ export async function POST(request: NextRequest) {
   }
   let months, priceMultiplier, amount
 
-  if (payAmount === undefined) {
+  if (blockchain.payType === PAY_TYPE.FULL) {
     ;[months, priceMultiplier] = subscriptions[plan]
     amount = blockchain.price * priceMultiplier
   } else {
