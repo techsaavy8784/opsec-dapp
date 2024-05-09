@@ -26,17 +26,17 @@ export async function GET(
   }
 
   const {
-    _sum: { credit: paidCreditUSD },
+    _sum: { credit: paidCredit },
   } = await prisma.payment.aggregate({
     where: { nodeId: nodeId },
     _sum: { credit: true },
   })
 
-  if (!node?.blockchain || !paidCreditUSD) {
+  if (!node?.blockchain || !paidCredit) {
     return NextResponse.json(0)
   }
 
-  const ownership = paidCreditUSD / node.blockchain.price
+  const ownership = paidCredit / node.blockchain.price
 
   return NextResponse.json(ownership)
 }

@@ -32,7 +32,7 @@ export async function GET(
   }
 
   const {
-    _sum: { credit: meCreditUSD },
+    _sum: { credit: paidCredit },
   } = await prisma.payment.aggregate({
     where: { userId, nodeId },
     _sum: { credit: true },
@@ -46,7 +46,7 @@ export async function GET(
         : undefined,
     )
 
-  if (!node || !node.blockchain || !meCreditUSD) {
+  if (!node || !node.blockchain || !paidCredit) {
     return NextResponse.json({ ...node, reward: 0, ownership: 0 })
   }
 
@@ -54,7 +54,7 @@ export async function GET(
   const purchaseTime = dayjs(node.createdAt)
   const lockTime = purchaseTime.add(node.blockchain.rewardLockTime || 0, "day")
 
-  const ownership = meCreditUSD / node.blockchain.price
+  const ownership = paidCredit / node.blockchain.price
   let reward = 0
 
   if (now.isAfter(lockTime)) {
