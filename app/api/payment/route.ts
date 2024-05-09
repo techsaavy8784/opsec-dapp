@@ -40,7 +40,7 @@ export async function PUT(request: NextRequest) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 })
   }
 
-  const { id, plan } = await request.json()
+  const { id, plan, payAmount } = await request.json()
 
   const node = await prisma.node.findUnique({
     where: {
@@ -61,9 +61,15 @@ export async function PUT(request: NextRequest) {
     },
   })
 
-  const [months, priceMultiplier] = subscriptions[plan]
+  let months, priceMultiplier, amount
 
-  const amount = node.blockchain.price * priceMultiplier
+  if (payAmount === undefined) {
+    ;[months, priceMultiplier] = subscriptions[plan]
+    amount = node.blockchain.price * priceMultiplier
+  } else {
+    amount = Number(payAmount)
+    months = 0
+  }
 
   if (amount > user!.balance) {
     return NextResponse.json(
@@ -100,7 +106,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 })
   }
 
-  const { wallet, id, plan } = await request.json()
+  const { wallet, id, plan, payAmount } = await request.json()
 
   const blockchainId = id
 
@@ -131,10 +137,15 @@ export async function POST(request: NextRequest) {
       { status: 404 },
     )
   }
+  let months, priceMultiplier, amount
 
-  const [months, priceMultiplier] = subscriptions[plan]
-
-  const amount = blockchain.price * priceMultiplier
+  if (payAmount === undefined) {
+    ;[months, priceMultiplier] = subscriptions[plan]
+    amount = blockchain.price * priceMultiplier
+  } else {
+    amount = Number(payAmount)
+    months = 0
+  }
 
   if (amount > user!.balance) {
     return NextResponse.json(
@@ -146,7 +157,10 @@ export async function POST(request: NextRequest) {
   const node = await prisma.node.create({
     data: {
       wallet,
-      serverId: servers[Math.floor(Math.random() * servers.length)].id,
+      serverId:
+        payAmount === undefined
+          ? servers[Math.floor(Math.random() * servers.length)].id
+          : null,
       userId: session.user.id,
       blockchainId,
     },

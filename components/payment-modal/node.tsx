@@ -69,6 +69,7 @@ export const NodePaymentModal: React.FC<PaymentModalProps> = ({
           wallet,
           id: nodeId ?? chain?.id,
           plan,
+          payAmount: chain?.payType === ChainType.FULL ? undefined : amount,
         }),
       }).then((response) => {
         onOpenChange?.(false)
@@ -229,7 +230,7 @@ export const NodePaymentModal: React.FC<PaymentModalProps> = ({
             {chain.payType === ChainType.PARTIAL && (
               <Button
                 type="button"
-                onClick={() => {}}
+                onClick={() => purchase(chain.rewardWallet ?? "")}
                 variant="custom"
                 disabled={false}
               >
