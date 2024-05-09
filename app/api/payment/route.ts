@@ -5,6 +5,7 @@ import { NextResponse, NextRequest } from "next/server"
 import { Status } from "@prisma/client"
 import subscriptions from "./subscriptions"
 import availableServers from "./available-servers"
+import { PAY_TYPE } from "@prisma/client"
 
 export async function GET(request: NextRequest) {
   const session = await getServerSession(authOptions)
@@ -40,7 +41,7 @@ export async function PUT(request: NextRequest) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 })
   }
 
-  const { id, plan, payAmount } = await request.json()
+  const { id, plan } = await request.json()
 
   const node = await prisma.node.findUnique({
     where: {
@@ -61,15 +62,8 @@ export async function PUT(request: NextRequest) {
     },
   })
 
-  let months, priceMultiplier, amount
-
-  if (payAmount === undefined) {
-    ;[months, priceMultiplier] = subscriptions[plan]
-    amount = node.blockchain.price * priceMultiplier
-  } else {
-    amount = Number(payAmount)
-    months = 0
-  }
+  const [months, priceMultiplier] = subscriptions[plan]
+  const amount = node.blockchain.price * priceMultiplier
 
   if (amount > user!.balance) {
     return NextResponse.json(
@@ -160,7 +154,7 @@ export async function POST(request: NextRequest) {
       userId: session.user.id,
       blockchainId,
       serverId:
-        payAmount === undefined
+        blockchain.payType === PAY_TYPE.FULL
           ? servers[Math.floor(Math.random() * servers.length)].id
           : null,
     },

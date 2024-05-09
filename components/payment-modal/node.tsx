@@ -19,7 +19,7 @@ import { useToast } from "../ui/use-toast"
 import clsx from "clsx"
 import subscriptions from "@/app/api/payment/subscriptions"
 import { useRouter } from "next/navigation"
-import { ChainType } from "@/lib/constants"
+import { PAY_TYPE } from "@prisma/client"
 
 interface PaymentModalProps extends DialogProps {
   open: boolean
@@ -69,7 +69,7 @@ export const NodePaymentModal: React.FC<PaymentModalProps> = ({
           wallet,
           id: nodeId ?? chain?.id,
           plan,
-          payAmount: chain?.payType === ChainType.FULL ? undefined : amount,
+          payAmount: chain?.payType === PAY_TYPE.FULL ? undefined : amount,
         }),
       }).then((response) => {
         onOpenChange?.(false)
@@ -78,7 +78,7 @@ export const NodePaymentModal: React.FC<PaymentModalProps> = ({
             title:
               nodeId === undefined ? "Node purchased" : "Subscription extended",
           })
-          if (chain?.payType === ChainType.FULL)
+          if (chain?.payType === PAY_TYPE.FULL)
             response.json().then((res) => router.push(`/nodes/${res.nodeId}`))
         } else {
           toast({
@@ -110,7 +110,7 @@ export const NodePaymentModal: React.FC<PaymentModalProps> = ({
                 height={64}
                 className="mt-10 mb-4"
               />
-              {chain.payType === ChainType.FULL && (
+              {chain.payType === PAY_TYPE.FULL && (
                 <>
                   <div className="flex w-full gap-2 flex-column">
                     {subscriptions.map(([month, priceMultiplier], key) => (
@@ -155,7 +155,7 @@ export const NodePaymentModal: React.FC<PaymentModalProps> = ({
           )}
 
           <form className="flex flex-col items-center justify-center gap-8 px-8">
-            {chain.payType === ChainType.FULL &&
+            {chain.payType === PAY_TYPE.FULL &&
               chain.hasWallet &&
               nodeId === undefined &&
               insufficientBalance == false && (
@@ -186,7 +186,7 @@ export const NodePaymentModal: React.FC<PaymentModalProps> = ({
                 </>
               )}
 
-            {chain.payType === ChainType.PARTIAL && (
+            {chain.payType === PAY_TYPE.PARTIAL && (
               <>
                 <Slider
                   value={[amount]}
@@ -210,7 +210,7 @@ export const NodePaymentModal: React.FC<PaymentModalProps> = ({
               </>
             )}
 
-            {chain.payType === ChainType.FULL && (
+            {chain.payType === PAY_TYPE.FULL && (
               <Button
                 type="button"
                 onClick={() => purchase(walletAddr)}
@@ -228,7 +228,7 @@ export const NodePaymentModal: React.FC<PaymentModalProps> = ({
               </Button>
             )}
 
-            {chain.payType === ChainType.PARTIAL && (
+            {chain.payType === PAY_TYPE.PARTIAL && (
               <Button
                 type="button"
                 onClick={() => purchase(chain.rewardWallet ?? "")}
