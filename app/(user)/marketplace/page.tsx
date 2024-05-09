@@ -53,6 +53,7 @@ const Nodes: React.FC = () => {
             key={chain.id}
             name={chain.name}
             description={chain.description}
+            payType={chain.payType}
             onBuy={() => setChain(chain)}
             disabled={chain.disabled}
           />

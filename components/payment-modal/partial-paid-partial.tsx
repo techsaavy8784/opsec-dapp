@@ -30,7 +30,7 @@ export const PartialNodePaymentModal: React.FC<PaymentModalProps> = ({
   onOpenChange,
   ...props
 }) => {
-  const [amount, setAmount] = useState(0)
+  const [amount, setAmount] = useState(chain?.floorPrice ?? 0)
 
   const { toast } = useToast()
 
@@ -42,10 +42,10 @@ export const PartialNodePaymentModal: React.FC<PaymentModalProps> = ({
   })
 
   useEffect(() => {
-    setAmount(0)
+    setAmount(chain?.floorPrice ?? 0)
   }, [open])
 
-  const insufficientBalance = Number(balance?.balance) < Number(chain?.price)
+  const insufficientBalance = Number(balance?.balance) < Number(amount)
 
   const { mutate: purchase, isPending: isPaying } = useMutation({
     mutationFn: (wallet: string) =>
@@ -75,9 +75,7 @@ export const PartialNodePaymentModal: React.FC<PaymentModalProps> = ({
   return (
     <Dialog {...props} open={open} onOpenChange={onOpenChange}>
       {chain && (
-        <DialogContent
-          className={`bg-[#18181B] border-none rounded-[24px] p-8 w-[350px] md:w-[450px]`}
-        >
+        <DialogContent className="bg-[#18181B] border-none rounded-[24px] p-8 w-[350px] md:w-[450px]">
           <DialogTitle className="text-white text-center font-[600] text-[28px]">
             Buy a node
           </DialogTitle>
@@ -125,11 +123,7 @@ export const PartialNodePaymentModal: React.FC<PaymentModalProps> = ({
               type="button"
               onClick={() => purchase(chain.rewardWallet ?? "")}
               variant="custom"
-              disabled={
-                isPaying ||
-                insufficientBalance ||
-                amount < (chain.floorPrice ?? 0)
-              }
+              disabled={isPaying || insufficientBalance}
             >
               {isPaying && <ReloadIcon className="mr-2 animate-spin" />}
               Purchase

@@ -1,5 +1,6 @@
 import { authOptions } from "@/lib/auth"
 import prisma from "@/prisma"
+import { PAY_TYPE } from "@prisma/client"
 import { getServerSession } from "next-auth"
 import { NextResponse } from "next/server"
 
@@ -40,7 +41,10 @@ export async function GET() {
     )
 
     // disabled if all possible servers have a node of this type
-    const disabled = chainServers.length === servers.length
+    const disabled =
+      chain.payType === PAY_TYPE.PARTIAL
+        ? false
+        : chainServers.length === servers.length
 
     return {
       id: chain.id,
