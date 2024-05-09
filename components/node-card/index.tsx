@@ -16,7 +16,7 @@ type NodeCardProps = {
   disabled?: boolean
   status?: string
   expireInDays?: number
-  payType?: PAY_TYPE
+  payType: PAY_TYPE
   onBuy?: () => void
 }
 

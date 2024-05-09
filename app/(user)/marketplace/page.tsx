@@ -9,10 +9,16 @@ import { Blockchain } from "@prisma/client"
 import { Skeleton } from "@/components/ui/skeleton"
 import { PAY_TYPE } from "@prisma/client"
 
+type Type = {
+  total: number
+  capacity: number
+  chains: (Blockchain & { disabled: boolean })[]
+}
+
 const Nodes: React.FC = () => {
   const [chain, setChain] = useState<Blockchain>()
 
-  const { isPending, data, refetch } = useQuery<any>({
+  const { isPending, data, refetch } = useQuery<Type>({
     queryKey: ["server/list"],
     queryFn: () => fetch("/api/server/list").then((res) => res.json()),
   })
@@ -48,7 +54,7 @@ const Nodes: React.FC = () => {
         </div>
       </div>
       <div className="grid items-center grid-cols-1 gap-8 pt-2 md:grid-cols-3">
-        {data.chains.map((chain: any) => (
+        {data.chains.map((chain) => (
           <NodeCard
             key={chain.id}
             name={chain.name}

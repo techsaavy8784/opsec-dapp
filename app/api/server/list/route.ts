@@ -37,6 +37,9 @@ export async function GET() {
 
   const chains = chainsAll.map((chain) => {
     let disabled = false
+
+    // todo: need to handle the case of PAY_TYPE.PARTIAL
+
     if (chain.payType === PAY_TYPE.FULL) {
       const chainServers = servers.filter((server) =>
         server.nodes.some((node) => node.blockchainId === chain.id),
