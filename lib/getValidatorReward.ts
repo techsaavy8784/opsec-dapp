@@ -1,7 +1,7 @@
 import dayjs from "dayjs"
 import prisma from "@/prisma"
 
-const getValidatorReward = async (userId: number, validatorId: number) => {
+const getValidatorReward = async (userId: number, nodeId: number) => {
   const now = dayjs()
 
   const [meCreditUSD, sumCreditUSD, validator, withdrawTime] =
@@ -9,19 +9,19 @@ const getValidatorReward = async (userId: number, validatorId: number) => {
       prisma.payment.aggregate({
         where: {
           userId,
-          validatorId,
+          nodeId,
         },
         _sum: { credit: true },
       }),
 
       prisma.payment.aggregate({
-        where: { validatorId },
+        where: { nodeId },
         _sum: { credit: true },
       }),
 
-      prisma.validator.findUnique({
-        where: { id: validatorId, NOT: { purchaseTime: null } },
-        include: { validatorType: true },
+      prisma.node.findUnique({
+        where: { id: nodeId },
+        include: { blockchain: true },
       }),
 
       prisma.reward
@@ -41,10 +41,10 @@ const getValidatorReward = async (userId: number, validatorId: number) => {
     return rewardAmount
   }
 
-  const purchaseTime = dayjs(validator.purchaseTime)
+  const purchaseTime = dayjs(validator.createdAt)
 
   const lockTime = purchaseTime.add(
-    validator.validatorType.rewardLockTime,
+    validator.blockchain.rewardLockTime ?? 0,
     "day",
   )
 
@@ -56,9 +56,10 @@ const getValidatorReward = async (userId: number, validatorId: number) => {
     }
 
     rewardAmount =
-      validator.validatorType.rewardPerMonth *
-      rewardPeriod *
-      (Number(meCreditUSD._sum.credit) / Number(sumCreditUSD._sum.credit))
+      validator.blockchain.rewardPerMonth ??
+      0 *
+        rewardPeriod *
+        (Number(meCreditUSD._sum.credit) / Number(sumCreditUSD._sum.credit))
   }
 
   return rewardAmount

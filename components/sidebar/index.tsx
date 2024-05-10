@@ -62,6 +62,11 @@ const Sidebar = ({ setOpen }: Props) => {
       icon: TreasuryIcon,
     },
     {
+      title: "Reward",
+      link: "reward",
+      icon: TreasuryIcon,
+    },
+    {
       title: "Billing",
       link: "billing",
       icon: BillingIcon,
