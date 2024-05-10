@@ -11,6 +11,8 @@ export type NodeType = Node & {
   blockchain: Blockchain
   payments: Payment[]
   server: Server
+  ownership: number
+  reward: number
 }
 
 const Nodes: React.FC = () => {

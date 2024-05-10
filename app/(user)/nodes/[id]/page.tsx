@@ -1,16 +1,16 @@
 "use client"
 
-import React, { useEffect, useRef, useState } from "react"
+import React, { useEffect } from "react"
 import { useQuery } from "@tanstack/react-query"
-import { Skeleton } from "@/components/ui/skeleton"
-import { NodeType } from "../page"
+import { PAY_TYPE } from "@prisma/client"
 import Image from "next/image"
-import { daysPassedSince, formatDate } from "@/lib/utils"
 import clsx from "clsx"
-import { NodePaymentModal } from "@/components/payment-modal/full-paid-node"
-import { Button } from "@/components/ui/button"
-import { ExtendStakingModal } from "@/components/extend-staking-modal"
 import usePollStatus from "@/hooks/usePollStatus"
+import { NodeType } from "@/app/(user)/nodes/page"
+import { Skeleton } from "@/components/ui/skeleton"
+import { FullNode } from "./full-paid-node"
+import { PartialNode } from "./partial-paid-node"
+import { daysPassedSince, formatDate } from "@/lib/utils"
 
 interface NodeProps {
   params: {
@@ -21,8 +21,6 @@ interface NodeProps {
 const uptimeDayCount = 90
 
 const Node: React.FC<NodeProps> = ({ params: { id } }) => {
-  const [modal, setModal] = useState(false)
-
   const { isPending, data, refetch } = useQuery<NodeType>({
     queryKey: [`nodes/${id}`],
     queryFn: () => fetch(`/api/nodes/${id}`).then((res) => res.json()),
@@ -46,19 +44,6 @@ const Node: React.FC<NodeProps> = ({ params: { id } }) => {
     )
   }
 
-  const daysTillExpiration = Math.max(
-    0,
-    data.payments.reduce((sum, item) => (sum += item.duration), 0) -
-      daysPassedSince(data.createdAt),
-  )
-
-  const soonExpired =
-    daysTillExpiration < Number(process.env.NEXT_PUBLIC_NODE_EXPIRE_WARN_DAYS)
-
-  const stakeId = data.payments.find(
-    (payment) => payment.stakeId !== null,
-  )?.stakeId
-
   return (
     <div className="w-full space-y-2">
       <Image
@@ -80,75 +65,26 @@ const Node: React.FC<NodeProps> = ({ params: { id } }) => {
             {data.blockchain.name}
           </h1>
         </div>
-        <div className="flex items-center justify-between">
-          <h1 className="text-[14px] font-[500] text-[#52525B]">
-            Days remaining
+      </div>
+      <div className="flex items-center justify-between">
+        <h1 className="text-[14px] font-[500] text-[#52525B]">Status</h1>
+        <div className="flex items-center gap-1">
+          <Image
+            src="/icons/tick-circle.svg"
+            alt="tick-circle"
+            width={18}
+            height={18}
+          />
+          <h1 className="font-[600] text-[14px] text-[#10B981]">
+            {data.status.toUpperCase()}
           </h1>
-          <h1
-            className={clsx(
-              "text-[14px] font-[500]",
-              soonExpired ? "text-yellow-500" : "text-white",
-            )}
-          >
-            {daysTillExpiration}
-          </h1>
-        </div>
-        <div className="flex items-center justify-between">
-          <h1 className="text-[14px] font-[500] text-[#52525B]">Status</h1>
-          <div className="flex items-center gap-1">
-            <Image
-              src="/icons/tick-circle.svg"
-              alt="tick-circle"
-              width={18}
-              height={18}
-            />
-            <h1 className="font-[600] text-[14px] text-[#10B981]">
-              {data.status.toUpperCase()}
-            </h1>
-          </div>
-        </div>
-
-        {["Avail", "BEVM"].includes(data.blockchain.name) && (
-          <div className="flex items-center justify-between">
-            <h1 className="text-[14px] font-[500] text-[#52525B]">Telemetry</h1>
-            <div className="flex items-center gap-1">
-              <a
-                target="_blank"
-                href={
-                  data.blockchain.name === "Avail"
-                    ? `https://telemetry.avail.tools/#/${data.wallet}`
-                    : `https://telemetry-testnet.bevm.io/#/${data.wallet}`
-                }
-                rel="noopener noreferrer"
-                className="font-[600] text-[14px] text-zinc-500 underline"
-              >
-                View
-              </a>
-            </div>
-          </div>
-        )}
-
-        <div className="text-center">
-          <Button onClick={() => setModal(true)}>Extend subscription</Button>
-          {stakeId ? (
-            <ExtendStakingModal
-              stakeId={stakeId}
-              open={modal}
-              onOpenChange={() => setModal(false)}
-              onComplete={() => refetch()}
-            />
-          ) : (
-            <NodePaymentModal
-              nodeId={data.id}
-              open={modal}
-              chain={data.blockchain}
-              onOpenChange={() => setModal(false)}
-              onPurchaseComplete={() => refetch()}
-            />
-          )}
         </div>
       </div>
-
+      {data.blockchain.payType === PAY_TYPE.FULL ? (
+        <FullNode node={data} refetch={refetch} />
+      ) : (
+        <PartialNode node={data} />
+      )}
       {data.status === "LIVE" && (
         <>
           <div className="flex items-center justify-between pt-3">
