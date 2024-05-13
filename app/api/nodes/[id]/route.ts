@@ -19,20 +19,39 @@ export async function GET(
   const nodeId = Number(params.id)
   const userId = session.user.id
 
-  const node = await prisma.node.findUnique({
+  const node = await prisma.node.findUniqueOrThrow({
     where: { id: nodeId },
     include: { payments: true, blockchain: true, server: true },
   })
 
-  if (node?.userId !== userId) {
+  if (node.userId !== userId) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 })
   }
 
-  if (node?.blockchain.payType === PAY_TYPE.FULL) {
-    return NextResponse.json(node)
+  if (!node.server || !node.blockchain.rewardWallet) {
+    return NextResponse.json({
+      ...node,
+      reward: 0,
+      ownership: 0,
+    })
   }
 
-  const { reward, ownership } = await getNodeReward(userId, nodeId)
+  const withdrawTime = await prisma.reward
+    .findFirst({
+      where: { userId },
+    })
+    .then((res) =>
+      res?.nodeRewardWithdrawTime
+        ? dayjs(res.nodeRewardWithdrawTime)
+        : undefined,
+    )
+
+  const paidCredit =
+    node.blockchain.payType === PAY_TYPE.FULL
+      ? node.blockchain.price
+      : node.payments.find((payment) => payment.userId === userId)?.credit ?? 0
+
+  const { reward, ownership } = getNodeReward(paidCredit, node, withdrawTime)
 
   return NextResponse.json({ ...node, reward, ownership })
 }
