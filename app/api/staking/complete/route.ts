@@ -31,7 +31,9 @@ export async function GET(request: NextRequest) {
     args: [user as `0x${string}`],
   })
 
-  const blockchains = await prisma.blockchain.findMany()
+  const blockchains = await prisma.blockchain.findMany({
+    where: { staking: true },
+  })
   const stakePercentage = Number(
     (stakingAmount * BigInt(100)) / (balance + stakingAmount),
   )

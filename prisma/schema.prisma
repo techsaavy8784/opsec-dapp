@@ -107,6 +107,7 @@ model Blockchain {
   url            String
   price          Int
   hasWallet      Boolean  @default(false) @map("has_wallet")
+  staking        Boolean  @default(true)
   launchedAt     DateTime @default(now()) @map("launched_at")
   Node           Node[]
   payType        PAY_TYPE @default(FULL) @map("pay_type")
@@ -139,12 +140,12 @@ model Claim {
 }
 
 model Reward {
-  id                          Int       @id @default(autoincrement())
-  userId                      Int       @map("user_id")
-  taxReward                   Int?      @map("tax_reward")
-  reflectionReward            Int?      @map("reflection_reward")
-  nodeRewardWithdrawTime      DateTime? @map("node_reward_withdraw_time")
-  user                        User      @relation(fields: [userId], references: [id])
+  id                     Int       @id @default(autoincrement())
+  userId                 Int       @map("user_id")
+  taxReward              Int?      @map("tax_reward")
+  reflectionReward       Int?      @map("reflection_reward")
+  nodeRewardWithdrawTime DateTime? @map("node_reward_withdraw_time")
+  user                   User      @relation(fields: [userId], references: [id])
 
   @@map("rewards")
 }

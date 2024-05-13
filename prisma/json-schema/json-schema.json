@@ -309,6 +309,10 @@
           "type": "boolean",
           "default": false
         },
+        "staking": {
+          "type": "boolean",
+          "default": true
+        },
         "launchedAt": {
           "type": "string",
           "format": "date-time"
