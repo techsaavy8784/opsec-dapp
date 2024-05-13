@@ -14,5 +14,5 @@ export async function GET(request: NextRequest) {
     where: { userId: session.user.id },
   })
 
-  return NextResponse.json(reward?.taxReward || 0)
+  return NextResponse.json(reward?.taxReward ?? 0)
 }

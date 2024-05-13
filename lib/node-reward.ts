@@ -1,9 +1,9 @@
 import prisma from "@/prisma"
-import dayjs from "dayjs"
-import getNodeReward from "./getNodeReward"
 import { PAY_TYPE } from "@prisma/client"
+import dayjs from "dayjs"
+import { Blockchain, Node } from "@prisma/client"
 
-const getNodeTotalReward = async (userId: number) => {
+export const getNodeTotalReward = async (userId: number) => {
   const nodes = await prisma.node.findMany({
     where: {
       NOT: { server: null },
@@ -40,4 +40,33 @@ const getNodeTotalReward = async (userId: number) => {
   return totalReward
 }
 
-export default getNodeTotalReward
+const getNodeReward = (
+  paidCredit: number,
+  node: Node & { blockchain: Blockchain },
+  withdrawTime?: dayjs.Dayjs,
+) => {
+  const now = dayjs()
+
+  const purchaseTime = dayjs(node.createdAt)
+
+  const lockTime = purchaseTime.add(node.blockchain.rewardLockTime ?? 0, "day")
+
+  const ownership = paidCredit / node.blockchain.price
+
+  if (now.isBefore(lockTime)) {
+    return { reward: 0, ownership }
+  }
+
+  let rewardPeriod = now.diff(purchaseTime, "month")
+
+  if (withdrawTime) {
+    rewardPeriod -= withdrawTime.diff(purchaseTime, "month")
+  }
+
+  return {
+    reward: (node.blockchain.rewardPerMonth ?? 0) * rewardPeriod * ownership,
+    ownership,
+  }
+}
+
+export default getNodeReward

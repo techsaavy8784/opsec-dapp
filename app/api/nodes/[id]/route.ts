@@ -4,7 +4,7 @@ import { getServerSession } from "next-auth"
 import { NextResponse } from "next/server"
 import dayjs from "dayjs"
 import { PAY_TYPE } from "@prisma/client"
-import getNodeReward from "@/lib/getNodeReward"
+import getNodeReward from "@/lib/node-reward"
 
 export async function GET(
   request: Request,
