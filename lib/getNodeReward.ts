@@ -6,13 +6,15 @@ const getNodeReward = async (userId: number, nodeId: number) => {
   const now = dayjs()
 
   const [paidCredit, node, withdrawTime] = await Promise.all([
-    prisma.payment.aggregate({
-      where: {
-        userId,
-        nodeId,
-      },
-      _sum: { credit: true },
-    }),
+    prisma.payment
+      .aggregate({
+        where: {
+          userId,
+          nodeId,
+        },
+        _sum: { credit: true },
+      })
+      .then((res) => res._sum.credit),
 
     prisma.node.findUnique({
       where: {
@@ -36,17 +38,19 @@ const getNodeReward = async (userId: number, nodeId: number) => {
       ),
   ])
 
-  let rewardAmount = 0
-
-  if (!node || !paidCredit._sum || !node.blockchain) {
-    return { reward: rewardAmount, ownership: 0 }
+  if (paidCredit === null || !node?.blockchain) {
+    return { reward: 0, ownership: 0 }
   }
 
   const purchaseTime = dayjs(node.createdAt)
 
   const lockTime = purchaseTime.add(node.blockchain.rewardLockTime ?? 0, "day")
 
-  const ownership = Number(paidCredit._sum.credit) / node.blockchain.price
+  const ownership = paidCredit / node.blockchain.price
+
+  if (now.isBefore(lockTime)) {
+    return { reward: 0, ownership }
+  }
 
   if (now.isAfter(lockTime)) {
     let rewardPeriod = now.diff(purchaseTime, "month")
@@ -55,11 +59,11 @@ const getNodeReward = async (userId: number, nodeId: number) => {
       rewardPeriod -= withdrawTime.diff(purchaseTime, "month")
     }
 
-    rewardAmount =
-      (node.blockchain.rewardPerMonth ?? 0) * rewardPeriod * ownership
+    return {
+      reward: (node.blockchain.rewardPerMonth ?? 0) * rewardPeriod * ownership,
+      ownership,
+    }
   }
-
-  return { reward: rewardAmount, ownership: ownership }
 }
 
 export default getNodeReward
