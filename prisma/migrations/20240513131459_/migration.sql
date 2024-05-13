@@ -2,7 +2,6 @@
   Warnings:
 
   - You are about to alter the column `price` on the `blockchains` table. The data in that column could be lost. The data in that column will be cast from `DoublePrecision` to `Integer`.
-  - Made the column `node_id` on table `payments` required. This step will fail if there are existing NULL values in that column.
 
 */
 -- CreateEnum
@@ -26,9 +25,11 @@ ADD COLUMN     "reward_wallet" TEXT,
 ALTER COLUMN "price" SET DATA TYPE INTEGER;
 
 -- AlterTable
+ALTER TABLE "nodes" ALTER COLUMN "server_id" DROP NOT NULL;
+
+-- AlterTable
 ALTER TABLE "payments" ADD COLUMN     "stake_id" TEXT,
-ADD COLUMN     "user_id" INTEGER,
-ALTER COLUMN "node_id" SET NOT NULL;
+ADD COLUMN     "user_id" INTEGER;
 
 -- AlterTable
 ALTER TABLE "servers" ADD COLUMN     "type" "SERVER_TYPE" NOT NULL DEFAULT 'MULTI_NODE';
