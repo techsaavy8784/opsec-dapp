@@ -17,7 +17,10 @@ const getNodeTotalReward = async (userId: number) => {
     nodes.map((node) => getNodeReward(userId, node.id)),
   )
 
-  const totalReward = rewardInfos.reduce((total, item) => total + item, 0)
+  const totalReward = rewardInfos.reduce(
+    (total, item) => total + item.reward,
+    0,
+  )
 
   return totalReward
 }
