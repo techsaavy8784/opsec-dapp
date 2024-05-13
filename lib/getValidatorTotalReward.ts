@@ -4,6 +4,7 @@ import { PAY_TYPE } from "@prisma/client"
 
 const getValidatorTotalReward = async (userId: number) => {
   const nodes = await prisma.node.findMany({
+    where: { NOT: { server: null } },
     include: { blockchain: true },
   })
 

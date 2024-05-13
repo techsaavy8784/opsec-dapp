@@ -20,7 +20,7 @@ const getValidatorReward = async (userId: number, nodeId: number) => {
       }),
 
       prisma.node.findUnique({
-        where: { id: nodeId },
+        where: { id: nodeId, NOT: { server: null } },
         include: { blockchain: true },
       }),
 
