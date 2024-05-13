@@ -8,11 +8,10 @@ import { useToast } from "@/components/ui/use-toast"
 const Reward = () => {
   const { toast } = useToast()
 
-  const { data: validatorReward, refetch: refetchValidatorReward } =
-    useQuery<number>({
-      queryKey: ["reward-validator"],
-      queryFn: () => fetch("/api/reward/validator").then((res) => res.json()),
-    })
+  const { data: nodeReward, refetch: refetchNodeReward } = useQuery<number>({
+    queryKey: ["reward-node"],
+    queryFn: () => fetch("/api/reward/node").then((res) => res.json()),
+  })
 
   const { data: reflectionReward, refetch: refetchReflectionReward } =
     useQuery<number>({
@@ -33,20 +32,20 @@ const Reward = () => {
       }).then((response) => {
         toast({ title: response.ok ? "Reward claimed" : "An error occured" })
 
-        refetchValidatorReward()
+        refetchNodeReward()
         refetchReflectionReward()
         refetchTaxReward()
       }),
   })
 
   const totalReward =
-    (validatorReward ?? 0) + (reflectionReward ?? 0) + (taxReward ?? 0)
+    (nodeReward ?? 0) + (reflectionReward ?? 0) + (taxReward ?? 0)
 
   return (
     <div className="space-y-4">
       <div className="flex gap-4">
-        <p className="w-1/2 text-right text-gray-400">Validator Reward</p>
-        <p>{validatorReward ?? 0}</p>
+        <p className="w-1/2 text-right text-gray-400">Node Reward</p>
+        <p>{nodeReward ?? 0}</p>
       </div>
       <div className="flex gap-4">
         <p className="w-1/2 text-right text-gray-400">Reflection Reward</p>

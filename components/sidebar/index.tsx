@@ -10,7 +10,6 @@ import {
   DashboardIcon,
   MarketplaceIcon,
   NodesIcon,
-  ValidatorsIcon,
   TreasuryIcon,
   BillingIcon,
 } from "@/components/icons"
@@ -45,11 +44,6 @@ const Sidebar = ({ setOpen }: Props) => {
       title: "Nodes",
       link: "nodes",
       icon: NodesIcon,
-    },
-    {
-      title: "Validators",
-      link: "validators",
-      icon: ValidatorsIcon,
     },
     {
       title: "Treasury",
