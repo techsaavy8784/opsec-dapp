@@ -41,8 +41,8 @@ export async function GET(
   const withdrawTime = await prisma.reward
     .findFirst({ where: { userId } })
     .then((res) =>
-      res?.validatorRewardWithdrawTime
-        ? dayjs(res.validatorRewardWithdrawTime)
+      res?.nodeRewardWithdrawTime
+        ? dayjs(res.nodeRewardWithdrawTime)
         : undefined,
     )
 

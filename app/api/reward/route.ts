@@ -2,7 +2,7 @@ import { getServerSession } from "next-auth"
 import { NextResponse, NextRequest } from "next/server"
 import prisma from "@/prisma"
 import { authOptions } from "@/lib/auth"
-import getValidatorTotalReward from "@/lib/getValidatorTotalReward"
+import getNodeTotalReward from "@/lib/getNodeTotalReward"
 
 export async function POST(request: NextRequest) {
   const session = await getServerSession(authOptions)
@@ -15,9 +15,9 @@ export async function POST(request: NextRequest) {
     where: { userId: session.user.id },
   })
 
-  const validatorReward = await getValidatorTotalReward(session.user.id)
+  const nodeReward = await getNodeTotalReward(session.user.id)
 
-  let totalReward = validatorReward
+  let totalReward = nodeReward
 
   if (reward) {
     totalReward += (reward.taxReward || 0) + (reward.reflectionReward || 0)
@@ -28,11 +28,11 @@ export async function POST(request: NextRequest) {
     update: {
       taxReward: 0,
       reflectionReward: 0,
-      validatorRewardWithdrawTime: new Date(),
+      nodeRewardWithdrawTime: new Date(),
     },
     create: {
       userId: session.user.id,
-      validatorRewardWithdrawTime: new Date(),
+      nodeRewardWithdrawTime: new Date(),
     },
   })
 

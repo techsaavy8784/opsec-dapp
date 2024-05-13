@@ -1,9 +1,9 @@
 import prisma from "@/prisma"
-import getValidatorReward from "./getValidatorReward"
+import getNodeReward from "./getNodeReward"
 import { PAY_TYPE } from "@prisma/client"
 
-const getValidatorTotalReward = async (userId: number) => {
-  const validators = await prisma.node.findMany({
+const getNodeTotalReward = async (userId: number) => {
+  const nodes = await prisma.node.findMany({
     where: {
       NOT: { server: null },
       blockchain: {
@@ -14,7 +14,7 @@ const getValidatorTotalReward = async (userId: number) => {
   })
 
   const rewardInfos = await Promise.all(
-    validators.map((validator) => getValidatorReward(userId, validator.id)),
+    nodes.map((node) => getNodeReward(userId, node.id)),
   )
 
   const totalReward = rewardInfos.reduce((total, item) => total + item, 0)
@@ -22,4 +22,4 @@ const getValidatorTotalReward = async (userId: number) => {
   return totalReward
 }
 
-export default getValidatorTotalReward
+export default getNodeTotalReward

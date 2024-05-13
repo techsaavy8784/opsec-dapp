@@ -420,7 +420,7 @@
             "null"
           ]
         },
-        "validatorRewardWithdrawTime": {
+        "nodeRewardWithdrawTime": {
           "type": [
             "string",
             "null"

@@ -143,7 +143,7 @@ model Reward {
   userId                      Int       @map("user_id")
   taxReward                   Int?      @map("tax_reward")
   reflectionReward            Int?      @map("reflection_reward")
-  validatorRewardWithdrawTime DateTime? @map("validator_reward_withdraw_time")
+  nodeRewardWithdrawTime      DateTime? @map("node_reward_withdraw_time")
   user                        User      @relation(fields: [userId], references: [id])
 
   @@map("rewards")

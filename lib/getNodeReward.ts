@@ -2,7 +2,7 @@ import dayjs from "dayjs"
 import prisma from "@/prisma"
 import { PAY_TYPE } from "@prisma/client"
 
-const getValidatorReward = async (userId: number, nodeId: number) => {
+const getNodeReward = async (userId: number, nodeId: number) => {
   const now = dayjs()
 
   const [paidCredit, paidCreditSum, node, withdrawTime] = await Promise.all([
@@ -35,8 +35,8 @@ const getValidatorReward = async (userId: number, nodeId: number) => {
         where: { userId },
       })
       .then((res) =>
-        res?.validatorRewardWithdrawTime
-          ? dayjs(res.validatorRewardWithdrawTime)
+        res?.nodeRewardWithdrawTime
+          ? dayjs(res.nodeRewardWithdrawTime)
           : undefined,
       ),
   ])
@@ -67,4 +67,4 @@ const getValidatorReward = async (userId: number, nodeId: number) => {
   return rewardAmount
 }
 
-export default getValidatorReward
+export default getNodeReward

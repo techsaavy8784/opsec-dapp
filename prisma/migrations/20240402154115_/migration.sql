@@ -61,7 +61,7 @@ CREATE TABLE "rewards" (
     "user_id" INTEGER NOT NULL,
     "tax_reward" INTEGER NULL,
     "reflection_reward" INTEGER NULL,
-    "validator_reward_withdraw_time" TIMESTAMP(3) NULL,
+    "node_reward_withdraw_time" TIMESTAMP(3) NULL,
 
     CONSTRAINT "rewards_pkey" PRIMARY KEY ("id")
 );

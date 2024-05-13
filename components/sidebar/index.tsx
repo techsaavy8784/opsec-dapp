@@ -10,7 +10,6 @@ import {
   DashboardIcon,
   MarketplaceIcon,
   NodesIcon,
-  ValidatorsIcon,
   TreasuryIcon,
   BillingIcon,
 } from "@/components/icons"
