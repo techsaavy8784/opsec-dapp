@@ -1,6 +1,5 @@
 import dayjs from "dayjs"
 import prisma from "@/prisma"
-import { PAY_TYPE } from "@prisma/client"
 
 const getNodeReward = async (userId: number, nodeId: number) => {
   const now = dayjs()
@@ -20,9 +19,6 @@ const getNodeReward = async (userId: number, nodeId: number) => {
       where: {
         id: nodeId,
         NOT: { server: null },
-        blockchain: {
-          payType: PAY_TYPE.PARTIAL,
-        },
       },
       include: { blockchain: true },
     }),
@@ -38,7 +34,7 @@ const getNodeReward = async (userId: number, nodeId: number) => {
       ),
   ])
 
-  if (paidCredit === null || !node?.blockchain) {
+  if (paidCredit === null || !node?.blockchain?.rewardWallet) {
     return { reward: 0, ownership: 0 }
   }
 

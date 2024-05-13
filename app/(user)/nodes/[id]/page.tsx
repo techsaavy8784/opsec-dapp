@@ -79,6 +79,12 @@ const Node: React.FC<NodeProps> = ({ params: { id } }) => {
             </h1>
           </div>
         </div>
+        <div className="flex items-center justify-between">
+          <h1 className="text-[14px] font-[500] text-[#52525B]">
+            Reward Amount
+          </h1>
+          <h1 className="text-[14px] font-[500] text-[#fff]">{data.reward}</h1>
+        </div>
         {data.blockchain.payType === PAY_TYPE.FULL ? (
           <FullNode node={data} refetch={refetch} />
         ) : (
