@@ -28,10 +28,6 @@ export async function GET(
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 })
   }
 
-  if (node?.blockchain.payType === PAY_TYPE.FULL) {
-    return NextResponse.json(node)
-  }
-
   const { reward, ownership } = await getNodeReward(userId, nodeId)
 
   return NextResponse.json({ ...node, reward, ownership })
