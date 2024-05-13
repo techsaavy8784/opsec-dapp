@@ -20,7 +20,7 @@ export const PartialNode: React.FC<Props> = ({ node }) => (
     </div>
 
     {!node.server && (
-      <h1 className="text-[#fff] text-center sm:w-1/2 m-auto pb-4">
+      <h1 className="text-[#fff] text-center pb-4">
         Waiting for admin to activate on server
       </h1>
     )}

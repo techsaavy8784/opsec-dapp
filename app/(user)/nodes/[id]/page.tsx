@@ -65,60 +65,60 @@ const Node: React.FC<NodeProps> = ({ params: { id } }) => {
             {data.blockchain.name}
           </h1>
         </div>
-      </div>
-      <div className="flex items-center justify-between">
-        <h1 className="text-[14px] font-[500] text-[#52525B]">Status</h1>
-        <div className="flex items-center gap-1">
-          <Image
-            src="/icons/tick-circle.svg"
-            alt="tick-circle"
-            width={18}
-            height={18}
-          />
-          <h1 className="font-[600] text-[14px] text-[#10B981]">
-            {data.status.toUpperCase()}
-          </h1>
+        <div className="flex items-center justify-between">
+          <h1 className="text-[14px] font-[500] text-[#52525B]">Status</h1>
+          <div className="flex items-center gap-1">
+            <Image
+              src="/icons/tick-circle.svg"
+              alt="tick-circle"
+              width={18}
+              height={18}
+            />
+            <h1 className="font-[600] text-[14px] text-[#10B981]">
+              {data.status.toUpperCase()}
+            </h1>
+          </div>
         </div>
+        {data.blockchain.payType === PAY_TYPE.FULL ? (
+          <FullNode node={data} refetch={refetch} />
+        ) : (
+          <PartialNode node={data} />
+        )}
+        {data.status === "LIVE" && (
+          <>
+            <div className="flex items-center justify-between pt-3">
+              <h1 className="text-[14px] font-[500] text-[#52525B]">
+                Activated date
+              </h1>
+              <h1 className="text-[14px] font-[500] text-[#fff]">
+                {formatDate(data.createdAt)}
+              </h1>
+            </div>
+            <h1 className="text-[14px] font-[500] text-[#52525B]">Uptime</h1>
+            <div className="flex flex-row-reverse">
+              {new Array(uptimeDayCount)
+                .fill(0)
+                ?.map((_, i) => (
+                  <div
+                    key={i}
+                    className={clsx(
+                      `w-[1%] h-[48px] m-[1px] rounded-[3px]`,
+                      i <= daysPassedSince(data.createdAt)
+                        ? "bg-[#10B981]"
+                        : "bg-zinc-900",
+                    )}
+                  />
+                ))}
+            </div>
+            <div className="flex items-center justify-between">
+              <h1 className="text-[14px] font-[500] text-[#52525B]">
+                {uptimeDayCount} days ago
+              </h1>
+              <h1 className="text-[14px] font-[500] text-[#52525B]">Today</h1>
+            </div>
+          </>
+        )}
       </div>
-      {data.blockchain.payType === PAY_TYPE.FULL ? (
-        <FullNode node={data} refetch={refetch} />
-      ) : (
-        <PartialNode node={data} />
-      )}
-      {data.status === "LIVE" && (
-        <>
-          <div className="flex items-center justify-between pt-3">
-            <h1 className="text-[14px] font-[500] text-[#52525B]">
-              Activated date
-            </h1>
-            <h1 className="text-[14px] font-[500] text-[#fff]">
-              {formatDate(data.createdAt)}
-            </h1>
-          </div>
-          <h1 className="text-[14px] font-[500] text-[#52525B]">Uptime</h1>
-          <div className="flex flex-row-reverse">
-            {new Array(uptimeDayCount)
-              .fill(0)
-              ?.map((_, i) => (
-                <div
-                  key={i}
-                  className={clsx(
-                    `w-[1%] h-[48px] m-[1px] rounded-[3px]`,
-                    i <= daysPassedSince(data.createdAt)
-                      ? "bg-[#10B981]"
-                      : "bg-zinc-900",
-                  )}
-                />
-              ))}
-          </div>
-          <div className="flex items-center justify-between">
-            <h1 className="text-[14px] font-[500] text-[#52525B]">
-              {uptimeDayCount} days ago
-            </h1>
-            <h1 className="text-[14px] font-[500] text-[#52525B]">Today</h1>
-          </div>
-        </>
-      )}
     </div>
   )
 }
