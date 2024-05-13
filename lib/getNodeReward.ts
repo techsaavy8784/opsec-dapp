@@ -52,17 +52,15 @@ const getNodeReward = async (userId: number, nodeId: number) => {
     return { reward: 0, ownership }
   }
 
-  if (now.isAfter(lockTime)) {
-    let rewardPeriod = now.diff(purchaseTime, "month")
+  let rewardPeriod = now.diff(purchaseTime, "month")
 
-    if (withdrawTime) {
-      rewardPeriod -= withdrawTime.diff(purchaseTime, "month")
-    }
+  if (withdrawTime) {
+    rewardPeriod -= withdrawTime.diff(purchaseTime, "month")
+  }
 
-    return {
-      reward: (node.blockchain.rewardPerMonth ?? 0) * rewardPeriod * ownership,
-      ownership,
-    }
+  return {
+    reward: (node.blockchain.rewardPerMonth ?? 0) * rewardPeriod * ownership,
+    ownership,
   }
 }
 
