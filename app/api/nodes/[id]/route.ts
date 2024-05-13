@@ -4,6 +4,7 @@ import { getServerSession } from "next-auth"
 import { NextResponse } from "next/server"
 import dayjs from "dayjs"
 import { PAY_TYPE } from "@prisma/client"
+import getNodeReward from "@/lib/getNodeReward"
 
 export async function GET(
   request: Request,
@@ -31,41 +32,7 @@ export async function GET(
     return NextResponse.json(node)
   }
 
-  const {
-    _sum: { credit: paidCredit },
-  } = await prisma.payment.aggregate({
-    where: { userId, nodeId },
-    _sum: { credit: true },
-  })
-
-  const withdrawTime = await prisma.reward
-    .findFirst({ where: { userId } })
-    .then((res) =>
-      res?.nodeRewardWithdrawTime
-        ? dayjs(res.nodeRewardWithdrawTime)
-        : undefined,
-    )
-
-  if (!node || !node.blockchain || !paidCredit) {
-    return NextResponse.json({ ...node, reward: 0, ownership: 0 })
-  }
-
-  const now = dayjs()
-  const purchaseTime = dayjs(node.createdAt)
-  const lockTime = purchaseTime.add(node.blockchain.rewardLockTime || 0, "day")
-
-  const ownership = paidCredit / node.blockchain.price
-  let reward = 0
-
-  if (now.isAfter(lockTime)) {
-    let rewardPeriod = now.diff(purchaseTime, "month")
-
-    if (withdrawTime) {
-      rewardPeriod -= withdrawTime.diff(purchaseTime, "month")
-    }
-
-    reward = (node.blockchain.rewardPerMonth || 0) * rewardPeriod * ownership
-  }
+  const { reward, ownership } = await getNodeReward(userId, nodeId)
 
   return NextResponse.json({ ...node, reward, ownership })
 }
