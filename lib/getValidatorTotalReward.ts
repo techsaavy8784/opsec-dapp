@@ -3,14 +3,16 @@ import getValidatorReward from "./getValidatorReward"
 import { PAY_TYPE } from "@prisma/client"
 
 const getValidatorTotalReward = async (userId: number) => {
-  const nodes = await prisma.node.findMany({
-    where: { NOT: { server: null } },
+  const validators = await prisma.node.findMany({
+    where: {
+      NOT: { server: null },
+      blockchain: {
+        payType: PAY_TYPE.PARTIAL,
+      },
+    },
     include: { blockchain: true },
   })
 
-  const validators = nodes.filter(
-    (node) => node.blockchain.payType === PAY_TYPE.PARTIAL,
-  )
   const rewardInfos = await Promise.all(
     validators.map((validator) => getValidatorReward(userId, validator.id)),
   )
