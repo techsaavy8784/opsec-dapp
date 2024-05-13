@@ -47,11 +47,6 @@ const Sidebar = ({ setOpen }: Props) => {
       icon: NodesIcon,
     },
     {
-      title: "Validators",
-      link: "validators",
-      icon: ValidatorsIcon,
-    },
-    {
       title: "Treasury",
       link: "treasury",
       icon: TreasuryIcon,
