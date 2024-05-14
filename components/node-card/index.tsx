@@ -50,8 +50,8 @@ export const NodeCard: React.FC<NodeCardProps> = ({
               Number(process.env.NEXT_PUBLIC_NODE_EXPIRE_WARN_DAYS) && (
               <Badge>{expireInDays} days left</Badge>
             )}
+          {payType === PAY_TYPE.PARTIAL && <Badge>PARTIAL</Badge>}
           {status && <Badge>{status}</Badge>}
-          {payType === PAY_TYPE.PARTIAL && <Badge>Partial Purchase</Badge>}
         </div>
       </div>
       <p className="text-[#BDBDBD] font-[500] text-[12px] line-clamp-2">

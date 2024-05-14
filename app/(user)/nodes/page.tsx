@@ -3,7 +3,7 @@
 import React from "react"
 import { useQuery } from "@tanstack/react-query"
 import { Skeleton } from "@/components/ui/skeleton"
-import { Blockchain, Node, Payment, Server } from "@prisma/client"
+import { Blockchain, Node, PAY_TYPE, Payment, Server } from "@prisma/client"
 import { NodeCard } from "@/components/node-card"
 import { daysPassedSince, formatDate } from "@/lib/utils"
 
@@ -47,8 +47,10 @@ const Nodes: React.FC = () => {
           description={node.blockchain.description}
           status={node.status}
           expireInDays={
-            node.payments.reduce((sum, item) => (sum += item.duration), 0) -
-            daysPassedSince(node.createdAt)
+            node.blockchain.payType === PAY_TYPE.FULL
+              ? node.payments.reduce((sum, item) => (sum += item.duration), 0) -
+                daysPassedSince(node.createdAt)
+              : undefined
           }
         />
       ))}

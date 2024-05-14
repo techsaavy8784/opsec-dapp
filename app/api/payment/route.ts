@@ -42,6 +42,7 @@ export async function PUT(request: NextRequest) {
   }
 
   const { id, plan } = await request.json()
+  const userId = session.user.id
 
   const node = await prisma.node.findUnique({
     where: {
@@ -62,7 +63,7 @@ export async function PUT(request: NextRequest) {
 
   const user = await prisma.user.findFirst({
     where: {
-      id: session.user.id,
+      id: userId,
     },
   })
 
@@ -89,7 +90,7 @@ export async function PUT(request: NextRequest) {
       balance: user!.balance - amount,
     },
     where: {
-      id: session.user.id,
+      id: userId,
     },
   })
 
@@ -105,9 +106,8 @@ export async function POST(request: NextRequest) {
   }
 
   const { wallet, id, plan, payAmount } = await request.json()
-
+  const userId = session.user.id
   const blockchainId = id
-
   const servers = await availableServers(blockchainId)
 
   if (servers.length === 0) {
@@ -119,7 +119,7 @@ export async function POST(request: NextRequest) {
 
   const user = await prisma.user.findFirst({
     where: {
-      id: session.user.id,
+      id: userId,
     },
   })
 
@@ -162,7 +162,7 @@ export async function POST(request: NextRequest) {
   const node = await prisma.node.create({
     data: {
       wallet,
-      userId: session.user.id,
+      userId,
       blockchainId,
       serverId:
         blockchain.payType === PAY_TYPE.FULL
@@ -176,6 +176,7 @@ export async function POST(request: NextRequest) {
       duration: months * 31,
       credit: amount,
       nodeId: node.id,
+      userId,
     },
   })
 
@@ -184,7 +185,7 @@ export async function POST(request: NextRequest) {
       balance: user!.balance - amount,
     },
     where: {
-      id: session.user.id,
+      id: userId,
     },
   })
 
