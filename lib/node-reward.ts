@@ -1,5 +1,5 @@
 import prisma from "@/prisma"
-import { PAY_TYPE } from "@prisma/client"
+import { PAY_TYPE, Payment } from "@prisma/client"
 import dayjs from "dayjs"
 import { Blockchain, Node } from "@prisma/client"
 
@@ -42,10 +42,10 @@ export const getNodeTotalReward = async (userId: number) => {
 
 const getNodeReward = (
   paidCredit: number,
-  node: Node & { blockchain: Blockchain },
+  node: Node & { blockchain: Blockchain; payments: Payment[] },
   withdrawTime?: dayjs.Dayjs,
 ) => {
-  const now = dayjs()
+  let now = dayjs()
 
   const purchaseTime = dayjs(node.createdAt)
 
@@ -55,6 +55,23 @@ const getNodeReward = (
 
   if (now.isBefore(lockTime)) {
     return { reward: 0, ownership }
+  }
+
+  if (node.blockchain.payType === PAY_TYPE.FULL) {
+    const expiration = node.payments.reduce(
+      (total, item) => (total += item.duration),
+      0,
+    )
+    const expirationTime = dayjs(node.createdAt).add(expiration, "day")
+
+    if (withdrawTime?.isAfter(expirationTime)) {
+      return { reward: 0, ownership }
+    }
+
+    // if node is expired, no rewards are accrued.
+    if (now.isAfter(expirationTime)) {
+      now = expirationTime
+    }
   }
 
   let rewardPeriod = now.diff(purchaseTime, "month")

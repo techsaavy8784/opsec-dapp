@@ -14,11 +14,6 @@ export const PartialNode: React.FC<Props> = ({ node }) => (
       </h1>
     </div>
 
-    <div className="flex items-center justify-between">
-      <h1 className="text-[14px] font-[500] text-[#52525B]">Reward Amount</h1>
-      <h1 className="text-[14px] font-[500] text-[#fff]">{node.reward}</h1>
-    </div>
-
     {!node.server && (
       <h1 className="text-[#fff] text-center pb-4">
         Waiting for admin to activate on server
