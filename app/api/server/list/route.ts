@@ -24,10 +24,15 @@ export async function GET() {
     server.nodes = server.nodes.filter((node) => node.status !== "EXPIRED")
   }
 
+  const multiNodeCount = servers.filter(
+    (server) => server.type === SERVER_TYPE.MULTI_NODE,
+  ).length
+  const singleNodeCount = servers.filter(
+    (server) => server.type === SERVER_TYPE.SINGLE_NODE,
+  ).length
   const totalCapacity =
-    servers.filter((server) => server.type === SERVER_TYPE.MULTI_NODE).length *
-      Number(process.env.NODE_COUNT_PER_SERVER) +
-    servers.filter((server) => server.type === SERVER_TYPE.SINGLE_NODE).length
+    multiNodeCount * Number(process.env.NODE_COUNT_PER_SERVER) + singleNodeCount
+
   const usedCapacity = servers.reduce(
     (acc, server) => acc + server.nodes.length,
     0,
@@ -48,10 +53,7 @@ export async function GET() {
           server.type === SERVER_TYPE.MULTI_NODE &&
           server.nodes.some((node) => node.blockchainId === chain.id),
       )
-      disabled =
-        chainServers.length ===
-        servers.filter((server) => server.type === SERVER_TYPE.MULTI_NODE)
-          .length
+      disabled = chainServers.length === multiNodeCount
     }
 
     return {
