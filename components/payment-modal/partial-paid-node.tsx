@@ -91,13 +91,28 @@ export const PartialNodePaymentModal: React.FC<PaymentModalProps> = ({
             </div>
           </DialogDescription>
 
-          {insufficientBalance && (
-            <p className="text-center text-yellow-600">
-              Insufficient credit balance
+          <div className="text-center">
+            <p className="flex">
+              <strong className="text-zinc-500 mr-5 w-1/2 text-right">
+                Chain Price
+              </strong>
+              <span>{chain.price}</span>
             </p>
-          )}
+            <p className="flex">
+              <strong className="text-zinc-500 mr-5 w-1/2 text-right">
+                Credits to be paid
+              </strong>
+              <span>{amount}</span>
+            </p>
+            <p className="flex">
+              <strong className="text-zinc-500 mr-5 w-1/2 text-right">
+                % Ownership
+              </strong>
+              <span>{Math.floor((amount * 100) / chain.price)}</span>
+            </p>
+          </div>
 
-          <form className="flex flex-col items-center justify-center gap-8 px-8">
+          <form className="space-y-4 text-center">
             <Slider
               value={[amount]}
               min={chain.floorPrice ?? 1}
@@ -106,17 +121,15 @@ export const PartialNodePaymentModal: React.FC<PaymentModalProps> = ({
               className="my-4"
               onValueChange={([value]) => setAmount(value)}
             />
-            <p className="text-[#F44336]">
-              <strong>Chain Price: </strong>
-              <span className="text-zinc-500">{chain.price}</span>
+
+            <p className="text-center text-yellow-600">
+              {insufficientBalance ? (
+                "Insufficient credit balance"
+              ) : (
+                <>&nbsp;</>
+              )}
             </p>
-            <p className="text-[#F44336]">
-              <strong>%Ownership: </strong>
-              <span className="text-zinc-500">
-                {Math.floor((amount * 100) / chain.price)}
-                {" %"}
-              </span>
-            </p>
+
             <Button
               type="button"
               onClick={() => purchase(chain.rewardWallet ?? "")}
