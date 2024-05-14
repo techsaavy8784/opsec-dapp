@@ -1,6 +1,6 @@
 import { authOptions } from "@/lib/auth"
 import prisma from "@/prisma"
-import { PAY_TYPE } from "@prisma/client"
+import { PAY_TYPE, SERVER_TYPE } from "@prisma/client"
 import { getServerSession } from "next-auth"
 import { NextResponse } from "next/server"
 
@@ -25,7 +25,9 @@ export async function GET() {
   }
 
   const totalCapacity =
-    servers.length * Number(process.env.NODE_COUNT_PER_SERVER)
+    servers.filter((server) => server.type === SERVER_TYPE.MULTI_NODE).length *
+      Number(process.env.NODE_COUNT_PER_SERVER) +
+    servers.filter((server) => server.type === SERVER_TYPE.SINGLE_NODE).length
   const usedCapacity = servers.reduce(
     (acc, server) => acc + server.nodes.length,
     0,
@@ -41,10 +43,15 @@ export async function GET() {
     // todo: need to handle the case of PAY_TYPE.PARTIAL
 
     if (chain.payType === PAY_TYPE.FULL) {
-      const chainServers = servers.filter((server) =>
-        server.nodes.some((node) => node.blockchainId === chain.id),
+      const chainServers = servers.filter(
+        (server) =>
+          server.type === SERVER_TYPE.MULTI_NODE &&
+          server.nodes.some((node) => node.blockchainId === chain.id),
       )
-      disabled = chainServers.length === servers.length
+      disabled =
+        chainServers.length ===
+        servers.filter((server) => server.type === SERVER_TYPE.MULTI_NODE)
+          .length
     }
 
     return {
