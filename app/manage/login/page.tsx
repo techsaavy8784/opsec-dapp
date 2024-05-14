@@ -45,7 +45,7 @@ function LoginForm() {
     })
 
     if (!result?.error) {
-      router.push("/manage")
+      router.push("/manage/user")
       form.reset()
     } else {
       // Handle error...
