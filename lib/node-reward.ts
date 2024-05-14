@@ -63,13 +63,14 @@ const getNodeReward = (
       0,
     )
     const expirationTime = dayjs(node.createdAt).add(expiration, "day")
+
+    if (withdrawTime?.isAfter(expirationTime)) {
+      return { reward: 0, ownership }
+    }
+
     // if node is expired, no rewards are accrued.
     if (now.isAfter(expirationTime)) {
       now = expirationTime
-    }
-
-    if (withdrawTime?.isAfter(now)) {
-      return { reward: 0, ownership: 1 }
     }
   }
 
