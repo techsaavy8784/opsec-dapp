@@ -64,7 +64,7 @@ const getNodeReward = (
     )
     const expirationTime = dayjs(node.createdAt).add(expiration, "day")
     // if node is expired, no rewards are accrued.
-    if (expirationTime.isAfter(now)) {
+    if (now.isAfter(expirationTime)) {
       now = expirationTime
     }
 
