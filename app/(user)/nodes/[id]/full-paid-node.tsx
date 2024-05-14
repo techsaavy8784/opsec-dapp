@@ -65,7 +65,7 @@ export const FullNode: React.FC<Props> = ({ node, refetch }) => {
         </div>
       )}
 
-      <div className="text-center">
+      <div className="text-center pt-8">
         <Button onClick={() => setModal(true)}>Extend subscription</Button>
         {stakeId ? (
           <ExtendStakingModal
