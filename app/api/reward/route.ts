@@ -2,7 +2,7 @@ import { getServerSession } from "next-auth"
 import { NextResponse, NextRequest } from "next/server"
 import prisma from "@/prisma"
 import { authOptions } from "@/lib/auth"
-import getNodeTotalReward from "@/lib/getNodeTotalReward"
+import { getNodeTotalReward } from "@/lib/node-reward"
 
 export async function POST(request: NextRequest) {
   const session = await getServerSession(authOptions)
@@ -11,16 +11,19 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 })
   }
 
-  const reward = await prisma.reward.findFirst({
-    where: { userId: session.user.id },
-  })
+  const userId = session.user.id
 
-  const nodeReward = await getNodeTotalReward(session.user.id)
+  const [reward, nodeReward] = await Promise.all([
+    prisma.reward.findFirst({
+      where: { userId },
+    }),
+    getNodeTotalReward(userId),
+  ])
 
   let totalReward = nodeReward
 
   if (reward) {
-    totalReward += (reward.taxReward || 0) + (reward.reflectionReward || 0)
+    totalReward += (reward.taxReward ?? 0) + (reward.reflectionReward ?? 0)
   }
 
   await prisma.reward.upsert({
@@ -31,22 +34,22 @@ export async function POST(request: NextRequest) {
       nodeRewardWithdrawTime: new Date(),
     },
     create: {
-      userId: session.user.id,
+      userId,
       nodeRewardWithdrawTime: new Date(),
     },
   })
 
   const claim = await prisma.claim.findFirst({
-    where: { userId: session.user.id },
+    where: { userId },
   })
 
   await prisma.claim.upsert({
     where: { id: claim?.id ?? 0 },
     update: {
-      amount: (claim?.amount || 0) + totalReward,
+      amount: (claim?.amount ?? 0) + totalReward,
     },
     create: {
-      userId: session.user.id,
+      userId,
       amount: totalReward,
     },
   })

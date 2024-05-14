@@ -42,6 +42,7 @@ const Nodes: React.FC = () => {
           key={key}
           id={node.id}
           name={node.blockchain.name}
+          payType={node.blockchain.payType}
           created={formatDate(node.createdAt)}
           description={node.blockchain.description}
           status={node.status}
