@@ -27,9 +27,11 @@ export async function GET() {
   const multiNodeServerCount = servers.filter(
     (server) => server.type === SERVER_TYPE.MULTI_NODE,
   ).length
+
   const singleNodeServerCount = servers.filter(
     (server) => server.type === SERVER_TYPE.SINGLE_NODE,
   ).length
+
   const totalCapacity =
     multiNodeServerCount * Number(process.env.NODE_COUNT_PER_SERVER) +
     singleNodeServerCount
@@ -38,6 +40,8 @@ export async function GET() {
     (acc, server) => acc + server.nodes.length,
     0,
   )
+
+  console.log(usedCapacity)
 
   const remainingCapacity = totalCapacity - usedCapacity
 
@@ -72,6 +76,6 @@ export async function GET() {
   return NextResponse.json({
     total: totalCapacity,
     capacity: remainingCapacity,
-    chains: chains,
+    chains,
   })
 }
