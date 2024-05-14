@@ -55,8 +55,9 @@ const Reward = () => {
         <p className="w-1/2 text-right text-gray-400">Tax Reward</p>
         <p>{taxReward ?? 0}</p>
       </div>
+      <hr />
       <div className="flex gap-4">
-        <p className="w-1/2 text-right text-gray-400">Total Claimable Amount</p>
+        <p className="w-1/2 text-right text-gray-400">Total</p>
         <p>{totalReward}</p>
       </div>
       <div className="text-center">
