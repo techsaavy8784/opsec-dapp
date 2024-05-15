@@ -6,20 +6,19 @@ export default withAuth(
     const isAdmin = request.nextauth?.token?.email
     const pathname = request.nextUrl?.pathname
 
-    if (pathname === "/manage/login") {
-      if (isAdmin) {
-        const adminurl = new URL("/manage", request.nextUrl.origin)
-        return NextResponse.redirect(adminurl.toString())
-      } else {
-        return NextResponse.next()
-      }
-    }
     if (pathname.startsWith("/manage")) {
       if (isAdmin) {
+        if (!pathname.startsWith("/manage/user")) {
+          const adminUserUrl = new URL("/manage/user", request.nextUrl.origin)
+          return NextResponse.redirect(adminUserUrl.toString())
+        }
         return NextResponse.next()
       } else {
-        const adminloginurl = new URL("/manage/login", request.nextUrl.origin)
-        return NextResponse.redirect(adminloginurl.toString())
+        if (!pathname.startsWith("/manage/login")) {
+          const adminLoginUrl = new URL("/manage/login", request.nextUrl.origin)
+          return NextResponse.redirect(adminLoginUrl.toString())
+        }
+        return NextResponse.next()
       }
     } else {
       return NextResponse.next()

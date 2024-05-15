@@ -1,12 +1,13 @@
 "use client"
 import { useState } from "react"
 import { useToast } from "@/components/ui/use-toast"
+import { Button } from "@/components/ui/button"
+import { signOut } from "next-auth/react"
 
 export default function Home() {
   const [address, setAddress] = useState("")
   const [data, setData] = useState<any>(null)
   const [loading, setLoading] = useState(false)
-  const [error, setError] = useState("")
   const [expandedNodes, setExpandedNodes] = useState(false)
   const [expandedCredits, setExpandedCredits] = useState(false)
   const [isEditing, setIsEditing] = useState<any>({ nodes: {}, credits: {} })
@@ -14,13 +15,18 @@ export default function Home() {
 
   const handleSearch = async () => {
     setLoading(true)
-    setError("")
     try {
       const response = await fetch(`/api/manage/user/fetch?address=${address}`)
       const result = await response.json()
       setData(result)
+
+      toast({
+        title: result.ok ? "User Found" : "User Not Found",
+      })
     } catch (err) {
-      setError("Failed to fetch data")
+      toast({
+        title: "Error Searching User",
+      })
     }
     setLoading(false)
   }
@@ -99,6 +105,12 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 p-6">
+      <Button
+        onClick={() => signOut()}
+        className="absolute right-3 top-3 z-10 bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-4 rounded"
+      >
+        Sign out
+      </Button>
       <h1 className="text-2xl font-bold mb-4">User Details</h1>
       <div className="mb-4">
         <input
@@ -118,7 +130,6 @@ export default function Home() {
           {loading ? "Loading..." : "Search"}
         </button>
       </div>
-      {error && <p className="text-red-500">{error}</p>}
       {data && (
         <div>
           <h2 className="text-xl font-bold mb-2">Address Information</h2>

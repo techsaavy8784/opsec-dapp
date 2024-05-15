@@ -63,27 +63,27 @@ function LoginForm() {
   }
 
   return (
-    <div className="relative">
+    <div className="relative ">
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
-          className="absolute left-[100px] flex flex-col gap-4 justify-center items-center"
+          className="absolute inset-x-0 top-[100px] w-full max-w-lg mx-auto p-8 bg-gray-800 rounded-lg shadow-md flex flex-col gap-6"
         >
-          <div>
+          <div className="flex flex-col gap-4">
             <FormField
               control={form.control}
               name="email"
               render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-white">email</FormLabel>
+                <FormItem className="flex flex-col gap-2">
+                  <FormLabel className="text-gray-300">Email</FormLabel>
                   <FormControl>
                     <Input
-                      className="bg-white text-black"
+                      className="bg-white text-gray-900 border border-gray-300 rounded-md p-2"
                       placeholder="admin@opsec.org"
                       {...field}
                     />
                   </FormControl>
-                  <FormMessage />
+                  <FormMessage className="text-sm text-red-500" />
                 </FormItem>
               )}
             />
@@ -91,34 +91,34 @@ function LoginForm() {
               control={form.control}
               name="password"
               render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-white">Password</FormLabel>
+                <FormItem className="flex flex-col gap-2">
+                  <FormLabel className="text-gray-300">Password</FormLabel>
                   <FormControl>
                     <Input
                       type="password"
-                      className="bg-white text-black"
+                      className="bg-white text-gray-900 border border-gray-300 rounded-md p-2"
                       placeholder="Password"
                       {...field}
                     />
                   </FormControl>
-                  <FormMessage />
+                  <FormMessage className="text-sm text-red-500" />
                 </FormItem>
               )}
             />
-            {loading ? (
-              <Button
-                className="w-full my-6 flex justify-center"
-                type="submit"
-                disabled
-              >
-                <PulseLoader color="black" />
-              </Button>
-            ) : (
-              <Button className="w-full my-6" type="submit">
-                Login
-              </Button>
-            )}
           </div>
+          {loading ? (
+            <Button
+              className="w-full py-3 mt-6 flex justify-center items-center bg-blue-600 text-white rounded-md shadow-sm opacity-50 cursor-not-allowed"
+              type="submit"
+              disabled
+            >
+              <PulseLoader color="white" />
+            </Button>
+          ) : (
+            <Button className="w-full py-3 mt-6 bg-blue-500 hover:bg-blue-600 text-white rounded-md shadow-sm">
+              Login
+            </Button>
+          )}
         </form>
       </Form>
     </div>
