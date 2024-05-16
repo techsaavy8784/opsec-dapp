@@ -138,7 +138,6 @@ export async function POST(request: NextRequest) {
   let months, priceMultiplier, amount
 
   if (blockchain.payType === PAY_TYPE.FULL) {
-    let aaa
     ;[months, priceMultiplier] = subscriptions[plan]
     amount = blockchain.price * priceMultiplier
   } else {
