@@ -19,14 +19,10 @@ export default function Home() {
       const response = await fetch(`/api/manage/user/fetch?address=${address}`)
       const result = await response.json()
       setData(result)
-
-      toast({
-        title: result.ok ? "User Found" : "User Not Found",
-      })
+      setIsEditing({ nodes: {}, credits: {}, balance: false })
+      toast({ title: result.error ? "User Not Found" : "User Found" })
     } catch (err) {
-      toast({
-        title: "Error Searching User",
-      })
+      toast({ title: "Error Searching User" })
     }
     setLoading(false)
   }
@@ -52,17 +48,21 @@ export default function Home() {
   const handleEdit = (index: any, section: any) => {
     setIsEditing((prev: any) => ({
       ...prev,
-      [section]: {
-        ...prev[section],
-        [index]: !prev[section][index],
-      },
+      [section]:
+        typeof index === "number"
+          ? {
+              ...prev[section],
+              [index]: !prev[section][index],
+            }
+          : !prev[section],
     }))
   }
 
   const handleSave = async (index: any, section: any) => {
-    const payload: any = { id: data[section][index].id, type: section }
+    const payload: any = { type: section }
 
     if (section === "nodes") {
+      payload.id = data[section][index].id
       payload.status = data[section][index].status
       payload.wallet = data[section][index].wallet
       payload.blockchainId = data[section][index].blockchainId
@@ -73,9 +73,13 @@ export default function Home() {
       payload.password = data.nodes[index].server.password
       payload.active = data.nodes[index].server.active
     } else if (section === "credits") {
+      payload.id = data[section][index].id
       payload.tx = data[section][index].tx
       payload.credits = data[section][index].credits
       payload.date = data[section][index].date
+    } else if (section === "balance") {
+      payload.address = data.address
+      payload.balance = data.balance
     }
 
     try {
@@ -88,21 +92,16 @@ export default function Home() {
       })
       const result = await response.json()
       if (response.ok) {
-        toast({
-          title: "Successfully Updated",
-        })
+        toast({ title: "Successfully Updated" })
       } else {
         throw new Error(result.error || "An unknown error occurred")
       }
-    } catch (error: any) {
+    } catch (error) {
       console.error("Save failed:", error)
-      toast({
-        title: "Updation failed",
-      })
+      toast({ title: "Update failed" })
     }
     handleEdit(index, section)
   }
-
   return (
     <div className="min-h-screen bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 p-6">
       <Button
@@ -134,11 +133,37 @@ export default function Home() {
         <div>
           <h2 className="text-xl font-bold mb-2">Address Information</h2>
           <div className="mb-4">
-            <label className="block mb-1">Balance:</label>
+            <div className="flex justify-between">
+              <label className="block mb-1">Balance:</label>
+              <div>
+                <button
+                  className="px-4 py-2 ml-2 bg-green-500 text-white rounded-lg"
+                  onClick={() => handleEdit(null, "balance")}
+                >
+                  {isEditing.balance ? "Cancel" : "Edit"}
+                </button>
+                {isEditing.balance && (
+                  <button
+                    className="px-4 py-2 ml-2 bg-blue-500 text-white rounded-lg"
+                    onClick={() => handleSave(null, "balance")}
+                  >
+                    Save
+                  </button>
+                )}
+              </div>
+            </div>
             <input
               type="number"
               value={data.balance}
-              className="px-4 py-2 w-full border rounded-lg bg-white dark:bg-gray-800 dark:border-gray-700"
+              onChange={(e) =>
+                handleInputChange(e, "balance", null, null, null)
+              }
+              disabled={!isEditing.balance}
+              className={`px-4 py-2 w-full border rounded-lg ${
+                isEditing.balance
+                  ? "bg-white dark:bg-gray-800"
+                  : "bg-gray-100 dark:bg-gray-700"
+              }`}
             />
           </div>
           <h3
