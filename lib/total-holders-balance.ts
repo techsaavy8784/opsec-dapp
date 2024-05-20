@@ -11,7 +11,7 @@ async function getAllHoldersOpSecBalance() {
   try {
     let sum: number = 0
     for await (const resp of client.BalanceService.getTokenHoldersV2ForTokenAddress(
-      "eth-mainnet",
+      process.env.NODE_ENV === "production" ? "eth-mainnet" : "eth-sepolia",
       process.env.NEXT_PUBLIC_OPSEC_TOKEN_ADDRESS as `0x${string}`,
       { pageSize: 1000 },
     )) {
