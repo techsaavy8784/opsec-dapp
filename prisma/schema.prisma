@@ -142,7 +142,6 @@ model Claim {
 model Reward {
   id                     Int       @id @default(autoincrement())
   userId                 Int       @map("user_id")
-  taxReward              Int?      @map("tax_reward")
   reflectionReward       Int?      @map("reflection_reward")
   rewardWithdrawTime     DateTime? @map("reward_withdraw_time")
   user                   User      @relation(fields: [userId], references: [id])

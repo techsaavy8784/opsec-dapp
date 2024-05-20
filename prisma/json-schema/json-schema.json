@@ -412,12 +412,6 @@
         "id": {
           "type": "integer"
         },
-        "taxReward": {
-          "type": [
-            "integer",
-            "null"
-          ]
-        },
         "reflectionReward": {
           "type": [
             "integer",
