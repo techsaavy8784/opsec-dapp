@@ -1,6 +1,6 @@
 import { formatUnits } from "viem"
-import cache from "./lruCache"
-import client from "./covalentClient"
+import cache from "./lru-cache"
+import client from "./covalent-client"
 
 async function getAllHoldersOpSecBalance() {
   const cachedData = cache.get("holders_opsec_balance")
