@@ -1,107 +1,143 @@
 "use client"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useToast } from "@/components/ui/use-toast"
 import { Button } from "@/components/ui/button"
 import { signOut } from "next-auth/react"
+import DatePicker from "react-datepicker"
+import "react-datepicker/dist/react-datepicker.css"
 
 export default function Home() {
   const [address, setAddress] = useState("")
   const [data, setData] = useState<any>(null)
   const [loading, setLoading] = useState(false)
-  const [expandedNodes, setExpandedNodes] = useState(false)
-  const [expandedCredits, setExpandedCredits] = useState(false)
-  const [isEditing, setIsEditing] = useState<any>({ nodes: {}, credits: {} })
+  const [showBalanceModal, setShowBalanceModal] = useState(false)
+  const [balanceInput, setBalanceInput] = useState(0)
+  const [creditsPage, setCreditsPage] = useState(1)
+  const [nodesPage, setNodesPage] = useState(1)
+  const [expandedPayments, setExpandedPayments] = useState<number | null>(null)
+  const itemsPerPage = 5
   const { toast } = useToast()
 
-  const handleSearch = async () => {
+  const fetchDataAndUpdate = async (
+    url: string,
+    successToast: any,
+    errorToast: any,
+  ) => {
     setLoading(true)
     try {
-      const response = await fetch(`/api/manage/user/fetch?address=${address}`)
+      const response = await fetch(url)
       const result = await response.json()
       setData(result)
-      setIsEditing({ nodes: {}, credits: {}, balance: false })
-      toast({ title: result.error ? "User Not Found" : "User Found" })
+      toast({ title: successToast })
     } catch (err) {
-      toast({ title: "Error Searching User" })
+      toast({ title: errorToast })
+    } finally {
+      setLoading(false)
     }
-    setLoading(false)
   }
 
-  const handleInputChange = (
-    e: any,
-    field: any,
-    index: any,
-    section: any,
-    subSection: any,
-  ) => {
-    const updatedData = { ...data }
-    if (subSection) {
-      updatedData[section][index][subSection][field] = e.target.value
-    } else if (section) {
-      updatedData[section][index][field] = e.target.value
-    } else {
-      updatedData[field] = e.target.value
-    }
-    setData(updatedData)
-  }
-
-  const handleEdit = (index: any, section: any) => {
-    setIsEditing((prev: any) => ({
-      ...prev,
-      [section]:
-        typeof index === "number"
-          ? {
-              ...prev[section],
-              [index]: !prev[section][index],
-            }
-          : !prev[section],
-    }))
-  }
-
-  const handleSave = async (index: any, section: any) => {
-    const payload: any = { type: section }
-
-    if (section === "nodes") {
-      payload.id = data[section][index].id
-      payload.status = data[section][index].status
-      payload.wallet = data[section][index].wallet
-      payload.blockchainId = data[section][index].blockchainId
-      payload.serverId = data[section][index].serverId
-      payload.host = data.nodes[index].server.host
-      payload.port = data.nodes[index].server.port
-      payload.username = data.nodes[index].server.username
-      payload.password = data.nodes[index].server.password
-      payload.active = data.nodes[index].server.active
-    } else if (section === "credits") {
-      payload.id = data[section][index].id
-      payload.tx = data[section][index].tx
-      payload.credits = data[section][index].credits
-      payload.date = data[section][index].date
-    } else if (section === "balance") {
-      payload.address = data.address
-      payload.balance = data.balance
-    }
-
+  const handleSearch = async () => {
     try {
-      const response = await fetch("/api/manage/user/update", {
+      const url = `/api/manage/user/fetch?address=${address}`
+      await fetchDataAndUpdate(url, "User Found", "Error Searching User")
+    } catch (e) {
+      toast({ title: "Search failed" })
+      throw new Error()
+    }
+  }
+
+  const handleAddBalance = () => {
+    setShowBalanceModal(true)
+  }
+
+  const handleBalanceSubmit = async () => {
+    try {
+      const response = await fetch("/api/manage/user/credit", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(payload),
+        body: JSON.stringify({
+          userId: data?.id,
+          balance: data?.balance,
+          balanceCredited: balanceInput,
+        }),
       })
       const result = await response.json()
       if (response.ok) {
-        toast({ title: "Successfully Updated" })
+        setData((prevData: any) => ({
+          ...prevData,
+          balance: prevData.balance + balanceInput,
+        }))
+        toast({ title: "Successfully Added Credit" })
       } else {
         throw new Error(result.error || "An unknown error occurred")
       }
-    } catch (error) {
-      console.error("Save failed:", error)
+      setShowBalanceModal(false)
+    } catch (e) {
       toast({ title: "Update failed" })
+      throw new Error()
     }
-    handleEdit(index, section)
   }
+
+  const handleMoreCredits = () => {
+    setCreditsPage((prevPage) => prevPage + 1)
+  }
+
+  const handleMoreNodes = () => {
+    setNodesPage((prevPage) => prevPage + 1)
+  }
+
+  const handleNodeStatusChange = (index: number, newStatus: string) => {
+    setData((prevData: any) => {
+      const updatedNodes = [...prevData.nodes]
+      updatedNodes[index].status = newStatus
+      return { ...prevData, nodes: updatedNodes }
+    })
+  }
+
+  const handleNodeDateChange = (index: number, newDate: Date) => {
+    setData((prevData: any) => {
+      const updatedNodes = [...prevData.nodes]
+      updatedNodes[index].expiryDate = newDate
+      return { ...prevData, nodes: updatedNodes }
+    })
+  }
+
+  const handleNodeUpdate = async (node: any) => {
+    try {
+      const response = await fetch("/api/manage/user/node", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          nodeId: node.id,
+          status: node.status,
+          expiryDate: node.expiryDate,
+        }),
+      })
+      const result = await response.json()
+      if (response.ok) {
+        const url = `/api/manage/user/fetch?address=${address}`
+        await fetchDataAndUpdate(
+          url,
+          "Node Successfully Updated",
+          "Error Updating Node",
+        )
+      } else {
+        throw new Error(result.error || "An unknown error occurred")
+      }
+    } catch (e) {
+      toast({ title: "Update failed" })
+      throw new Error()
+    }
+  }
+
+  const togglePayments = (index: number) => {
+    setExpandedPayments(expandedPayments === index ? null : index)
+  }
+
   return (
     <div className="min-h-screen bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 p-6">
       <Button
@@ -110,6 +146,7 @@ export default function Home() {
       >
         Sign out
       </Button>
+
       <h1 className="text-2xl font-bold mb-4">User Details</h1>
       <div className="mb-4">
         <input
@@ -119,8 +156,6 @@ export default function Home() {
           placeholder="Enter Ethereum Address"
           className="px-4 py-2 w-full border rounded-lg bg-white dark:bg-gray-800 dark:border-gray-700"
         />
-      </div>
-      <div className="mb-4">
         <button
           onClick={handleSearch}
           disabled={loading}
@@ -129,212 +164,179 @@ export default function Home() {
           {loading ? "Loading..." : "Search"}
         </button>
       </div>
+
       {data && (
         <div>
-          <h2 className="text-xl font-bold mb-2">Address Information</h2>
           <div className="mb-4">
             <div className="flex justify-between">
-              <label className="block mb-1">Balance:</label>
-              <div>
-                <button
-                  className="px-4 py-2 ml-2 bg-green-500 text-white rounded-lg"
-                  onClick={() => handleEdit(null, "balance")}
-                >
-                  {isEditing.balance ? "Cancel" : "Edit"}
-                </button>
-                {isEditing.balance && (
-                  <button
-                    className="px-4 py-2 ml-2 bg-blue-500 text-white rounded-lg"
-                    onClick={() => handleSave(null, "balance")}
-                  >
-                    Save
-                  </button>
-                )}
-              </div>
+              <label className="block mb-1 text-lg font-semibold">
+                Balance:
+              </label>
+              <button
+                className="px-4 py-2 ml-2 bg-green-500 text-white rounded-lg"
+                onClick={handleAddBalance}
+              >
+                Add Credit
+              </button>
             </div>
             <input
               type="number"
               value={data.balance}
-              onChange={(e) =>
-                handleInputChange(e, "balance", null, null, null)
-              }
-              disabled={!isEditing.balance}
-              className={`px-4 py-2 w-full border rounded-lg ${
-                isEditing.balance
-                  ? "bg-white dark:bg-gray-800"
-                  : "bg-gray-100 dark:bg-gray-700"
-              }`}
+              readOnly
+              className="px-4 py-2 w-full border rounded-lg bg-gray-100 dark:bg-gray-700"
             />
           </div>
-          <h3
-            className="text-lg font-bold mb-2 cursor-pointer"
-            onClick={() => setExpandedNodes(!expandedNodes)}
-          >
-            Nodes {expandedNodes ? "-" : "+"}
-          </h3>
-          {expandedNodes &&
-            data?.nodes?.map((node: any, index: any) => (
-              <div
-                key={index}
-                className="mb-4 border p-4 rounded-lg bg-white dark:bg-gray-800"
-              >
+          {showBalanceModal && (
+            <div className="fixed inset-0 bg-gray-900 bg-opacity-50 flex justify-center items-center">
+              <div className="dark:bg-gray-800 p-6 rounded-lg">
+                <h2 className="text-xl font-bold mb-4">Add Balance</h2>
+                <input
+                  type="number"
+                  value={balanceInput}
+                  onChange={(e) => setBalanceInput(Number(e.target.value))}
+                  className="px-4 py-2 w-full border rounded-lg mb-4 text-black dark:text-black"
+                />
                 <div className="flex justify-between">
-                  <div className="mb-2 w-full">
-                    <label className="block mb-1">Node ID:</label>
-                    <input
-                      type="text"
-                      value={node.id}
-                      onChange={(e) =>
-                        handleInputChange(e, "id", index, "nodes", "")
-                      }
-                      readOnly
-                      className="px-4 py-2 w-full border rounded-lg bg-gray-100 dark:bg-gray-700"
-                    />
-                  </div>
                   <button
-                    className="px-4 py-1 ml-2 bg-green-500 text-white rounded-lg"
-                    onClick={() => handleEdit(index, "nodes")}
+                    onClick={() => setShowBalanceModal(false)}
+                    className="px-4 py-2 bg-red-500 rounded-lg mr-2"
                   >
-                    {isEditing.nodes[index] ? "Cancel" : "Edit"}
+                    Cancel
                   </button>
-                  {isEditing.nodes[index] && (
-                    <button
-                      className="px-4 py-1 ml-2 bg-blue-500 text-white rounded-lg"
-                      onClick={() => handleSave(index, "nodes")}
-                    >
-                      Save
-                    </button>
-                  )}
-                </div>
-                <div className="mb-2">
-                  <label className="block mb-1">Status:</label>
-                  <select
-                    value={node.status}
-                    onChange={(e) =>
-                      handleInputChange(e, "status", index, "nodes", "")
-                    }
-                    disabled={!isEditing.nodes[index]}
-                    className={`px-4 py-2 w-full border rounded-lg ${
-                      isEditing.nodes[index]
-                        ? "bg-white dark:bg-gray-800"
-                        : "bg-gray-100 dark:bg-gray-700"
-                    }`}
+                  <button
+                    onClick={handleBalanceSubmit}
+                    className="px-4 py-2 bg-blue-500 rounded-lg"
                   >
-                    {["LIVE", "CREATED", "INSTALLING", "FAILED", "EXPIRED"].map(
-                      (status) => (
-                        <option key={status} value={status}>
-                          {status}
-                        </option>
-                      ),
-                    )}
-                  </select>
+                    Submit
+                  </button>
                 </div>
-                {["wallet", "createdAt", "blockchainId"].map((field) => (
-                  <div className="mb-2" key={field}>
-                    <label className="block mb-1 capitalize">
-                      {field.replace(/([A-Z])/g, " $1")}:
-                    </label>
-                    <input
-                      type="text"
-                      value={node[field]}
-                      onChange={(e) =>
-                        handleInputChange(e, field, index, "nodes", "")
-                      }
-                      readOnly={!isEditing.nodes[index]}
-                      className={`px-4 py-2 w-full border rounded-lg ${
-                        isEditing.nodes[index]
-                          ? "bg-white dark:bg-gray-800"
-                          : "bg-gray-100 dark:bg-gray-700"
-                      }`}
-                    />
-                  </div>
-                ))}
-                {["host", "port", "username", "password", "active"].map(
-                  (field) => (
-                    <div className="mb-2" key={field}>
-                      <label className="block mb-1 capitalize">
-                        {`Server ${field}`}:
-                      </label>
-                      <input
-                        type={field === "password" ? "password" : "text"}
-                        value={node.server[field]}
+              </div>
+            </div>
+          )}
+
+          <div>
+            <h3 className="text-lg font-semibold">Nodes:</h3>
+            {data?.nodes
+              ?.slice(0, nodesPage * itemsPerPage)
+              .map((node: any, index: number) => (
+                <div
+                  key={index}
+                  className="p-4 border rounded-lg mb-4 bg-gray-50 dark:bg-gray-800"
+                >
+                  <div className="flex justify-between items-center mb-2">
+                    <span>Wallet: {node.wallet}</span>
+                    <span>Blockchain ID: {node.blockchainId}</span>
+                    <div>
+                      <span>Status:</span>
+                      <select
+                        value={node.status}
                         onChange={(e) =>
-                          handleInputChange(e, field, index, "nodes", "server")
+                          handleNodeStatusChange(index, e.target.value)
                         }
-                        readOnly={!isEditing.nodes[index]}
-                        className={`px-4 py-2 w-full border rounded-lg ${
-                          isEditing.nodes[index]
-                            ? "bg-white dark:bg-gray-800"
-                            : "bg-gray-100 dark:bg-gray-700"
-                        }`}
+                        className="px-2 py-1 border rounded-lg bg-white dark:bg-gray-800"
+                      >
+                        {[
+                          "LIVE",
+                          "CREATED",
+                          "INSTALLING",
+                          "FAILED",
+                          "EXPIRED",
+                        ].map((status) => (
+                          <option key={status} value={status}>
+                            {status}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                    <div>
+                      <span>Expiry:</span>
+
+                      <DatePicker
+                        selected={new Date(node.expiryDate)}
+                        onChange={(date: Date) =>
+                          handleNodeDateChange(index, date)
+                        }
+                        minDate={new Date(node.expiryDate)}
+                        className="px-2 py-1 border rounded-lg bg-white dark:bg-gray-800"
                       />
                     </div>
-                  ),
-                )}
-              </div>
-            ))}
-          <h3
-            className="text-lg font-bold mb-2 cursor-pointer"
-            onClick={() => setExpandedCredits(!expandedCredits)}
-          >
-            Credits {expandedCredits ? "-" : "+"}
-          </h3>
-          {expandedCredits &&
-            data?.credits?.map((credit: any, index: any) => (
-              <div
-                key={index}
-                className="mb-4 border p-4 rounded-lg bg-white dark:bg-gray-800"
-              >
-                <div className="flex justify-between">
-                  <div className="mb-2 w-full">
-                    <label className="block mb-1">Credit ID:</label>
-                    <input
-                      type="text"
-                      value={credit.id}
-                      onChange={(e) =>
-                        handleInputChange(e, "id", index, "credits", "")
-                      }
-                      readOnly
-                      className="px-4 py-2 w-full border rounded-lg bg-gray-100 dark:bg-gray-700"
-                    />
                   </div>
-                  <button
-                    className="px-4 py-1 ml-2 bg-green-500 text-white rounded-lg"
-                    onClick={() => handleEdit(index, "credits")}
-                  >
-                    {isEditing.credits[index] ? "Cancel" : "Edit"}
-                  </button>
-                  {isEditing.credits[index] && (
+                  <div className="flex justify-between">
                     <button
-                      className="px-4 py-1 ml-2 bg-blue-500 text-white rounded-lg"
-                      onClick={() => handleSave(index, "credits")}
+                      onClick={() => togglePayments(index)}
+                      className="px-4 py-2 bg-blue-500 text-white rounded-lg mb-2"
                     >
-                      Save
+                      {expandedPayments === index ? "Payments" : "Payments"}
                     </button>
+
+                    <button
+                      onClick={() => handleNodeUpdate(node)}
+                      className="px-4 py-2 bg-green-500 text-white rounded-lg"
+                    >
+                      Update
+                    </button>
+                  </div>
+                  {expandedPayments === index && (
+                    <div className="ml-4 pt-2">
+                      {node.payments?.map(
+                        (payment: any, paymentIndex: number) => (
+                          <div
+                            key={paymentIndex}
+                            className="flex justify-between mb-2"
+                          >
+                            <span>
+                              {new Date(payment.date).toLocaleString()}
+                            </span>
+                            <span>{payment.credit} credits</span>
+                            <span>{payment.duration} days</span>
+                          </div>
+                        ),
+                      )}
+                    </div>
                   )}
                 </div>
-                {["tx", "credits", "date"].map((field) => (
-                  <div className="mb-2" key={field}>
-                    <label className="block mb-1 capitalize">
-                      {field.replace(/([A-Z])/g, " $1")}:
-                    </label>
-                    <input
-                      type="text"
-                      value={credit[field]}
-                      onChange={(e) =>
-                        handleInputChange(e, field, index, "credits", "")
-                      }
-                      readOnly={!isEditing.credits[index]}
-                      className={`px-4 py-2 w-full border rounded-lg ${
-                        isEditing.credits[index]
-                          ? "bg-white dark:bg-gray-800"
-                          : "bg-gray-100 dark:bg-gray-700"
-                      }`}
-                    />
-                  </div>
-                ))}
-              </div>
-            ))}
+              ))}
+            {nodesPage * itemsPerPage < data?.nodes?.length && (
+              <button
+                onClick={handleMoreNodes}
+                className="px-4 py-2 mt-2 bg-blue-500 text-white rounded-lg"
+              >
+                More
+              </button>
+            )}
+          </div>
+
+          <div>
+            <h3 className="text-lg font-semibold">Credits:</h3>
+            {data?.credits
+              ?.slice(0, creditsPage * itemsPerPage)
+              .map((credit: any, index: any) => (
+                <div key={index} className="flex justify-between p-2">
+                  <span>{new Date(credit.date).toLocaleString()}</span>
+                  {credit.tx ? (
+                    <a
+                      href={credit.tx}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-blue-500 hover:text-blue-600"
+                    >
+                      Transaction
+                    </a>
+                  ) : (
+                    <span></span>
+                  )}
+                  <span>{credit.credits} credits</span>
+                </div>
+              ))}
+            {creditsPage * itemsPerPage < data?.credits?.length && (
+              <button
+                onClick={handleMoreCredits}
+                className="px-4 py-2 mt-2 bg-blue-500 text-white rounded-lg"
+              >
+                More
+              </button>
+            )}
+          </div>
         </div>
       )}
     </div>
