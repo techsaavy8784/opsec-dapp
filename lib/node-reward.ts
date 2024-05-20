@@ -16,9 +16,7 @@ export const getNodeTotalReward = async (userId: number) => {
       where: { userId },
     })
     .then((res) =>
-      res?.nodeRewardWithdrawTime
-        ? dayjs(res.nodeRewardWithdrawTime)
-        : undefined,
+      res?.rewardWithdrawTime ? dayjs(res.rewardWithdrawTime) : undefined,
     )
 
   const totalReward = nodes.reduce((total, node) => {

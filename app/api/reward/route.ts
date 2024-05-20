@@ -31,11 +31,11 @@ export async function POST(request: NextRequest) {
     update: {
       taxReward: 0,
       reflectionReward: 0,
-      nodeRewardWithdrawTime: new Date(),
+      rewardWithdrawTime: new Date(),
     },
     create: {
       userId,
-      nodeRewardWithdrawTime: new Date(),
+      rewardWithdrawTime: new Date(),
     },
   })
 

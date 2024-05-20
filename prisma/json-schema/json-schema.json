@@ -424,7 +424,7 @@
             "null"
           ]
         },
-        "nodeRewardWithdrawTime": {
+        "rewardWithdrawTime": {
           "type": [
             "string",
             "null"
@@ -437,6 +437,21 @@
       },
       "required": [
         "userId"
+      ]
+    },
+    "DistributorReceive": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer"
+        },
+        "receivedTime": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "receivedTime"
       ]
     }
   },
@@ -474,6 +489,9 @@
     },
     "reward": {
       "$ref": "#/definitions/Reward"
+    },
+    "distributorReceive": {
+      "$ref": "#/definitions/DistributorReceive"
     }
   }
 }

@@ -144,10 +144,17 @@ model Reward {
   userId                 Int       @map("user_id")
   taxReward              Int?      @map("tax_reward")
   reflectionReward       Int?      @map("reflection_reward")
-  nodeRewardWithdrawTime DateTime? @map("node_reward_withdraw_time")
+  rewardWithdrawTime     DateTime? @map("reward_withdraw_time")
   user                   User      @relation(fields: [userId], references: [id])
 
   @@map("rewards")
+}
+
+model DistributorReceive {
+  id            Int       @id @default(autoincrement())
+  receivedTime  DateTime  @map("received_time")
+
+  @@map("distributor_receive")
 }
 
 enum Status {
