@@ -18,7 +18,7 @@ export async function POST(request: NextRequest) {
   const taxAmount = formatUnits(taxBalance, 18)
 
   await prisma.taxHistory.create({
-    data: { amount: Number(taxAmount), totalOpsec, createdAt: new Date() },
+    data: { amount: Number(taxAmount), totalOpsec },
   })
 
   return NextResponse.json({ status: 201 })
