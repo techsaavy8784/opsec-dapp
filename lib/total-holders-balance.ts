@@ -15,9 +15,7 @@ async function getAllHoldersOpsecBalance() {
       process.env.NEXT_PUBLIC_OPSEC_TOKEN_ADDRESS as `0x${string}`,
       { pageSize: 1000 },
     )) {
-      sum =
-        sum +
-        Number(formatUnits(resp.balance as bigint, resp.contract_decimals))
+      sum += Number(formatUnits(resp.balance as bigint, resp.contract_decimals))
     }
     cache.set("holders_opsec_balance", sum)
     return sum
