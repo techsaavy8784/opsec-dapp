@@ -2,7 +2,7 @@ import { formatUnits } from "viem"
 import cache from "./lru-cache"
 import client from "./covalent-client"
 
-async function getAllHoldersOpSecBalance() {
+async function getAllHoldersOpsecBalance() {
   const cachedData = cache.get("holders_opsec_balance")
 
   if (cachedData !== undefined) {
@@ -27,4 +27,4 @@ async function getAllHoldersOpSecBalance() {
   }
 }
 
-export default getAllHoldersOpSecBalance
+export default getAllHoldersOpsecBalance

@@ -2,7 +2,7 @@ import { NextResponse, NextRequest } from "next/server"
 import { formatUnits } from "viem"
 import prisma from "@/prisma"
 import { publicClient } from "@/contract/client"
-import getAllHoldersOpSecBalance from "@/lib/total-holders-balance"
+import getAllHoldersOpsecBalance from "@/lib/total-holders-balance"
 
 export async function POST(request: NextRequest) {
   if (request.headers.get("X-API-KEY") !== process.env.WEBHOOK_KEY) {
@@ -14,7 +14,7 @@ export async function POST(request: NextRequest) {
   })
   const taxAmount = formatUnits(taxBalance, 18)
 
-  const totalOpsec = await getAllHoldersOpSecBalance()
+  const totalOpsec = await getAllHoldersOpsecBalance()
 
   await prisma.taxHistory.create({
     data: { amount: Number(taxAmount), totalOpsec, createdAt: new Date() },
