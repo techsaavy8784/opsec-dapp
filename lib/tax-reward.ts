@@ -10,17 +10,16 @@ const getTaxReward = async (userId: number, userAddress: string) => {
     where: { userId: userId },
   })
 
-  const taxHistories = await prisma.taxHistory.findMany({
+  const taxHistory = await prisma.taxHistory.findFirst({
     orderBy: { createdAt: "desc" },
-    take: 2,
   })
 
-  if (taxHistories.length == 0) {
+  if (!taxHistory) {
     return 0
   }
 
-  const taxHistory = taxHistories[0]
   const receivedTime = dayjs(taxHistory.createdAt)
+  const receivedDiff = dayjs().diff(receivedTime, "day")
 
   if (reward && dayjs(reward.rewardWithdrawTime).isAfter(receivedTime)) {
     return 0
@@ -30,7 +29,7 @@ const getTaxReward = async (userId: number, userAddress: string) => {
     await covalentClient.BalanceService.getHistoricalPortfolioForWalletAddress(
       process.env.NEXT_PUBLIC_COVALENT_CHAIN as Chain,
       userAddress,
-      { days: dayjs().diff(receivedTime, "day") + 10 },
+      { days: receivedDiff + 10 },
     )
   const opsecData = historicalBalancer.items.find(
     (item) =>
@@ -40,11 +39,8 @@ const getTaxReward = async (userId: number, userAddress: string) => {
   if (!opsecData) {
     return 0
   }
-  const holdings = opsecData.holdings.filter((item) =>
-    receivedTime.isAfter(dayjs(item.timestamp)),
-  )
-  for (let i = 0; i < holdings.length; i++) {
-    const element = holdings[i]
+  for (let i = receivedDiff; i < opsecData.holdings.length; i++) {
+    const element = opsecData.holdings[i]
     if (
       BigInt(element.open.balance || "0") <
       BigInt(opsecData.holdings[i + 1].open.balance || "0")
@@ -53,7 +49,32 @@ const getTaxReward = async (userId: number, userAddress: string) => {
     }
   }
 
-  const [balance, decimals] = await Promise.all([
+  const { data: latestTokenBalances } =
+    await covalentClient.BalanceService.getHistoricalTokenBalancesForWalletAddress(
+      process.env.NEXT_PUBLIC_COVALENT_CHAIN as Chain,
+      userAddress,
+    )
+
+  const latestOpsec = latestTokenBalances.items.find(
+    (item) =>
+      item.contract_address.toLowerCase() ===
+      process.env.NEXT_PUBLIC_OPSEC_TOKEN_ADDRESS,
+  )
+  if (!latestOpsec) {
+    return 0
+  }
+
+  const latestDate = dayjs(
+    Math.max(
+      dayjs(latestOpsec.last_transferred_at).add(10, "day").unix(),
+      reward ? dayjs(reward.rewardWithdrawTime).unix() : 0,
+    ),
+  )
+
+  const [ethbalance, balance, decimals] = await Promise.all([
+    publicClient.getBalance({
+      address: process.env.NEXT_PUBLIC_STAKING_CONTRACT as `0x${string}`,
+    }),
     publicClient.readContract({
       abi: erc20Abi,
       address: process.env.NEXT_PUBLIC_OPSEC_TOKEN_ADDRESS as `0x${string}`,
@@ -68,10 +89,13 @@ const getTaxReward = async (userId: number, userAddress: string) => {
   ])
   const balanceOpsec = Number(formatUnits(balance, decimals))
 
-  let taxAmount = taxHistory.amount
-  if (taxHistories.length == 2) {
-    taxAmount = taxHistories[0].amount - taxHistories[1].amount
-  }
+  const latestTax = await prisma.taxHistory.findFirst({
+    where: { createdAt: { lte: latestDate.toDate() } },
+    orderBy: { createdAt: "desc" },
+  })
+
+  const taxAmount =
+    Number(formatUnits(ethbalance, 18)) - (latestTax?.amount || 0)
 
   const taxReward =
     (taxAmount *
