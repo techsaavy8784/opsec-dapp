@@ -1,8 +1,8 @@
 import { Chain } from "@covalenthq/client-sdk"
 import { erc20Abi, formatUnits } from "viem"
 import dayjs from "dayjs"
-import { covalentClient } from "./covalent"
 import prisma from "@/prisma"
+import covalentClient from "./covalent-client"
 import { publicClient } from "@/contract/client"
 
 const getTaxReward = async (userId: number, userAddress: string) => {
