@@ -10,14 +10,16 @@ const getTaxReward = async (userId: number, userAddress: string) => {
     where: { userId: userId },
   })
 
-  const taxHistory = await prisma.taxHistory.findFirst({
+  const taxHistories = await prisma.taxHistory.findMany({
     orderBy: { createdAt: "desc" },
+    take: 2,
   })
 
-  if (!taxHistory) {
+  if (taxHistories.length == 0) {
     return 0
   }
 
+  const taxHistory = taxHistories[0]
   const receivedTime = dayjs(taxHistory.createdAt)
 
   if (reward && dayjs(reward.rewardWithdrawTime).isAfter(receivedTime)) {
@@ -51,21 +53,28 @@ const getTaxReward = async (userId: number, userAddress: string) => {
     }
   }
 
-  const balance = await publicClient.readContract({
-    abi: erc20Abi,
-    address: process.env.NEXT_PUBLIC_OPSEC_TOKEN_ADDRESS as `0x${string}`,
-    functionName: "balanceOf",
-    args: [userAddress as `0x${string}`],
-  })
-  const decimals = await publicClient.readContract({
-    abi: erc20Abi,
-    address: process.env.NEXT_PUBLIC_OPSEC_TOKEN_ADDRESS as `0x${string}`,
-    functionName: "decimals",
-  })
+  const [balance, decimals] = await Promise.all([
+    publicClient.readContract({
+      abi: erc20Abi,
+      address: process.env.NEXT_PUBLIC_OPSEC_TOKEN_ADDRESS as `0x${string}`,
+      functionName: "balanceOf",
+      args: [userAddress as `0x${string}`],
+    }),
+    publicClient.readContract({
+      abi: erc20Abi,
+      address: process.env.NEXT_PUBLIC_OPSEC_TOKEN_ADDRESS as `0x${string}`,
+      functionName: "decimals",
+    }),
+  ])
   const balanceOpsec = Number(formatUnits(balance, decimals))
 
+  let taxAmount = taxHistory.amount
+  if (taxHistories.length == 2) {
+    taxAmount = taxHistories[0].amount - taxHistories[1].amount
+  }
+
   const taxReward =
-    (taxHistory.amount *
+    (taxAmount *
       balanceOpsec *
       Number(process.env.NEXT_PUBLIC_TAX_PERCENT as string)) /
     taxHistory.totalOpsec /
