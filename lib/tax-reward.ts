@@ -1,5 +1,5 @@
 import { Chain } from "@covalenthq/client-sdk"
-import { erc20Abi } from "viem"
+import { erc20Abi, formatUnits } from "viem"
 import dayjs from "dayjs"
 import { covalentClient } from "./covalent"
 import prisma from "@/prisma"
@@ -10,13 +10,15 @@ const getTaxReward = async (userId: number, userAddress: string) => {
     where: { userId: userId },
   })
 
-  const distributorReceive = await prisma.distributorReceive.findFirst()
+  const taxHistory = await prisma.taxHistory.findFirst({
+    orderBy: { createdAt: "desc" },
+  })
 
-  if (!distributorReceive) {
+  if (!taxHistory) {
     return 0
   }
 
-  const receivedTime = dayjs(distributorReceive.receivedTime)
+  const receivedTime = dayjs(taxHistory.createdAt)
 
   if (reward && dayjs(reward.rewardWithdrawTime).isAfter(receivedTime)) {
     return 0
@@ -49,29 +51,25 @@ const getTaxReward = async (userId: number, userAddress: string) => {
     }
   }
 
-  const totalSupply = await publicClient.readContract({
-    abi: erc20Abi,
-    address: process.env.NEXT_PUBLIC_OPSEC_TOKEN_ADDRESS as `0x${string}`,
-    functionName: "totalSupply",
-  })
-
   const balance = await publicClient.readContract({
     abi: erc20Abi,
     address: process.env.NEXT_PUBLIC_OPSEC_TOKEN_ADDRESS as `0x${string}`,
     functionName: "balanceOf",
     args: [userAddress as `0x${string}`],
   })
-
-  const taxAmount = await publicClient.getBalance({
-    address: process.env.NEXT_PUBLIC_STAKING_CONTRACT as `0x${string}`,
+  const decimals = await publicClient.readContract({
+    abi: erc20Abi,
+    address: process.env.NEXT_PUBLIC_OPSEC_TOKEN_ADDRESS as `0x${string}`,
+    functionName: "decimals",
   })
+  const balanceOpsec = Number(formatUnits(balance, decimals))
 
   const taxReward =
-    (taxAmount *
-      balance *
-      BigInt(process.env.NEXT_PUBLIC_TAX_PERCENT as string)) /
-    totalSupply /
-    BigInt(100)
+    (taxHistory.amount *
+      balanceOpsec *
+      Number(process.env.NEXT_PUBLIC_TAX_PERCENT as string)) /
+    taxHistory.totalOpsec /
+    100
 
   return Number(taxReward)
 }
