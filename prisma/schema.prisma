@@ -5,10 +5,10 @@ generator client {
   provider = "prisma-client-js"
 }
 
-generator jsonSchema {
-  provider              = "prisma-json-schema-generator"
-  includeRequiredFields = "true"
-}
+// generator jsonSchema {
+//   provider              = "prisma-json-schema-generator"
+//   includeRequiredFields = "true"
+// }
 
 datasource db {
   provider  = "postgresql"
@@ -24,6 +24,7 @@ model User {
   nodes    Node[]
   credits  Credit[]
   Staking  Staking[]
+  role     Role      @default(USER) // default is user 
 
   @@map("users")
 }
@@ -127,4 +128,9 @@ model Credit {
   date    DateTime @default(now())
 
   @@map("credits")
+}
+
+enum Role {
+  USER
+  ADMIN
 }

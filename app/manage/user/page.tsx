@@ -148,13 +148,13 @@ export default function Home() {
       </Button>
 
       <h1 className="text-2xl font-bold mb-4">User Details</h1>
-      <div className="mb-4">
+      <div className="mb-4 flex flex-row gap-4 w-full">
         <input
           type="text"
           value={address}
           onChange={(e) => setAddress(e.target.value)}
           placeholder="Enter Ethereum Address"
-          className="px-4 py-2 w-full border rounded-lg bg-white dark:bg-gray-800 dark:border-gray-700"
+          className="px-4 py-2 w-3/4 border rounded-lg bg-white dark:bg-gray-800 dark:border-gray-700"
         />
         <button
           onClick={handleSearch}
@@ -168,7 +168,7 @@ export default function Home() {
       {data && (
         <div>
           <div className="mb-4">
-            <div className="flex justify-between">
+            <div className="flex gap-4 justify-between">
               <label className="block mb-1 text-lg font-semibold">
                 Balance:
               </label>
@@ -215,7 +215,20 @@ export default function Home() {
           )}
 
           <div>
-            <h3 className="text-lg font-semibold">Nodes:</h3>
+            {/* <h3 className="text-lg font-semibold">Nodes:</h3> */}
+            <div>
+              <div className="flex gap-4 justify-between">
+                <label className="block mb-1 text-lg font-semibold">
+                  Nodes:
+                </label>
+                <button
+                  className="px-4 py-2 ml-2 bg-green-500 text-white rounded-lg"
+                  onClick={handleAddBalance}
+                >
+                  Add Nodes
+                </button>
+              </div>
+            </div>
             {data?.nodes
               ?.slice(0, nodesPage * itemsPerPage)
               .map((node: any, index: number) => (
