@@ -5,9 +5,7 @@ import { publicClient } from "@/contract/client"
 import getAllHoldersOpSecBalance from "@/lib/total-holders-balance"
 
 export async function POST(request: NextRequest) {
-  if (
-    request.headers.get("Authorization") !== `Bearer ${process.env.CRON_SECRET}`
-  ) {
+  if (request.headers.get("X-API-KEY") !== process.env.WEBHOOK_KEY) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 })
   }
 
