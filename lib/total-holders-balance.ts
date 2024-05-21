@@ -1,13 +1,7 @@
 import { formatUnits } from "viem"
-import cache from "./lru-cache"
 import client from "./covalent-client"
 
 async function getAllHoldersOpsecBalance() {
-  const cachedData = cache.get("holders_opsec_balance")
-
-  if (cachedData !== undefined) {
-    return cachedData
-  }
   try {
     let sum: number = 0
     for await (const resp of client.BalanceService.getTokenHoldersV2ForTokenAddress(
@@ -17,7 +11,6 @@ async function getAllHoldersOpsecBalance() {
     )) {
       sum += Number(formatUnits(resp.balance as bigint, resp.contract_decimals))
     }
-    cache.set("holders_opsec_balance", sum)
     return sum
   } catch (error) {
     console.error("Error fetching All Holders balance:", error)
