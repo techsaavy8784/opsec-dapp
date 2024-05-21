@@ -149,11 +149,13 @@ model Reward {
   @@map("rewards")
 }
 
-model DistributorReceive {
+model TaxHistory {
   id            Int       @id @default(autoincrement())
-  receivedTime  DateTime  @map("received_time")
+  amount        Int
+  totalOpsec    Int       @map("total_opsec")
+  createdAt     DateTime  @map("created_at")
 
-  @@map("distributor_receive")
+  @@map("tax_histories")
 }
 
 enum Status {

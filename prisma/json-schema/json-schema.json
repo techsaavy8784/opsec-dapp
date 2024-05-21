@@ -433,19 +433,27 @@
         "userId"
       ]
     },
-    "DistributorReceive": {
+    "TaxHistory": {
       "type": "object",
       "properties": {
         "id": {
           "type": "integer"
         },
-        "receivedTime": {
+        "amount": {
+          "type": "integer"
+        },
+        "totalOpsec": {
+          "type": "integer"
+        },
+        "createdAt": {
           "type": "string",
           "format": "date-time"
         }
       },
       "required": [
-        "receivedTime"
+        "amount",
+        "totalOpsec",
+        "createdAt"
       ]
     }
   },
@@ -484,8 +492,8 @@
     "reward": {
       "$ref": "#/definitions/Reward"
     },
-    "distributorReceive": {
-      "$ref": "#/definitions/DistributorReceive"
+    "taxHistory": {
+      "$ref": "#/definitions/TaxHistory"
     }
   }
 }
