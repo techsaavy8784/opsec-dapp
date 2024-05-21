@@ -9,12 +9,13 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 })
   }
 
-  const taxBalance = await publicClient.getBalance({
-    address: process.env.NEXT_PUBLIC_STAKING_CONTRACT as `0x${string}`,
-  })
+  const [taxBalance, totalOpsec] = await Promise.all([
+    publicClient.getBalance({
+      address: process.env.NEXT_PUBLIC_STAKING_CONTRACT as `0x${string}`,
+    }),
+    getAllHoldersOpsecBalance(),
+  ])
   const taxAmount = formatUnits(taxBalance, 18)
-
-  const totalOpsec = await getAllHoldersOpsecBalance()
 
   await prisma.taxHistory.create({
     data: { amount: Number(taxAmount), totalOpsec, createdAt: new Date() },
