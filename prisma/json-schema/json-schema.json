@@ -452,8 +452,7 @@
       },
       "required": [
         "amount",
-        "totalOpsec",
-        "createdAt"
+        "totalOpsec"
       ]
     }
   },
