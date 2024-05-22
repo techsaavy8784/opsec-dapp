@@ -41,9 +41,7 @@ export async function GET(
       where: { userId },
     })
     .then((res) =>
-      res?.nodeRewardWithdrawTime
-        ? dayjs(res.nodeRewardWithdrawTime)
-        : undefined,
+      res?.rewardWithdrawTime ? dayjs(res.rewardWithdrawTime) : undefined,
     )
 
   const paidCredit =
