@@ -9,7 +9,7 @@ const OPSEC_DECIMALS = 18
 
 const getTaxReward = async (userId: number, userAddress: string) => {
   const reward = await prisma.reward.findFirst({
-    where: { userId: userId },
+    where: { userId },
   })
 
   const taxHistory = await prisma.taxHistory.findFirst({
@@ -30,7 +30,6 @@ const getTaxReward = async (userId: number, userAddress: string) => {
     await covalentClient.BalanceService.getHistoricalPortfolioForWalletAddress(
       process.env.NEXT_PUBLIC_COVALENT_CHAIN as Chain,
       userAddress,
-      { days: 10 },
     )
 
   const recentOpsecBalanceHistory = balanceHistory.items.find(
@@ -43,12 +42,27 @@ const getTaxReward = async (userId: number, userAddress: string) => {
     return 0
   }
 
-  for (let i = 0; i < recentOpsecBalanceHistory.holdings.length; i++) {
+  if (recentOpsecBalanceHistory.holdings.length <= 10) {
+    // less than 10 days after holding OPSEC
+    return 0
+  }
+
+  let fromDayAgo = recentOpsecBalanceHistory.holdings.length - 10
+
+  for (let i = 0; i < fromDayAgo; i++) {
     if (
       BigInt(recentOpsecBalanceHistory.holdings[i].open.balance ?? 0) <
       BigInt(recentOpsecBalanceHistory.holdings[i + 1].open.balance ?? 0)
     ) {
-      return 0
+      // sold $OPSEC
+      if (i <= 10) {
+        // in last 10 days
+        return 0
+      }
+
+      // calculate reward after 10 days since sell day
+      fromDayAgo = i + 10
+      break
     }
   }
 
@@ -70,8 +84,10 @@ const getTaxReward = async (userId: number, userAddress: string) => {
 
   const fromDate = dayjs(
     Math.max(
-      dayjs(latestOpsec.last_transferred_at).add(10, "day").unix(),
-      reward ? dayjs(reward.rewardWithdrawTime).unix() : 0,
+      dayjs().add(-fromDayAgo, "day").unix(),
+      reward && reward.rewardWithdrawTime
+        ? dayjs(reward.rewardWithdrawTime).unix()
+        : 0,
     ),
   )
 
@@ -101,9 +117,7 @@ const getTaxReward = async (userId: number, userAddress: string) => {
 
   const percent = Number(process.env.NEXT_PUBLIC_TAX_PERCENT) / 100
 
-  const taxReward = (percent * taxAmount * userBalance) / taxHistory.totalOpsec
-
-  return Number(taxReward)
+  return (percent * taxAmount * userBalance) / taxHistory.totalOpsec
 }
 
 export default getTaxReward
