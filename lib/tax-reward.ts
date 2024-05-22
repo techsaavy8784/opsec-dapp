@@ -19,19 +19,18 @@ const getTaxReward = async (userId: number, userAddress: string) => {
   }
 
   const receivedTime = dayjs(taxHistory.createdAt)
-  const receivedDiff = dayjs().diff(receivedTime, "day")
 
   if (reward && dayjs(reward.rewardWithdrawTime).isAfter(receivedTime)) {
     return 0
   }
 
-  const { data: historicalBalancer } =
+  const { data: balanceHistory } =
     await covalentClient.BalanceService.getHistoricalPortfolioForWalletAddress(
       process.env.NEXT_PUBLIC_COVALENT_CHAIN as Chain,
       userAddress,
-      { days: receivedDiff + 10 },
+      { days: 10 },
     )
-  const opsecData = historicalBalancer.items.find(
+  const opsecData = balanceHistory.items.find(
     (item) =>
       item.contract_address.toLowerCase() ===
       process.env.NEXT_PUBLIC_OPSEC_TOKEN_ADDRESS,
@@ -39,11 +38,10 @@ const getTaxReward = async (userId: number, userAddress: string) => {
   if (!opsecData) {
     return 0
   }
-  for (let i = receivedDiff; i < opsecData.holdings.length; i++) {
-    const element = opsecData.holdings[i]
+  for (let i = 0; i < opsecData.holdings.length; i++) {
     if (
-      BigInt(element.open.balance || "0") <
-      BigInt(opsecData.holdings[i + 1].open.balance || "0")
+      BigInt(opsecData.holdings[i].open.balance ?? "0") <
+      BigInt(opsecData.holdings[i + 1].open.balance ?? "0")
     ) {
       return 0
     }
@@ -71,7 +69,7 @@ const getTaxReward = async (userId: number, userAddress: string) => {
     ),
   )
 
-  const [ethbalance, balance, decimals] = await Promise.all([
+  const [ethbalance, balance] = await Promise.all([
     publicClient.getBalance({
       address: process.env.NEXT_PUBLIC_STAKING_CONTRACT as `0x${string}`,
     }),
@@ -81,13 +79,8 @@ const getTaxReward = async (userId: number, userAddress: string) => {
       functionName: "balanceOf",
       args: [userAddress as `0x${string}`],
     }),
-    publicClient.readContract({
-      abi: erc20Abi,
-      address: process.env.NEXT_PUBLIC_OPSEC_TOKEN_ADDRESS as `0x${string}`,
-      functionName: "decimals",
-    }),
   ])
-  const balanceOpsec = Number(formatUnits(balance, decimals))
+  const balanceOpsec = Number(formatUnits(balance, 18))
 
   const latestTax = await prisma.taxHistory.findFirst({
     where: { createdAt: { lte: latestDate.toDate() } },
