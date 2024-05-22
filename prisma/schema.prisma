@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -25,19 +22,13 @@ model User {
   credits  Credit[]
   stakings Staking[]
   payments Payment[]
+
   role    Role      @default(USER)
+
   Reward   Reward[]
   claims   Claim[]
 
   @@map("users")
-}
-
-enum Status {
-  CREATED
-  INSTALLING
-  LIVE
-  FAILED
-  EXPIRED
 }
 
 model Node {
@@ -142,10 +133,12 @@ model Credit {
   @@map("credits")
 }
 
+
 enum Role {
   USER
   ADMIN
 }
+
 
 model Claim {
   id     Int  @id @default(autoincrement())
@@ -167,6 +160,15 @@ model Reward {
   @@map("rewards")
 }
 
+
+enum Status {
+  CREATED
+  INSTALLING
+  LIVE
+  FAILED
+  EXPIRED
+}
+
 enum SERVER_TYPE {
   MULTI_NODE
   SINGLE_NODE
@@ -175,4 +177,6 @@ enum SERVER_TYPE {
 enum PAY_TYPE {
   FULL
   PARTIAL
+
 }
+

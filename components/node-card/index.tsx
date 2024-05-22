@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button"
 import { FaArrowRightLong } from "react-icons/fa6"
 import Link from "next/link"
 import { Badge } from "@/components/ui/badge"
+import { PAY_TYPE } from "@prisma/client"
 
 type NodeCardProps = {
   id?: number
@@ -15,6 +16,7 @@ type NodeCardProps = {
   disabled?: boolean
   status?: string
   expireInDays?: number
+  payType: PAY_TYPE
   onBuy?: () => void
 }
 
@@ -26,6 +28,7 @@ export const NodeCard: React.FC<NodeCardProps> = ({
   disabled,
   status,
   expireInDays,
+  payType,
   onBuy,
 }) => (
   <div className="col-span-1 p-4 rounded-[16px] backdrop:blur-[100px] overflow-hidden flex flex-col gap-4 border border-zinc-600 h-full">
@@ -47,6 +50,7 @@ export const NodeCard: React.FC<NodeCardProps> = ({
               Number(process.env.NEXT_PUBLIC_NODE_EXPIRE_WARN_DAYS) && (
               <Badge>{expireInDays} days left</Badge>
             )}
+          {payType === PAY_TYPE.PARTIAL && <Badge>PARTIAL</Badge>}
           {status && <Badge>{status}</Badge>}
         </div>
       </div>

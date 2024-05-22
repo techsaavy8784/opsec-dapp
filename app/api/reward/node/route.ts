@@ -1,7 +1,7 @@
-import prisma from "@/prisma"
 import { authOptions } from "@/lib/auth"
 import { getServerSession } from "next-auth"
 import { NextResponse, NextRequest } from "next/server"
+import { getNodeTotalReward } from "@/lib/node-reward"
 
 export async function GET(request: NextRequest) {
   const session = await getServerSession(authOptions)
@@ -10,11 +10,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 })
   }
 
-  const claim = await prisma.claims.findMany({
-    where: {
-      user_id: session.user.id,
-    },
-  })
+  const totalReward = await getNodeTotalReward(session.user.id)
 
-  return NextResponse.json(claim)
+  return NextResponse.json(totalReward)
 }
