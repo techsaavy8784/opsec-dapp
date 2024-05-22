@@ -215,18 +215,11 @@ export default function Home() {
           )}
 
           <div>
-            {/* <h3 className="text-lg font-semibold">Nodes:</h3> */}
             <div>
               <div className="flex gap-4 justify-between">
                 <label className="block mb-1 text-lg font-semibold">
                   Nodes:
                 </label>
-                <button
-                  className="px-4 py-2 ml-2 bg-green-500 text-white rounded-lg"
-                  onClick={handleAddBalance}
-                >
-                  Add Nodes
-                </button>
               </div>
             </div>
             {data?.nodes
