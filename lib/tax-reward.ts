@@ -61,25 +61,9 @@ const getTaxReward = async (userId: number, userAddress: string) => {
       }
 
       // calculate reward after 10 days since sell day
-      fromDayAgo = i + 10
+      fromDayAgo = i - 10
       break
     }
-  }
-
-  const { data: latestTokenBalances } =
-    await covalentClient.BalanceService.getHistoricalTokenBalancesForWalletAddress(
-      process.env.NEXT_PUBLIC_COVALENT_CHAIN as Chain,
-      userAddress,
-    )
-
-  const latestOpsec = latestTokenBalances.items.find(
-    (item) =>
-      item.contract_address.toLowerCase() ===
-      process.env.NEXT_PUBLIC_OPSEC_TOKEN_ADDRESS,
-  )
-
-  if (!latestOpsec) {
-    return 0
   }
 
   const fromDate = dayjs(
@@ -113,7 +97,7 @@ const getTaxReward = async (userId: number, userAddress: string) => {
     }),
   ])
 
-  const taxAmount = stakingBalance - (lastTax?.amount ?? 0)
+  const taxAmount = lastTax ? stakingBalance - lastTax.amount : 0
 
   const percent = Number(process.env.NEXT_PUBLIC_TAX_PERCENT) / 100
 
