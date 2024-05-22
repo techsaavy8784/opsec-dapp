@@ -2,7 +2,7 @@ import { NextResponse, NextRequest } from "next/server"
 import prisma from "@/prisma"
 
 export async function POST(request: NextRequest) {
-  if (request.headers.get("X-API-KEY") !== process.env.STAKE_WEBHOOK_KEY) {
+  if (request.headers.get("X-API-KEY") !== process.env.WEBHOOK_KEY) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 })
   }
 

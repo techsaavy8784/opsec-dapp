@@ -1,23 +1,41 @@
 import prisma from "@/prisma"
 import { Status } from "@prisma/client"
+import { SERVER_TYPE, PAY_TYPE } from "@prisma/client"
 
 const availableServers = async (blockchainId: number) => {
-  const serverIds = await prisma.server.findMany({
+  const blockchain = await prisma.blockchain.findUnique({
     where: {
-      NOT: [
-        {
-          nodes: {
-            some: {
-              blockchainId,
-              status: {
-                not: Status.EXPIRED,
-              },
+      id: blockchainId,
+    },
+  })
+  const whereCondition: any = {
+    active: true,
+    type:
+      blockchain?.payType === PAY_TYPE.FULL
+        ? SERVER_TYPE.MULTI_NODE
+        : SERVER_TYPE.SINGLE_NODE,
+  }
+
+  if (blockchain?.payType === PAY_TYPE.FULL) {
+    whereCondition.NOT = [
+      {
+        nodes: {
+          some: {
+            blockchainId,
+            status: {
+              not: Status.EXPIRED,
             },
           },
         },
-      ],
-      active: true,
-    },
+      },
+    ]
+  } else {
+    whereCondition.nodes = {
+      none: {},
+    }
+  }
+  const serverIds = await prisma.server.findMany({
+    where: whereCondition,
     include: {
       _count: {
         select: {

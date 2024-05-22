@@ -32,10 +32,28 @@
             "$ref": "#/definitions/Credit"
           }
         },
-        "Staking": {
+        "stakings": {
           "type": "array",
           "items": {
             "$ref": "#/definitions/Staking"
+          }
+        },
+        "payments": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Payment"
+          }
+        },
+        "Reward": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Reward"
+          }
+        },
+        "claims": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Claim"
           }
         }
       },
@@ -53,7 +71,14 @@
           "$ref": "#/definitions/User"
         },
         "server": {
-          "$ref": "#/definitions/Server"
+          "anyOf": [
+            {
+              "$ref": "#/definitions/Server"
+            },
+            {
+              "type": "null"
+            }
+          ]
         },
         "wallet": {
           "type": [
@@ -94,7 +119,6 @@
       },
       "required": [
         "userId",
-        "serverId",
         "blockchainId"
       ]
     },
@@ -181,6 +205,14 @@
           "items": {
             "$ref": "#/definitions/Node"
           }
+        },
+        "type": {
+          "type": "string",
+          "default": "MULTI_NODE",
+          "enum": [
+            "MULTI_NODE",
+            "SINGLE_NODE"
+          ]
         }
       },
       "required": [
@@ -212,6 +244,16 @@
         "date": {
           "type": "string",
           "format": "date-time"
+        },
+        "user": {
+          "anyOf": [
+            {
+              "$ref": "#/definitions/User"
+            },
+            {
+              "type": "null"
+            }
+          ]
         }
       },
       "required": [
@@ -261,11 +303,15 @@
           "type": "string"
         },
         "price": {
-          "type": "number"
+          "type": "integer"
         },
         "hasWallet": {
           "type": "boolean",
           "default": false
+        },
+        "staking": {
+          "type": "boolean",
+          "default": true
         },
         "launchedAt": {
           "type": "string",
@@ -276,6 +322,38 @@
           "items": {
             "$ref": "#/definitions/Node"
           }
+        },
+        "payType": {
+          "type": "string",
+          "default": "FULL",
+          "enum": [
+            "FULL",
+            "PARTIAL"
+          ]
+        },
+        "rewardWallet": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "rewardLockTime": {
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "rewardPerMonth": {
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "floorPrice": {
+          "type": [
+            "integer",
+            "null"
+          ]
         }
       },
       "required": [
@@ -309,6 +387,73 @@
         "credits",
         "userId"
       ]
+    },
+    "Claim": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer"
+        },
+        "amount": {
+          "type": "integer"
+        },
+        "user": {
+          "$ref": "#/definitions/User"
+        }
+      },
+      "required": [
+        "userId",
+        "amount"
+      ]
+    },
+    "Reward": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer"
+        },
+        "reflectionReward": {
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "rewardWithdrawTime": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time"
+        },
+        "user": {
+          "$ref": "#/definitions/User"
+        }
+      },
+      "required": [
+        "userId"
+      ]
+    },
+    "TaxHistory": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer"
+        },
+        "amount": {
+          "type": "integer"
+        },
+        "totalOpsec": {
+          "type": "integer"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "amount",
+        "totalOpsec"
+      ]
     }
   },
   "type": "object",
@@ -339,6 +484,15 @@
     },
     "credit": {
       "$ref": "#/definitions/Credit"
+    },
+    "claim": {
+      "$ref": "#/definitions/Claim"
+    },
+    "reward": {
+      "$ref": "#/definitions/Reward"
+    },
+    "taxHistory": {
+      "$ref": "#/definitions/TaxHistory"
     }
   }
 }

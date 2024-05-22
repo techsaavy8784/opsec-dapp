@@ -19,7 +19,7 @@ export const ProgressBar = () => {
 
   useEffect(() => {
     if (data) {
-      setValue(Math.floor((data.capacity / data.total) * 100))
+      setValue(Math.floor((100 * (data.total - data.capacity)) / data.total))
     }
   }, [data])
 

@@ -19,14 +19,7 @@ export async function GET() {
     },
     include: {
       payments: true,
-      blockchain: {
-        select: {
-          id: true,
-          name: true,
-          url: true,
-          description: true,
-        },
-      },
+      blockchain: true,
     },
   })
 
