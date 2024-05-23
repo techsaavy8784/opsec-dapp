@@ -15,6 +15,7 @@ type NodeCardProps = {
   disabled?: boolean
   status?: string
   expireInDays?: number
+  isComing?: boolean
   onBuy?: () => void
 }
 
@@ -26,6 +27,7 @@ export const NodeCard: React.FC<NodeCardProps> = ({
   disabled,
   status,
   expireInDays,
+  isComing,
   onBuy,
 }) => (
   <div className="col-span-1 p-4 rounded-[16px] backdrop:blur-[100px] overflow-hidden flex flex-col gap-4 border border-zinc-600 h-full">
@@ -58,6 +60,10 @@ export const NodeCard: React.FC<NodeCardProps> = ({
     {disabled ? (
       <Button type="button" variant="custom" disabled>
         Sold out
+      </Button>
+    ) : isComing ? (
+      <Button type="button" variant="custom" disabled>
+        Coming Soon
       </Button>
     ) : onBuy ? (
       <Button type="button" variant="custom" onClick={onBuy}>
