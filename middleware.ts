@@ -3,14 +3,13 @@ import { NextResponse } from "next/server"
 
 export default withAuth(
   function middleware(request) {
-    const isAdmin = request.nextauth?.token?.role === "ADMIN"
+    const isAdmin = request.nextauth?.token?.email
     const pathname = request.nextUrl?.pathname
 
     if (pathname.startsWith("/manage")) {
       if (pathname === "/manage/register" || pathname === "/manage/login") {
         return NextResponse.next()
       }
-
       if (isAdmin) {
         if (!pathname.startsWith("/manage/user")) {
           const adminUserUrl = new URL("/manage/user", request.nextUrl.origin)
@@ -18,8 +17,11 @@ export default withAuth(
         }
         return NextResponse.next()
       } else {
-        const adminLoginUrl = new URL("/manage/login", request.nextUrl.origin)
-        return NextResponse.redirect(adminLoginUrl.toString())
+        if (!pathname.startsWith("/manage/login")) {
+          const adminLoginUrl = new URL("/manage/login", request.nextUrl.origin)
+          return NextResponse.redirect(adminLoginUrl.toString())
+        }
+        return NextResponse.next()
       }
     } else {
       return NextResponse.next()
