@@ -57,6 +57,5 @@ export const pickFromProbabilities = (probs: number[]) => {
       return i
     }
   }
-
   return probs.length - 1
 }

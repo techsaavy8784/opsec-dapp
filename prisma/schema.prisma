@@ -2,10 +2,10 @@ generator client {
   provider = "prisma-client-js"
 }
 
-generator jsonSchema {
-  provider              = "prisma-json-schema-generator"
-  includeRequiredFields = "true"
-}
+// generator jsonSchema {
+//   provider              = "prisma-json-schema-generator"
+//   includeRequiredFields = "true"
+// }
 
 datasource db {
   provider  = "postgresql"
@@ -22,6 +22,9 @@ model User {
   credits  Credit[]
   stakings Staking[]
   payments Payment[]
+
+  role    Role      @default(USER)
+
   Reward   Reward[]
   claims   Claim[]
 
@@ -130,6 +133,13 @@ model Credit {
   @@map("credits")
 }
 
+
+enum Role {
+  USER
+  ADMIN
+}
+
+
 model Claim {
   id     Int  @id @default(autoincrement())
   userId Int  @map("user_id")
@@ -149,6 +159,7 @@ model Reward {
   @@map("rewards")
 }
 
+
 model TaxHistory {
   id            Int       @id @default(autoincrement())
   amount        Int
@@ -157,6 +168,7 @@ model TaxHistory {
 
   @@map("tax_histories")
 }
+
 
 enum Status {
   CREATED
@@ -174,4 +186,6 @@ enum SERVER_TYPE {
 enum PAY_TYPE {
   FULL
   PARTIAL
+
 }
+
