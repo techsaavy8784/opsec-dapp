@@ -22,6 +22,7 @@ ADD COLUMN     "pay_type" "PAY_TYPE" NOT NULL DEFAULT 'FULL',
 ADD COLUMN     "reward_lock_time" INTEGER,
 ADD COLUMN     "reward_per_month" INTEGER,
 ADD COLUMN     "reward_wallet" TEXT,
+ADD COLUMN     "staking" BOOLEAN NOT NULL DEFAULT true,
 ALTER COLUMN "price" SET DATA TYPE INTEGER;
 
 -- AlterTable
@@ -57,11 +58,20 @@ CREATE TABLE "claims" (
 CREATE TABLE "rewards" (
     "id" SERIAL NOT NULL,
     "user_id" INTEGER NOT NULL,
-    "tax_reward" INTEGER,
     "reflection_reward" INTEGER,
-    "node_reward_withdraw_time" TIMESTAMP(3),
+    "reward_withdraw_time" TIMESTAMP(3),
 
     CONSTRAINT "rewards_pkey" PRIMARY KEY ("id")
+);
+
+-- CreateTable
+CREATE TABLE "tax_histories" (
+    "id" SERIAL NOT NULL,
+    "amount" INTEGER NOT NULL,
+    "total_opsec" INTEGER NOT NULL,
+    "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    CONSTRAINT "tax_histories_pkey" PRIMARY KEY ("id")
 );
 
 -- AddForeignKey

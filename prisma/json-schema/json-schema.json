@@ -412,19 +412,13 @@
         "id": {
           "type": "integer"
         },
-        "taxReward": {
-          "type": [
-            "integer",
-            "null"
-          ]
-        },
         "reflectionReward": {
           "type": [
             "integer",
             "null"
           ]
         },
-        "nodeRewardWithdrawTime": {
+        "rewardWithdrawTime": {
           "type": [
             "string",
             "null"
@@ -437,6 +431,28 @@
       },
       "required": [
         "userId"
+      ]
+    },
+    "TaxHistory": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer"
+        },
+        "amount": {
+          "type": "integer"
+        },
+        "totalOpsec": {
+          "type": "integer"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "amount",
+        "totalOpsec"
       ]
     }
   },
@@ -474,6 +490,9 @@
     },
     "reward": {
       "$ref": "#/definitions/Reward"
+    },
+    "taxHistory": {
+      "$ref": "#/definitions/TaxHistory"
     }
   }
 }

@@ -1,7 +1,7 @@
-import { authOptions } from "@/lib/auth"
-import prisma from "@/prisma"
 import { getServerSession } from "next-auth"
 import { NextResponse, NextRequest } from "next/server"
+import { authOptions } from "@/lib/auth"
+import getTaxReward from "@/lib/tax-reward"
 
 export async function GET(request: NextRequest) {
   const session = await getServerSession(authOptions)
@@ -10,9 +10,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 })
   }
 
-  const reward = await prisma.reward.findFirst({
-    where: { userId: session.user.id },
-  })
+  const taxReward = await getTaxReward(session.user.id, session.user.address)
 
-  return NextResponse.json(reward?.taxReward ?? 0)
+  return NextResponse.json(taxReward)
 }

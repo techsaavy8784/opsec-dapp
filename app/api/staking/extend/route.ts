@@ -4,7 +4,7 @@ import { publicClient } from "@/contract/client"
 import abi from "@/contract/abi.json"
 
 export async function POST(request: NextRequest) {
-  if (request.headers.get("X-API-KEY") !== process.env.STAKE_WEBHOOK_KEY) {
+  if (request.headers.get("X-API-KEY") !== process.env.WEBHOOK_KEY) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 })
   }
 
