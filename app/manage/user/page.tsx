@@ -5,6 +5,10 @@ import { Button } from "@/components/ui/button"
 import { signOut } from "next-auth/react"
 import DatePicker from "react-datepicker"
 import "react-datepicker/dist/react-datepicker.css"
+import SupportNodeCard from "@/components/support-node-card"
+import AddressSearchBox from "@/components/address-search-box"
+import AddCredit from "@/components/add-credit"
+import { CircleDollarSign, RefreshCw, X } from "lucide-react"
 
 export default function Home() {
   const [address, setAddress] = useState("")
@@ -15,6 +19,8 @@ export default function Home() {
   const [creditsPage, setCreditsPage] = useState(1)
   const [nodesPage, setNodesPage] = useState(1)
   const [expandedPayments, setExpandedPayments] = useState<number | null>(null)
+  const [searchedData, setSearchedData] = useState<any>(false)
+  const [newAddress, setNewAddress] = useState<any>("")
   const itemsPerPage = 5
   const { toast } = useToast()
 
@@ -38,8 +44,9 @@ export default function Home() {
 
   const handleSearch = async () => {
     try {
-      const url = `/api/manage/user/fetch?address=${address}`
+      const url = `/api/manage/user/fetch?address=${address || newAddress}`
       await fetchDataAndUpdate(url, "User Found", "Error Searching User")
+      setSearchedData(true)
     } catch (e) {
       toast({ title: "Search failed" })
       throw new Error()
@@ -139,211 +146,229 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-100 p-6">
-      <Button
-        onClick={() => signOut()}
-        className="absolute right-3 top-3 z-10 bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-4 rounded"
-      >
-        Sign out
-      </Button>
+    <div className="min-h-screen p-4 md:p-6">
+      <div className="relative">
+        {searchedData ? (
+          <h1 className="text-2xl font-bold text-white">User Details</h1>
+        ) : (
+          <h1 className="text-2xl font-bold text-white">Support</h1>
+        )}
 
-      <h1 className="text-2xl font-bold mb-4">User Details</h1>
-      <div className="mb-4 flex flex-row gap-4 w-full">
-        <input
-          type="text"
-          value={address}
-          onChange={(e) => setAddress(e.target.value)}
-          placeholder="Enter Ethereum Address"
-          className="px-4 py-2 w-3/4 border rounded-lg bg-white dark:bg-gray-800 dark:border-gray-700"
-        />
-        <button
-          onClick={handleSearch}
-          disabled={loading}
-          className="px-4 py-2 bg-blue-500 text-white rounded-lg disabled:opacity-50"
+        <Button
+          onClick={() => signOut()}
+          className="absolute right-3 top-3 z-10 bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-4 rounded"
         >
-          {loading ? "Loading..." : "Search"}
-        </button>
+          Sign out
+        </Button>
       </div>
-
-      {data && (
-        <div>
-          <div className="mb-4">
-            <div className="flex gap-4 justify-between">
-              <label className="block mb-1 text-lg font-semibold">
-                Balance:
-              </label>
-              <button
-                className="px-4 py-2 ml-2 bg-green-500 text-white rounded-lg"
-                onClick={handleAddBalance}
-              >
-                Add Credit
-              </button>
-            </div>
-            <input
-              type="number"
-              value={data.balance}
-              readOnly
-              className="px-4 py-2 w-full border rounded-lg bg-gray-100 dark:bg-gray-700"
-            />
-          </div>
-          {showBalanceModal && (
-            <div className="fixed inset-0 bg-gray-900 bg-opacity-50 flex justify-center items-center">
-              <div className="dark:bg-gray-800 p-6 rounded-lg">
-                <h2 className="text-xl font-bold mb-4">Add Balance</h2>
-                <input
-                  type="number"
-                  value={balanceInput}
-                  onChange={(e) => setBalanceInput(Number(e.target.value))}
-                  className="px-4 py-2 w-full border rounded-lg mb-4 text-black dark:text-black"
-                />
-                <div className="flex justify-between">
+      {!searchedData ? (
+        <AddressSearchBox
+          address={address}
+          setAddress={setAddress}
+          handleSearch={handleSearch}
+          loading={loading}
+        />
+      ) : (
+        <>
+          <div className="flex-1 mt-8 md:mt-12">
+            <h1 className="text-[#F44336]">
+              {address ? (
+                <div className="flex flex-row gap-2 text-[18px]">
+                  <h1>{address.slice(0, 18) || newAddress}</h1>
                   <button
-                    onClick={() => setShowBalanceModal(false)}
-                    className="px-4 py-2 bg-red-500 rounded-lg mr-2"
+                    title="Close"
+                    onClick={() => {
+                      setAddress("")
+                      setNewAddress("")
+                    }}
+                    className="flex flex-row gap-2 text-white"
                   >
-                    Cancel
-                  </button>
-                  <button
-                    onClick={handleBalanceSubmit}
-                    className="px-4 py-2 bg-blue-500 rounded-lg"
-                  >
-                    Submit
+                    <X className="bg-[#777777] rounded-full w-5 h-5 p-1 items-center justify-center" />
+                    Clear
                   </button>
                 </div>
-              </div>
-            </div>
-          )}
+              ) : (
+                <div className="flex flex-row gap-2">
+                  <input
+                    type="search"
+                    value={newAddress}
+                    onChange={(e) => setNewAddress(e.target.value)}
+                    placeholder="0xdee...."
+                    className="px-4 py-2 border rounded-lg bg-transparent border-[#27272A] text-[#727272]"
+                  />
+                  <button
+                    onClick={handleSearch}
+                    disabled={loading}
+                    className="px-4 py-2 bg-red-500 text-white rounded-lg disabled:opacity-50"
+                  >
+                    {loading ? "Loading..." : "Search"}
+                  </button>
+                </div>
+              )}
+            </h1>
+          </div>
+          <div className="flex flex-col md:flex-row gap-4 ">
+            {data && (
+              <div className="pt-6 flex flex-col md:flex-row gap-4  ">
+                <div className="">
+                  <SupportNodeCard
+                    data={data}
+                    handleAddBalance={handleAddBalance}
+                  />
+                </div>
 
-          <div>
-            <div>
-              <div className="flex gap-4 justify-between">
-                <label className="block mb-1 text-lg font-semibold">
-                  Nodes:
-                </label>
-              </div>
-            </div>
-            {data?.nodes
-              ?.slice(0, nodesPage * itemsPerPage)
-              .map((node: any, index: number) => (
-                <div
-                  key={index}
-                  className="p-4 border rounded-lg mb-4 bg-gray-50 dark:bg-gray-800"
-                >
-                  <div className="flex justify-between items-center mb-2">
-                    <span>Wallet: {node.wallet}</span>
-                    <span>Blockchain ID: {node.blockchainId}</span>
-                    <div>
-                      <span>Status:</span>
-                      <select
-                        value={node.status}
-                        onChange={(e) =>
-                          handleNodeStatusChange(index, e.target.value)
-                        }
-                        className="px-2 py-1 border rounded-lg bg-white dark:bg-gray-800"
-                      >
-                        {[
-                          "LIVE",
-                          "CREATED",
-                          "INSTALLING",
-                          "FAILED",
-                          "EXPIRED",
-                        ].map((status) => (
-                          <option key={status} value={status}>
-                            {status}
-                          </option>
-                        ))}
-                      </select>
-                    </div>
-                    <div>
-                      <span>Expiry:</span>
+                <div className=" flex flex-col gap-4  w-[65vw] ">
+                  <div className="p-4 border rounded-lg mb-4 bg-[#0D0D0E] min-w-full">
+                    {data?.nodes
+                      ?.slice(0, nodesPage * itemsPerPage)
+                      .map((node: any, index: number) => (
+                        <div key={index} className="mb-4">
+                          <div className="flex md:flex-row flex-col w-full justify-between">
+                            <div>
+                              <h1 className="text-white font-semibold text-xl mb-4">
+                                Nodes
+                              </h1>
+                            </div>
+                            <div className="flex justify-between gap-4 mb-2">
+                              <button
+                                onClick={() => togglePayments(index)}
+                                className="px-2 py-1 bg-[#18181B] text-white rounded-lg flex flex-row gap-2"
+                              >
+                                <CircleDollarSign />{" "}
+                                {expandedPayments === index
+                                  ? "Hide Payments"
+                                  : "Payments"}
+                              </button>
 
-                      <DatePicker
-                        selected={new Date(node.expiryDate)}
-                        onChange={(date: Date) =>
-                          handleNodeDateChange(index, date)
-                        }
-                        minDate={new Date(node.expiryDate)}
-                        className="px-2 py-1 border rounded-lg bg-white dark:bg-gray-800"
-                      />
-                    </div>
-                  </div>
-                  <div className="flex justify-between">
-                    <button
-                      onClick={() => togglePayments(index)}
-                      className="px-4 py-2 bg-blue-500 text-white rounded-lg mb-2"
-                    >
-                      {expandedPayments === index ? "Payments" : "Payments"}
-                    </button>
-
-                    <button
-                      onClick={() => handleNodeUpdate(node)}
-                      className="px-4 py-2 bg-green-500 text-white rounded-lg"
-                    >
-                      Update
-                    </button>
-                  </div>
-                  {expandedPayments === index && (
-                    <div className="ml-4 pt-2">
-                      {node.payments?.map(
-                        (payment: any, paymentIndex: number) => (
-                          <div
-                            key={paymentIndex}
-                            className="flex justify-between mb-2"
-                          >
-                            <span>
-                              {new Date(payment.date).toLocaleString()}
-                            </span>
-                            <span>{payment.credit} credits</span>
-                            <span>{payment.duration} days</span>
+                              <button
+                                onClick={() => handleNodeUpdate(node)}
+                                className="px-2 py-1 text-[#F44336] rounded-lg flex flex-row gap-2"
+                              >
+                                <RefreshCw /> Update
+                              </button>
+                            </div>
                           </div>
-                        ),
-                      )}
-                    </div>
-                  )}
-                </div>
-              ))}
-            {nodesPage * itemsPerPage < data?.nodes?.length && (
-              <button
-                onClick={handleMoreNodes}
-                className="px-4 py-2 mt-2 bg-blue-500 text-white rounded-lg"
-              >
-                More
-              </button>
-            )}
-          </div>
 
-          <div>
-            <h3 className="text-lg font-semibold">Credits:</h3>
-            {data?.credits
-              ?.slice(0, creditsPage * itemsPerPage)
-              .map((credit: any, index: any) => (
-                <div key={index} className="flex justify-between p-2">
-                  <span>{new Date(credit.date).toLocaleString()}</span>
-                  {credit.tx ? (
-                    <a
-                      href={credit.tx}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-blue-500 hover:text-blue-600"
-                    >
-                      Transaction
-                    </a>
-                  ) : (
-                    <span></span>
-                  )}
-                  <span>{credit.credits} credits</span>
+                          <div className="flex flex-col md:flex-row justify-between gap-4 mb-2">
+                            <div>
+                              <span>Wallet: {node.wallet}</span>
+                            </div>
+                            <div className="flex flex-col md:flex-row gap-4">
+                              <span>Blockchain ID: {node.blockchainId}</span>
+                              <div>
+                                <span>Status: </span>
+                                <select
+                                  aria-label="Status"
+                                  value={node.status}
+                                  onChange={(e) =>
+                                    handleNodeStatusChange(
+                                      index,
+                                      e.target.value,
+                                    )
+                                  }
+                                  className=" border rounded-md bg-transparent text-white px-2 py-1 "
+                                >
+                                  {[
+                                    "LIVE",
+                                    "CREATED",
+                                    "INSTALLING",
+                                    "FAILED",
+                                    "EXPIRED",
+                                  ].map((status) => (
+                                    <option key={status} value={status}>
+                                      {status}
+                                    </option>
+                                  ))}
+                                </select>
+                              </div>
+                              <div>
+                                <span>Expiry: </span>
+                                <DatePicker
+                                  selected={new Date(node.expiryDate)}
+                                  onChange={(date: Date) =>
+                                    handleNodeDateChange(index, date)
+                                  }
+                                  minDate={new Date(node.expiryDate)}
+                                  className="border rounded-md bg-transparent text-white px-2 py-1"
+                                />
+                              </div>
+                            </div>
+                          </div>
+
+                          {expandedPayments === index && (
+                            <div className="ml-4 pt-2">
+                              {node.payments?.map(
+                                (payment: any, paymentIndex: number) => (
+                                  <div
+                                    key={paymentIndex}
+                                    className="flex justify-between mb-2"
+                                  >
+                                    <span>
+                                      {new Date(payment.date).toLocaleString()}
+                                    </span>
+                                    <span>{payment.credit} credits</span>
+                                    <span>{payment.duration} days</span>
+                                  </div>
+                                ),
+                              )}
+                            </div>
+                          )}
+                        </div>
+                      ))}
+                    {nodesPage * itemsPerPage < data?.nodes?.length && (
+                      <button
+                        onClick={handleMoreNodes}
+                        className="px-4 py-2 mt-2 bg-blue-500 text-white rounded-lg"
+                      >
+                        More
+                      </button>
+                    )}
+                  </div>
+
+                  <div className="p-4 border rounded-lg mb-4 bg-[#0D0D0E]">
+                    <h3 className="text-lg font-semibold mb-4">Credits:</h3>
+                    {data?.credits
+                      ?.slice(0, creditsPage * itemsPerPage)
+                      .map((credit: any, index: any) => (
+                        <div key={index} className="flex justify-between p-2">
+                          <span>{new Date(credit.date).toLocaleString()}</span>
+                          {credit.tx ? (
+                            <a
+                              href={credit.tx}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-blue-500 hover:text-blue-600"
+                            >
+                              Transaction
+                            </a>
+                          ) : (
+                            <span></span>
+                          )}
+                          <span>{credit.credits} credits</span>
+                        </div>
+                      ))}
+                    {creditsPage * itemsPerPage < data?.credits?.length && (
+                      <button
+                        onClick={handleMoreCredits}
+                        className="px-4 py-2 mt-2 bg-blue-500 text-white rounded-lg"
+                      >
+                        More
+                      </button>
+                    )}
+                  </div>
                 </div>
-              ))}
-            {creditsPage * itemsPerPage < data?.credits?.length && (
-              <button
-                onClick={handleMoreCredits}
-                className="px-4 py-2 mt-2 bg-blue-500 text-white rounded-lg"
-              >
-                More
-              </button>
+              </div>
             )}
           </div>
-        </div>
+        </>
+      )}
+      {showBalanceModal && (
+        <AddCredit
+          setShowBalanceModal={setShowBalanceModal}
+          balanceInput={balanceInput}
+          setBalanceInput={setBalanceInput}
+          handleBalanceSubmit={handleBalanceSubmit}
+        />
       )}
     </div>
   )
