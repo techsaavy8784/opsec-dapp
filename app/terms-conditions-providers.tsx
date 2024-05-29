@@ -3,28 +3,29 @@
 import TermsAndConditions from "@/components/terms-and-conditons"
 import { useState, useEffect } from "react"
 
-const TermsAndConditionsProvider = () => {
+const TermsAndConditionsProvider: React.FC = () => {
   const [isMounted, setIsMounted] = useState(false)
+  const [acceptedTerms, setAcceptedTerms] = useState<string | null>(null)
+  const [modalOpenStatus, setModalOpenStatus] = useState(true)
 
   useEffect(() => {
     setIsMounted(true)
   }, [])
 
-  const [acceptedTerms, setAcceptedTerms] = useState(() =>
-    localStorage.getItem("acceptedTerms"),
-  )
-
-  const [modalOpenStatus, setModalOpenStatus] = useState(true)
-
   useEffect(() => {
-    if (acceptedTerms === "true") {
-      setModalOpenStatus(false)
+    if (isMounted) {
+      const termsAccepted = localStorage.getItem("acceptedTerms")
+      setAcceptedTerms(termsAccepted)
+      if (termsAccepted === "true") {
+        setModalOpenStatus(false)
+      }
     }
-  }, [acceptedTerms])
+  }, [isMounted])
 
   const handleAcceptTerms = () => {
     localStorage.setItem("acceptedTerms", "true")
     setAcceptedTerms("true")
+    setModalOpenStatus(false)
   }
 
   if (!isMounted) {
