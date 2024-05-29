@@ -63,6 +63,10 @@ export const NodeCard: React.FC<NodeCardProps> = ({
       <Button type="button" variant="custom" disabled>
         Sold out
       </Button>
+    ) : isComing ? (
+      <Button type="button" variant="custom" disabled>
+        Coming Soon
+      </Button>
     ) : onBuy ? (
       <Button type="button" variant="custom" onClick={onBuy}>
         Deploy
