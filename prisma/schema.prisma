@@ -2,10 +2,10 @@ generator client {
   provider = "prisma-client-js"
 }
 
-// generator jsonSchema {
-//   provider              = "prisma-json-schema-generator"
-//   includeRequiredFields = "true"
-// }
+generator jsonSchema {
+  provider              = "prisma-json-schema-generator"
+  includeRequiredFields = "true"
+}
 
 datasource db {
   provider  = "postgresql"
