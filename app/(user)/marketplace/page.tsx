@@ -108,6 +108,7 @@ const Nodes: React.FC = () => {
             name={chain.name}
             description={chain.description}
             isComing={true}
+           
           />
         ))}
         <NodePaymentModal
