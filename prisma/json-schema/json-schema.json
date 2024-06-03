@@ -44,6 +44,14 @@
             "$ref": "#/definitions/Payment"
           }
         },
+        "role": {
+          "type": "string",
+          "default": "USER",
+          "enum": [
+            "USER",
+            "ADMIN"
+          ]
+        },
         "Reward": {
           "type": "array",
           "items": {
