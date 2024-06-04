@@ -170,26 +170,26 @@ const StakingHistory = () => {
                     </TableCell>
                     <TableCell className="text-[16px] font-[600] text-white max-md:min-w-[130px] flex gap-2">
                       {remaining >= 0 ? (
-                        `${remaining} days`
+                        <>
+                          `${remaining} days`
+                          <Button onClick={() => setStakeModal(item.stakeId)}>
+                            Extend
+                          </Button>
+                        </>
                       ) : staking === undefined ? (
                         "0 days"
                       ) : staking[key]?.[4] ? (
                         "Unstaked"
                       ) : (
-                        <>
-                          <Button
-                            onClick={() => handleUnstake(item.stakeId)}
-                            disabled={unstakePending}
-                          >
-                            {unstakePending && (
-                              <ReloadIcon className="mr-2 animate-spin" />
-                            )}
-                            Unstake
-                          </Button>
-                          <Button onClick={() => setStakeModal(item.stakeId)}>
-                            Extend
-                          </Button>
-                        </>
+                        <Button
+                          onClick={() => handleUnstake(item.stakeId)}
+                          disabled={unstakePending}
+                        >
+                          {unstakePending && (
+                            <ReloadIcon className="mr-2 animate-spin" />
+                          )}
+                          Unstake
+                        </Button>
                       )}
                     </TableCell>
                     <TableCell className="text-[16px] font-[600] text-white max-md:min-w-[130px]">
