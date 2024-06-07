@@ -41,8 +41,6 @@ export async function GET() {
     0,
   )
 
-  console.log(usedCapacity)
-
   const remainingCapacity = totalCapacity - usedCapacity
 
   const chainsAll = await prisma.blockchain.findMany()
@@ -73,9 +71,16 @@ export async function GET() {
     }
   })
 
+  const sortedChains = chains.sort((a, b) => {
+    if (a.disabled === b.disabled) {
+      return 0
+    }
+    return a.disabled ? -1 : 1
+  })
+
   return NextResponse.json({
     total: totalCapacity,
     capacity: remainingCapacity,
-    chains,
+    chains: sortedChains,
   })
 }
