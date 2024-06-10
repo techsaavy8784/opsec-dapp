@@ -41,37 +41,42 @@ export async function GET() {
     0,
   )
 
-  console.log(usedCapacity)
-
   const remainingCapacity = totalCapacity - usedCapacity
 
   const chainsAll = await prisma.blockchain.findMany()
 
-  const chains = chainsAll.map((chain) => {
-    let disabled = false
+  const chains = chainsAll
+    .map((chain) => {
+      let disabled = false
 
-    // todo: need to handle the case of PAY_TYPE.PARTIAL
+      // todo: need to handle the case of PAY_TYPE.PARTIAL
 
-    if (chain.payType === PAY_TYPE.FULL) {
-      const chainServers = servers.filter(
-        (server) =>
-          server.type === SERVER_TYPE.MULTI_NODE &&
-          server.nodes.some((node) => node.blockchainId === chain.id),
-      )
-      disabled = chainServers.length === multiNodeServerCount
-    }
+      if (chain.payType === PAY_TYPE.FULL) {
+        const chainServers = servers.filter(
+          (server) =>
+            server.type === SERVER_TYPE.MULTI_NODE &&
+            server.nodes.some((node) => node.blockchainId === chain.id),
+        )
+        disabled = chainServers.length === multiNodeServerCount
+      }
 
-    return {
-      id: chain.id,
-      name: chain.name,
-      description: chain.description,
-      price: chain.price,
-      floorPrice: chain.floorPrice,
-      hasWallet: chain.hasWallet,
-      payType: chain.payType,
-      disabled,
-    }
-  })
+      return {
+        id: chain.id,
+        name: chain.name,
+        description: chain.description,
+        price: chain.price,
+        floorPrice: chain.floorPrice,
+        hasWallet: chain.hasWallet,
+        payType: chain.payType,
+        disabled,
+      }
+    })
+    .sort((a, b) => {
+      if (a.disabled === b.disabled) {
+        return 0
+      }
+      return a.disabled ? -1 : 1
+    })
 
   return NextResponse.json({
     total: totalCapacity,
