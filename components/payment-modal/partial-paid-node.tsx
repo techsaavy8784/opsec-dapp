@@ -41,7 +41,7 @@ export const PartialNodePaymentModal: React.FC<PaymentModalProps> = ({
 
   useEffect(() => {
     setAmount(chain?.floorPrice ?? 0)
-  }, [open])
+  }, [chain, open])
 
   const insufficientBalance = Number(balance?.balance) < Number(amount)
 

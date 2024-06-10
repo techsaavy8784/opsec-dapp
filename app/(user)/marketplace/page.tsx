@@ -87,7 +87,11 @@ const Nodes: React.FC = () => {
     <>
       <div className="pb-6">
         <div className="w-full flex px-[20px] md:px-[34px] py-6 rounded-[24px] justify-center flex-col bg-[url(/backgrounds/marketplace.jpg)] bg-center bg-cover bg-no-repeat h-[172px]">
-          <h1 className="uppercase text-[32px] font-[900]">{data.capacity}</h1>
+          <h1 className="uppercase text-[32px] font-[900]">
+            {data.chains.length === data.chains.filter((c) => c.disabled).length
+              ? 0
+              : data.capacity}
+          </h1>
           <h1 className="uppercase text-md font-[300]">nodes available</h1>
         </div>
       </div>
@@ -107,7 +111,7 @@ const Nodes: React.FC = () => {
             key={chain.id}
             name={chain.name}
             description={chain.description}
-            isComing={true}
+            isComing
           />
         ))}
         <NodePaymentModal

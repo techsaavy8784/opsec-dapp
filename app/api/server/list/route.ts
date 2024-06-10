@@ -37,7 +37,7 @@ export async function GET() {
     singleNodeServerCount
 
   const usedCapacity = servers.reduce(
-    (acc, server) => acc + server.nodes.length,
+    (acc, server) => acc + Math.min(server.nodes.length, Number(process.env.NODE_COUNT_PER_SERVER)),
     0,
   )
 
@@ -57,7 +57,7 @@ export async function GET() {
             server.type === SERVER_TYPE.MULTI_NODE &&
             server.nodes.some((node) => node.blockchainId === chain.id),
         )
-        disabled = chainServers.length === multiNodeServerCount
+        disabled = chainServers.length >= multiNodeServerCount
       }
 
       return {
