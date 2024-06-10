@@ -3,7 +3,12 @@
 @tailwind utilities;
 
 ::-webkit-scrollbar {
-  display: none;
+  width: 8px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #52525b;
+  border-radius: 8px;
 }
 
 .grid-cols-100 {

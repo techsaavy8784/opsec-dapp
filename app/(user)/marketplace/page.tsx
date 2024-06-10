@@ -91,7 +91,7 @@ const Nodes: React.FC = () => {
           <h1 className="uppercase text-md font-[300]">nodes available</h1>
         </div>
       </div>
-      <div className="grid items-center grid-cols-1 gap-8 pt-2 md:grid-cols-3">
+      <div className="grid items-center grid-cols-1 gap-8 pt-2 md:grid-cols-3 flex-1 overflow-y-auto">
         {data.chains.map((chain) => (
           <NodeCard
             key={chain.id}
