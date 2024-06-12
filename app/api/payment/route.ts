@@ -2,10 +2,9 @@ import prisma from "@/prisma"
 import { authOptions } from "@/lib/auth"
 import { getServerSession } from "next-auth"
 import { NextResponse, NextRequest } from "next/server"
-import { Status } from "@prisma/client"
 import subscriptions from "./subscriptions"
 import availableServers from "./available-servers"
-import { PAY_TYPE } from "@prisma/client"
+import { PAY_TYPE, Status } from "@prisma/client"
 
 export async function GET(request: NextRequest) {
   const session = await getServerSession(authOptions)
@@ -157,6 +156,74 @@ export async function POST(request: NextRequest) {
       { message: "Insufficient credit balance" },
       { status: 400 },
     )
+  }
+
+  if (blockchain.payType === PAY_TYPE.PARTIAL) {
+    const nodes = await prisma.node.findMany({
+      where: { blockchainId: blockchain.id, NOT: { status: Status.EXPIRED } },
+      include: { payments: true },
+    })
+
+    const node = nodes.find(
+      (node) =>
+        blockchain.price >
+        node.payments.reduce((total, payment) => total + payment.credit, 0),
+    )
+
+    if (node) {
+      const paidCredit = node.payments.reduce(
+        (total, payment) => total + payment.credit,
+        0,
+      )
+      const remain = blockchain.price - paidCredit
+      let payment
+      if (amount > remain && nodes.length < (blockchain.count || 0) - 1) {
+        const newNode = await prisma.node.create({
+          data: {
+            wallet,
+            userId,
+            blockchainId,
+            serverId: null,
+          },
+        })
+        payment = await prisma.payment.createMany({
+          data: [
+            {
+              duration: months * 31,
+              credit: remain,
+              nodeId: node.id,
+              userId,
+            },
+            {
+              duration: months * 31,
+              credit: amount - remain,
+              nodeId: newNode.id,
+              userId,
+            },
+          ],
+        })
+      } else {
+        payment = await prisma.payment.create({
+          data: {
+            duration: months * 31,
+            credit: amount,
+            nodeId: node.id,
+            userId,
+          },
+        })
+      }
+
+      await prisma.user.update({
+        data: {
+          balance: user!.balance - amount,
+        },
+        where: {
+          id: userId,
+        },
+      })
+
+      return NextResponse.json(payment, { status: 201 })
+    }
   }
 
   const node = await prisma.node.create({

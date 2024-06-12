@@ -118,6 +118,7 @@ model Blockchain {
   rewardLockTime Int?     @map("reward_lock_time")
   rewardPerMonth Int?     @map("reward_per_month")
   floorPrice     Int?     @map("floor_price")
+  count          Int?
 
   @@map("blockchains")
 }

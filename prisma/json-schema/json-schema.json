@@ -362,6 +362,12 @@
             "integer",
             "null"
           ]
+        },
+        "count": {
+          "type": [
+            "integer",
+            "null"
+          ]
         }
       },
       "required": [
