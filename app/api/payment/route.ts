@@ -158,13 +158,19 @@ export async function POST(request: NextRequest) {
     )
   }
 
-  if (blockchain.payType === PAY_TYPE.PARTIAL) {
-    months = 0
-    const nodes = await prisma.node.findMany({
-      where: { blockchainId: blockchain.id, NOT: { status: Status.EXPIRED } },
-      include: { payments: true },
-    })
+  const nodes = await prisma.node.findMany({
+    where: {
+      blockchainId: blockchain.id,
+      NOT: {
+        status: Status.EXPIRED
+      }
+    },
+    include: {
+      payments: true
+    },
+  })
 
+  if (blockchain.payType === PAY_TYPE.PARTIAL) {
     const node = nodes.find(
       (node) =>
         blockchain.price >
@@ -177,7 +183,7 @@ export async function POST(request: NextRequest) {
         0,
       )
       const remain = blockchain.price - creditSum
-      let payment
+
       if (amount > remain) {
         if (blockchain.count !== null && nodes.length >= blockchain.count) {
           return NextResponse.json(
@@ -194,16 +200,17 @@ export async function POST(request: NextRequest) {
             serverId: servers[Math.floor(Math.random() * servers.length)].id,
           },
         })
-        payment = await prisma.payment.createMany({
+
+        await prisma.payment.createMany({
           data: [
             {
-              duration: months * 31,
+              duration: 0,
               credit: remain,
               nodeId: node.id,
               userId,
             },
             {
-              duration: months * 31,
+              duration: 0,
               credit: amount - remain,
               nodeId: newNode.id,
               userId,
@@ -211,9 +218,9 @@ export async function POST(request: NextRequest) {
           ],
         })
       } else {
-        payment = await prisma.payment.create({
+        await prisma.payment.create({
           data: {
-            duration: months * 31,
+            duration: 0,
             credit: amount,
             nodeId: node.id,
             userId,
@@ -222,12 +229,23 @@ export async function POST(request: NextRequest) {
       }
 
       await prisma.user.update({
-        data: { balance: user!.balance - amount },
-        where: { id: userId },
+        data: {
+          balance: user!.balance - amount
+        },
+        where: {
+          id: userId
+        },
       })
 
-      return NextResponse.json(payment, { status: 201 })
+      return NextResponse.json({ nodeId: node.id }, { status: 201 })
     }
+  }
+
+  if (blockchain.count !== null && nodes.length >= blockchain.count) {
+    return NextResponse.json(
+      { message: "Node count reached full limit" },
+      { status: 401 },
+    )
   }
 
   const node = await prisma.node.create({
@@ -235,14 +253,11 @@ export async function POST(request: NextRequest) {
       wallet,
       userId,
       blockchainId,
-      serverId:
-        blockchain.payType === PAY_TYPE.FULL
-          ? servers[Math.floor(Math.random() * servers.length)].id
-          : null,
+      serverId: servers[Math.floor(Math.random() * servers.length)].id
     },
   })
 
-  const payment = await prisma.payment.create({
+  await prisma.payment.create({
     data: {
       duration: months * 31,
       credit: amount,
@@ -256,5 +271,5 @@ export async function POST(request: NextRequest) {
     where: { id: userId },
   })
 
-  return NextResponse.json(payment, { status: 201 })
+  return NextResponse.json({ nodeId: node.id }, { status: 201 })
 }
