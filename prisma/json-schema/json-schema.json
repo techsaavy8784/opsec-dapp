@@ -325,7 +325,7 @@
           "type": "string",
           "format": "date-time"
         },
-        "Node": {
+        "nodes": {
           "type": "array",
           "items": {
             "$ref": "#/definitions/Node"
@@ -358,6 +358,12 @@
           ]
         },
         "floorPrice": {
+          "type": [
+            "integer",
+            "null"
+          ]
+        },
+        "count": {
           "type": [
             "integer",
             "null"

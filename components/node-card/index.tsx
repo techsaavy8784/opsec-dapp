@@ -18,6 +18,7 @@ type NodeCardProps = {
   expireInDays?: number
   payType?: PAY_TYPE
   isComing?: boolean
+  noCapacity?: boolean
   onBuy?: () => void
 }
 
@@ -31,6 +32,7 @@ export const NodeCard: React.FC<NodeCardProps> = ({
   expireInDays,
   payType,
   isComing,
+  noCapacity,
   onBuy,
 }) => (
   <div className="col-span-1 p-4 rounded-[16px] backdrop:blur-[100px] overflow-hidden flex flex-col gap-4 border border-zinc-600 h-full">
@@ -70,7 +72,12 @@ export const NodeCard: React.FC<NodeCardProps> = ({
         Coming Soon
       </Button>
     ) : onBuy ? (
-      <Button type="button" variant="custom" onClick={onBuy}>
+      <Button
+        type="button"
+        variant="custom"
+        onClick={onBuy}
+        disabled={noCapacity}
+      >
         Deploy
         <FaArrowRightLong className="ml-2 font-[300]" />
       </Button>

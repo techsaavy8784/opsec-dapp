@@ -19,7 +19,7 @@ import { useRouter } from "next/navigation"
 
 interface PaymentModalProps extends DialogProps {
   open: boolean
-  chain?: Blockchain
+  chain?: Blockchain & { disabled: boolean; priceLimit: number }
   onPurchaseComplete: () => void
 }
 
@@ -61,8 +61,11 @@ export const PartialNodePaymentModal: React.FC<PaymentModalProps> = ({
             title: "Node purchased",
           })
         } else {
-          toast({
-            title: "An error occurred",
+          response.json().then((res) => {
+            toast({
+              title: "An error occurred",
+              description: res.message,
+            })
           })
         }
         onPurchaseComplete()
@@ -116,7 +119,7 @@ export const PartialNodePaymentModal: React.FC<PaymentModalProps> = ({
             <Slider
               value={[amount]}
               min={chain.floorPrice ?? 1}
-              max={chain.price}
+              max={chain.priceLimit}
               step={1}
               className="my-4"
               onValueChange={([value]) => setAmount(value)}
