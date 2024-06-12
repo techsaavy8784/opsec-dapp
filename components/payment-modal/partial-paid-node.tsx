@@ -61,8 +61,11 @@ export const PartialNodePaymentModal: React.FC<PaymentModalProps> = ({
             title: "Node purchased",
           })
         } else {
-          toast({
-            title: "An error occurred",
+          response.json().then((res) => {
+            toast({
+              title: "An error occurred",
+              description: res.message,
+            })
           })
         }
         onPurchaseComplete()

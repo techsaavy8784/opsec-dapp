@@ -109,13 +109,6 @@ export async function POST(request: NextRequest) {
   const blockchainId = id
   const servers = await availableServers(blockchainId)
 
-  if (servers.length === 0) {
-    return NextResponse.json(
-      { message: "No suitable server found" },
-      { status: 404 },
-    )
-  }
-
   const user = await prisma.user.findFirst({
     where: {
       id: userId,
@@ -192,6 +185,13 @@ export async function POST(request: NextRequest) {
           )
         }
 
+        if (servers.length === 0) {
+          return NextResponse.json(
+            { message: "No suitable server found" },
+            { status: 404 },
+          )
+        }
+
         const newNode = await prisma.node.create({
           data: {
             wallet,
@@ -245,6 +245,13 @@ export async function POST(request: NextRequest) {
     return NextResponse.json(
       { message: "Node count reached full limit" },
       { status: 401 },
+    )
+  }
+
+  if (servers.length === 0) {
+    return NextResponse.json(
+      { message: "No suitable server found" },
+      { status: 404 },
     )
   }
 
