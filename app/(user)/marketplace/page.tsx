@@ -12,7 +12,7 @@ import { PAY_TYPE } from "@prisma/client"
 type Type = {
   total: number
   capacity: number
-  chains: (Blockchain & { disabled: boolean })[]
+  chains: (Blockchain & { disabled: boolean; priceLimit: number })[]
 }
 
 type ComingSoonChain = {
@@ -54,7 +54,9 @@ const comingChains: ComingSoonChain[] = [
 ]
 
 const Nodes: React.FC = () => {
-  const [chain, setChain] = useState<Blockchain>()
+  const [chain, setChain] = useState<
+    Blockchain & { disabled: boolean; priceLimit: number }
+  >()
 
   const { isPending, data, refetch } = useQuery<Type>({
     queryKey: ["server/list"],

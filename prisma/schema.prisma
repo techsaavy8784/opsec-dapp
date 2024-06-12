@@ -23,10 +23,10 @@ model User {
   stakings Staking[]
   payments Payment[]
 
-  role    Role      @default(USER)
+  role Role @default(USER)
 
-  Reward   Reward[]
-  claims   Claim[]
+  Reward Reward[]
+  claims Claim[]
 
   @@map("users")
 }
@@ -112,7 +112,7 @@ model Blockchain {
   hasWallet      Boolean  @default(false) @map("has_wallet")
   staking        Boolean  @default(true)
   launchedAt     DateTime @default(now()) @map("launched_at")
-  Node           Node[]
+  nodes          Node[]
   payType        PAY_TYPE @default(FULL) @map("pay_type")
   rewardWallet   String?  @map("reward_wallet")
   rewardLockTime Int?     @map("reward_lock_time")
@@ -134,12 +134,10 @@ model Credit {
   @@map("credits")
 }
 
-
 enum Role {
   USER
   ADMIN
 }
-
 
 model Claim {
   id     Int  @id @default(autoincrement())
@@ -151,25 +149,23 @@ model Claim {
 }
 
 model Reward {
-  id                     Int       @id @default(autoincrement())
-  userId                 Int       @map("user_id")
-  reflectionReward       Int?      @map("reflection_reward")
-  rewardWithdrawTime     DateTime? @map("reward_withdraw_time")
-  user                   User      @relation(fields: [userId], references: [id])
+  id                 Int       @id @default(autoincrement())
+  userId             Int       @map("user_id")
+  reflectionReward   Int?      @map("reflection_reward")
+  rewardWithdrawTime DateTime? @map("reward_withdraw_time")
+  user               User      @relation(fields: [userId], references: [id])
 
   @@map("rewards")
 }
 
-
 model TaxHistory {
-  id            Int       @id @default(autoincrement())
-  amount        Int
-  totalOpsec    Int       @map("total_opsec")
-  createdAt     DateTime  @default(now()) @map("created_at")
+  id         Int      @id @default(autoincrement())
+  amount     Int
+  totalOpsec Int      @map("total_opsec")
+  createdAt  DateTime @default(now()) @map("created_at")
 
   @@map("tax_histories")
 }
-
 
 enum Status {
   CREATED
@@ -187,6 +183,4 @@ enum SERVER_TYPE {
 enum PAY_TYPE {
   FULL
   PARTIAL
-
 }
-

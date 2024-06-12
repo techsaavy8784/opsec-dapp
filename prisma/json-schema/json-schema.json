@@ -325,7 +325,7 @@
           "type": "string",
           "format": "date-time"
         },
-        "Node": {
+        "nodes": {
           "type": "array",
           "items": {
             "$ref": "#/definitions/Node"
