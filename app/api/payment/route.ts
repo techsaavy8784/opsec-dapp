@@ -171,11 +171,11 @@ export async function POST(request: NextRequest) {
     )
 
     if (node) {
-      const paidCredit = node.payments.reduce(
+      const creditSum = node.payments.reduce(
         (total, payment) => total + payment.credit,
         0,
       )
-      const remain = blockchain.price - paidCredit
+      const remain = blockchain.price - creditSum
       let payment
       if (amount > remain && nodes.length < (blockchain.count || 0) - 1) {
         const newNode = await prisma.node.create({
