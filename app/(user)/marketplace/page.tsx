@@ -106,6 +106,7 @@ const Nodes: React.FC = () => {
             payType={chain.payType}
             onBuy={() => setChain(chain)}
             disabled={chain.disabled}
+            noCapacity={data.capacity === 0}
           />
         ))}
         {comingChains.map((chain) => (
