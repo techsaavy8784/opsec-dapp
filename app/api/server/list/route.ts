@@ -1,6 +1,6 @@
 import { authOptions } from "@/lib/auth"
 import prisma from "@/prisma"
-import { PAY_TYPE, SERVER_TYPE } from "@prisma/client"
+import { PAY_TYPE, Payment, SERVER_TYPE } from "@prisma/client"
 import { getServerSession } from "next-auth"
 import { NextResponse } from "next/server"
 
@@ -43,12 +43,16 @@ export async function GET() {
 
   const remainingCapacity = totalCapacity - usedCapacity
 
-  const chainsAll = await prisma.blockchain.findMany()
+  const chainsAll = await prisma.blockchain.findMany({
+    include: {
+      Node: true
+    }
+  })
 
   const chains = chainsAll
     .map((chain) => {
       let disabled = false
-
+      let maxPrice = chain.price
       // todo: need to handle the case of PAY_TYPE.PARTIAL
 
       if (chain.payType === PAY_TYPE.FULL) {
@@ -58,6 +62,18 @@ export async function GET() {
             server.nodes.some((node) => node.blockchainId === chain.id),
         )
         disabled = chainServers.length >= multiNodeServerCount
+      } else {
+        prisma.payment.findMany({
+          where: { node: {
+            blockchainId: chain.id
+          }, }
+        }).then((res : any) => {
+          const checkAllOwnerShip = res.every((item: Payment) => item.credit === chain.price)
+          if(checkAllOwnerShip && chain.Node.length === chain.count)
+            disabled = true
+          else if(chain.Node.length === chain.count)
+            maxPrice = chain.price - res.find((item: Payment) => item.credit !== chain.price).credit
+        })
       }
 
       return {
@@ -69,6 +85,9 @@ export async function GET() {
         hasWallet: chain.hasWallet,
         payType: chain.payType,
         disabled,
+        count: chain.count,
+        nodeCount: chain.Node.length,
+        maxPrice
       }
     })
     .sort((a, b) => {

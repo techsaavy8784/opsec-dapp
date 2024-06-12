@@ -19,7 +19,7 @@ import { useRouter } from "next/navigation"
 
 interface PaymentModalProps extends DialogProps {
   open: boolean
-  chain?: Blockchain
+  chain?: Blockchain & { disabled: boolean, maxPrice: number, nodeCount: number }
   onPurchaseComplete: () => void
 }
 
@@ -116,7 +116,7 @@ export const PartialNodePaymentModal: React.FC<PaymentModalProps> = ({
             <Slider
               value={[amount]}
               min={chain.floorPrice ?? 1}
-              max={chain.price}
+              max={ chain.maxPrice }
               step={1}
               className="my-4"
               onValueChange={([value]) => setAmount(value)}
