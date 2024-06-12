@@ -190,7 +190,7 @@ export async function POST(request: NextRequest) {
             wallet,
             userId,
             blockchainId,
-            serverId: null,
+            serverId: servers[Math.floor(Math.random() * servers.length)].id,
           },
         })
         payment = await prisma.payment.createMany({
