@@ -189,13 +189,13 @@ export async function POST(request: NextRequest) {
         payment = await prisma.payment.createMany({
           data: [
             {
-              duration: months * 31,
+              duration: 0,
               credit: remain,
               nodeId: node.id,
               userId,
             },
             {
-              duration: months * 31,
+              duration: 0,
               credit: amount - remain,
               nodeId: newNode.id,
               userId,
@@ -205,7 +205,7 @@ export async function POST(request: NextRequest) {
       } else {
         payment = await prisma.payment.create({
           data: {
-            duration: months * 31,
+            duration: 0,
             credit: amount,
             nodeId: node.id,
             userId,
