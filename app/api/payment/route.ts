@@ -177,7 +177,14 @@ export async function POST(request: NextRequest) {
       )
       const remain = blockchain.price - creditSum
       let payment
-      if (amount > remain && nodes.length < (blockchain.count || 0) - 1) {
+      if (amount > remain) {
+        if (blockchain.count !== null && nodes.length >= blockchain.count) {
+          return NextResponse.json(
+            { message: "Node count reached full limit" },
+            { status: 401 },
+          )
+        }
+
         const newNode = await prisma.node.create({
           data: {
             wallet,
