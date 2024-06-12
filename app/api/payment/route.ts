@@ -214,12 +214,8 @@ export async function POST(request: NextRequest) {
       }
 
       await prisma.user.update({
-        data: {
-          balance: user!.balance - amount,
-        },
-        where: {
-          id: userId,
-        },
+        data: { balance: user!.balance - amount },
+        where: { id: userId },
       })
 
       return NextResponse.json(payment, { status: 201 })
@@ -248,12 +244,8 @@ export async function POST(request: NextRequest) {
   })
 
   await prisma.user.update({
-    data: {
-      balance: user!.balance - amount,
-    },
-    where: {
-      id: userId,
-    },
+    data: { balance: user!.balance - amount },
+    where: { id: userId },
   })
 
   return NextResponse.json(payment, { status: 201 })
