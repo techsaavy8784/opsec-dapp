@@ -159,6 +159,7 @@ export async function POST(request: NextRequest) {
   }
 
   if (blockchain.payType === PAY_TYPE.PARTIAL) {
+    months = 0
     const nodes = await prisma.node.findMany({
       where: { blockchainId: blockchain.id, NOT: { status: Status.EXPIRED } },
       include: { payments: true },
@@ -196,13 +197,13 @@ export async function POST(request: NextRequest) {
         payment = await prisma.payment.createMany({
           data: [
             {
-              duration: 0,
+              duration: months * 31,
               credit: remain,
               nodeId: node.id,
               userId,
             },
             {
-              duration: 0,
+              duration: months * 31,
               credit: amount - remain,
               nodeId: newNode.id,
               userId,
@@ -212,7 +213,7 @@ export async function POST(request: NextRequest) {
       } else {
         payment = await prisma.payment.create({
           data: {
-            duration: 0,
+            duration: months * 31,
             credit: amount,
             nodeId: node.id,
             userId,
