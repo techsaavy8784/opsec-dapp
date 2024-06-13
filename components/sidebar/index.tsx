@@ -50,11 +50,11 @@ const Sidebar = ({ setOpen }: Props) => {
       link: "treasury",
       icon: TreasuryIcon,
     },
-    // {
-    //   title: "Staking",
-    //   link: "staking",
-    //   icon: TreasuryIcon,
-    // },
+    {
+      title: "Staking",
+      link: "staking",
+      icon: TreasuryIcon,
+    },
     // {
     //   title: "Reward",
     //   link: "reward",
