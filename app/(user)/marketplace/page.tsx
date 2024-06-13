@@ -23,12 +23,6 @@ type ComingSoonChain = {
 
 const comingChains: ComingSoonChain[] = [
   {
-    id: 0,
-    name: "XAI",
-    description:
-      "With Xai, potentially billions of traditional gamers can own and trade valuable in-game items in their favorite games for the first time, without the need to interact with crypto-wallets.",
-  },
-  {
     id: 1,
     name: "Myria",
     description:
