@@ -1,6 +1,6 @@
 import { useAccount } from "wagmi"
 import { useSession } from "next-auth/react"
-import { chain as c } from "@/app/providers"
+import { chain as c } from "@/contract/client"
 
 const useConnected = () => {
   const { isConnected, chain } = useAccount()
