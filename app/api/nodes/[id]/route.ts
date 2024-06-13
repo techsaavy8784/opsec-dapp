@@ -47,7 +47,11 @@ export async function GET(
   const paidCredit =
     node.blockchain.payType === PAY_TYPE.FULL
       ? node.blockchain.price
-      : node.payments.find((payment) => payment.userId === userId)?.credit ?? 0
+      : node.payments.reduce(
+          (sum, payment) =>
+            payment.userId === userId ? sum + payment.credit : sum,
+          0,
+        )
 
   const { reward, ownership } = getNodeReward(paidCredit, node, withdrawTime)
 
