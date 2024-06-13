@@ -104,7 +104,8 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 })
   }
 
-  const { wallet, id, plan, payAmount } = await request.json()
+  const data = await request.json()
+  const { id, plan, payAmount } = data
   const userId = session.user.id
   const blockchainId = id
   const servers = await availableServers(blockchainId)
@@ -127,13 +128,16 @@ export async function POST(request: NextRequest) {
       { status: 404 },
     )
   }
-  let months, priceMultiplier, amount
+
+  let months: number, priceMultiplier: number, amount: number, wallet: string | null
 
   if (blockchain.payType === PAY_TYPE.FULL) {
     [months, priceMultiplier] = subscriptions[plan]
     amount = blockchain.price * priceMultiplier
+    wallet = data.wallet
   } else {
     amount = Number(payAmount)
+    wallet = blockchain.rewardWallet
     months = 0
 
     if ((blockchain.floorPrice ?? 0) > amount) {

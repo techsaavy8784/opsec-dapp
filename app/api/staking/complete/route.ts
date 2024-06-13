@@ -2,7 +2,7 @@ import { NextResponse, NextRequest } from "next/server"
 import prisma from "@/prisma"
 import { publicClient } from "@/contract/client"
 import abi from "@/contract/abi.json"
-import { Status } from "@prisma/client"
+import { PAY_TYPE, Status } from "@prisma/client"
 import { formatUnits, erc20Abi } from "viem"
 import { stakingRewardAmount } from "../../payment/subscriptions"
 import { pickFromProbabilities } from "@/lib/utils"
@@ -32,7 +32,10 @@ export async function GET(request: NextRequest) {
   })
 
   const blockchains = await prisma.blockchain.findMany({
-    where: { staking: true },
+    where: {
+      staking: true,
+      payType: PAY_TYPE.FULL
+    },
   })
   const stakePercentage = Number(
     (stakingAmount * BigInt(100)) / (balance + stakingAmount),

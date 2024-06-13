@@ -46,11 +46,10 @@ export const PartialNodePaymentModal: React.FC<PaymentModalProps> = ({
   const insufficientBalance = Number(balance?.balance) < Number(amount)
 
   const { mutate: purchase, isPending: isPaying } = useMutation({
-    mutationFn: (wallet: string) =>
+    mutationFn: () =>
       fetch("/api/payment", {
         method: "POST",
         body: JSON.stringify({
-          wallet,
           id: chain?.id,
           payAmount: amount,
         }),
@@ -135,7 +134,7 @@ export const PartialNodePaymentModal: React.FC<PaymentModalProps> = ({
 
             <Button
               type="button"
-              onClick={() => purchase(chain.rewardWallet ?? "")}
+              onClick={() => purchase()}
               variant="custom"
               disabled={isPaying || insufficientBalance}
             >
