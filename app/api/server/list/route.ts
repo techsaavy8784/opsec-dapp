@@ -130,7 +130,7 @@ export async function GET() {
       if (a.disabled === b.disabled) {
         return 0
       }
-      return a.disabled ? -1 : 1
+      return a.disabled ? 1 : -1
     })
 
   return NextResponse.json({
