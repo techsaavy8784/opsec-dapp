@@ -24,7 +24,13 @@ export async function GET(
     include: { payments: true, blockchain: true, server: true },
   })
 
-  if (node.userId !== userId) {
+  const payments = await prisma.payment.findMany({
+    where: {
+      nodeId: nodeId,
+    },
+  })
+
+  if (!payments.some((item) => item.userId === userId)) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 })
   }
 
