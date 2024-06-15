@@ -10,7 +10,6 @@ import { Input } from "../ui/input"
 import { Button } from "../ui/button"
 import { useForm } from "react-hook-form"
 import { useToast } from "../ui/use-toast"
-import usePollStatus from "@/hooks/usePollStatus"
 
 interface CreditPaymentModalProps extends DialogProps {
   onComplete: () => void
@@ -38,32 +37,20 @@ export const CreditPaymentModal: React.FC<CreditPaymentModalProps> = ({
 
   const { toast } = useToast()
 
+  const [showCompleteTransaction, setShowCompleteTransaction] = useState(false)
   const [transactionUrl, setTransactionUrl] = useState("")
-
-  const { startPoll, stopPoll } = usePollStatus({
-    cb: (tx: string) =>
-      fetch(`/api/credits/status?tx=${tx}`)
-        .then((res) => res.json())
-        .then((res) => res.status),
-    stopWhen: (status: string) => ["confirmed", "failed"].includes(status),
-    onStop: (status: string) => {
-      if (status === "confirmed") {
-        setStep("complete")
-        onComplete()
-      } else if (status === "failed") {
-        setStep("failed")
-      }
-    },
-  })
+  const [transactionInitiated, setTransactionInitiated] = useState(false)
 
   useEffect(() => {
     setStep("form")
 
     if (!props.open) {
-      stopPoll()
+      clearInterval(timer.current)
+      setShowCompleteTransaction(false)
       setTransactionUrl("")
+      setTransactionInitiated(false)
     }
-  }, [props.open, stopPoll])
+  }, [props.open])
 
   const { mutateAsync, isPending } = useMutation({
     mutationFn: (amount: number) =>
@@ -82,6 +69,8 @@ export const CreditPaymentModal: React.FC<CreditPaymentModalProps> = ({
             // window.open(url, "_blank", options)
 
             setTransactionUrl(url)
+            setShowCompleteTransaction(true)
+
             setStep("initiating")
 
             return tx
@@ -103,19 +92,40 @@ export const CreditPaymentModal: React.FC<CreditPaymentModalProps> = ({
           return
         }
 
-        startPoll(tx)
+        // setStep("waiting")
+        clearInterval(timer.current)
+
+        timer.current = setInterval(
+          () =>
+            fetch(`/api/credits/status?tx=${tx}`)
+              .then((res) => res.json())
+              .then((res) => {
+                if (res.status === "confirmed") {
+                  clearInterval(timer.current)
+                  setStep("complete")
+                  onComplete()
+                } else if (res.status === "failed") {
+                  clearInterval(timer.current)
+                  setStep("failed")
+                }
+              }),
+          3000,
+        )
 
         timeout.current = setTimeout(() => {
           setStep("failed")
-          stopPoll()
+          clearInterval(timer.current)
         }, 12 * 60000)
       })
     },
-    [mutateAsync, startPoll, stopPoll],
+    [onComplete, mutateAsync],
   )
 
   useEffect(() => {
-    return () => clearTimeout(timeout.current)
+    return () => {
+      clearInterval(timer.current)
+      clearTimeout(timeout.current)
+    }
   }, [])
 
   return (
@@ -181,6 +191,7 @@ export const CreditPaymentModal: React.FC<CreditPaymentModalProps> = ({
                     className="inline-flex items-center"
                     onClick={(e) => {
                       e.preventDefault()
+                      setTransactionInitiated(true)
                       setStep("waiting")
                       window.open(
                         transactionUrl,
