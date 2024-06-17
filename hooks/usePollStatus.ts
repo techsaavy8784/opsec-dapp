@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react"
+import { useCallback, useEffect, useRef } from "react"
 
 type PollStatusArgs = {
   cb: (...arg: any[]) => Promise<any>
@@ -18,7 +18,11 @@ const usePollStatus = ({
     return () => clearInterval(timerRef.current)
   }, [])
 
-  const startPoll = (...arg: any[]) => {
+  const stopPoll = useCallback(() => {
+    clearInterval(timerRef.current)
+  }, [])
+
+  const startPoll = useCallback((...arg: any[]) => {
     timerRef.current = setInterval(() => {
       cb(...arg).then((res) => {
         if (stopWhen(res)) {
@@ -27,11 +31,7 @@ const usePollStatus = ({
         }
       })
     }, interval)
-  }
-
-  const stopPoll = () => {
-    clearInterval(timerRef.current)
-  }
+  }, [cb, interval, onStop, stopPoll, stopWhen])
 
   return {
     startPoll,
