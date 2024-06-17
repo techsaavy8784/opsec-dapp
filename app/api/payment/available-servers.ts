@@ -8,6 +8,7 @@ const availableServers = async (blockchainId: number) => {
       id: blockchainId,
     },
   })
+
   const whereCondition: any = {
     active: true,
     type:
@@ -34,6 +35,7 @@ const availableServers = async (blockchainId: number) => {
       none: {},
     }
   }
+
   const serverIds = await prisma.server.findMany({
     where: whereCondition,
     include: {
