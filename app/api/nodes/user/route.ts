@@ -15,18 +15,16 @@ export async function GET() {
       server: {
         active: true,
       },
-      AND: {
-        OR: [
-          { userId: session.user.id },
-          {
-            payments: {
-              some: {
-                userId: session.user.id,
-              },
+      OR: [
+        { userId: session.user.id },
+        {
+          payments: {
+            some: {
+              userId: session.user.id,
             },
           },
-        ],
-      },
+        },
+      ],
     },
     include: {
       payments: true,
