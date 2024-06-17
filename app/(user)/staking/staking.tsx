@@ -176,7 +176,19 @@ const Staking: React.FC = () => {
           onValueChange={([value]) => setAmount(value)}
         />
       ) : (
-        <p className="text-yellow-500">Not enough balance to stake</p>
+        <p className="text-yellow-500 mt-8">
+          Not enough $OPSEC in your wallet.
+          <br />
+          Buy $OPSEC{" "}
+          <a
+            href="https://app.uniswap.org/swap?outputCurrency=0x6a7eff1e2c355ad6eb91bebb5ded49257f3fed98"
+            className="hover:underline"
+            target="_blank"
+          >
+            here
+          </a>{" "}
+          and start staking now.
+        </p>
       )}
 
       <Button
