@@ -24,7 +24,10 @@ export async function GET(
     include: { payments: true, blockchain: true, server: true },
   })
 
-  if (!node.payments.some((item) => item.userId === userId)) {
+  if (
+    !node.payments.some((item) => item.userId === userId) &&
+    node.userId !== userId
+  ) {
     return NextResponse.json({ message: "Unauthorized" }, { status: 401 })
   }
 
